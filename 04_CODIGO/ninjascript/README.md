@@ -98,3 +98,55 @@ Mapeamento direto:
 ## APIs NinjaScript usadas
 
 A whitelist consumida por Hermes durante a fase `AVALIACAO_TECNICA` está em `.kiro/steering/ninjascript-api.md`. Qualquer API fora dessa lista provoca veto técnico.
+
+## Estratégias incluídas
+
+### ORB — Opening Range Breakout (Spec 4)
+
+Primeira estratégia plugável real do CAOS. Implementa Opening Range Breakout: define o "opening range" como a faixa formada pelos primeiros N minutos após a abertura da sessão regular (RTH) e gera 1 entrada por sessão quando o preço rompe o range.
+
+| Arquivo | O que faz |
+|---|---|
+| `EstrategiaORBLogica.cs` | Função pura `DecidirAcao` (porta direta de `caos/walk_forward/estrategias/orb_logica.py`) |
+| `StrategyORB.cs` | Subclasse de `Strategy_CAOS` que delega a regra de decisão para `EstrategiaORBLogica` e despacha via `EntrarLong`/`EntrarShort`/`SairLong`/`SairShort` da base |
+
+Parâmetros configuráveis no painel de Strategies do NT8 (todos `[NinjaScriptProperty]` com `[Range]`):
+
+- `MinutosOR` (5–60, default 30)
+- `RiscoMultiplicador` (0.5–2.0, default 1.0)
+- `AlvoMultiplicador` (0.5–5.0, default 2.0)
+- `CooldownMinutos` (0–120, default 15)
+- `SessaoInicioUtc` / `SessaoFimUtc` / `HoraCorteEntradasUtc` (HH:mm UTC, defaults `13:30` / `20:00` / `19:00`)
+- `RangeMinimoPontos` (default 0.5 — abaixo disso a sessão é pulada)
+
+#### Como habilitar no NT8
+
+```cmd
+:: 1. Garantir que TODOS os 7 .cs do núcleo + ORB estão na pasta de Strategies.
+copy 04_CODIGO\ninjascript\*.cs "%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\"
+
+:: 2. F5 no NinjaScript Editor.
+
+:: 3. No NT8: Strategies → Add Strategy → "StrategyORB".
+::    Configurar conta = Sim101 e instrumento = MNQ 03-26 (ou contrato vigente).
+::    Ajustar parâmetros se necessário; defaults rodam direto.
+```
+
+#### Como rodar via Walk-Forward (Python)
+
+```cmd
+cd CAOS_Orchestrator
+caos walk-forward run ^
+  --estrategia caos.walk_forward.estrategias.orb:EstrategiaORB ^
+  --identificador 2026-04-15-01 ^
+  --root e:\CAOS
+```
+
+#### Validação automatizada
+
+```cmd
+pytest tests/unit/test_orb.py -v                        :: 30 unit tests da regra pura
+pytest tests/unit/test_orb_walk_forward_integrado.py -v :: integração com WalkForwardEngine
+pytest tests/property/test_orb_python_csharp_paridade.py -v   :: Property 19 — paridade Py↔C#
+pytest tests/property/test_orb_determinismo.py -v             :: Property 20 — determinismo end-to-end
+```

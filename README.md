@@ -13,12 +13,13 @@ e:\CAOS\
 │   ├── steering/              # 8 regras de governança (idioma, plataforma, MNQ, ...)
 │   └── specs/
 │       ├── caos-conselho-infra/        # Spec 1 — IMPLEMENTADO
-│       ├── caos-walk-forward/          # Spec 2 — Pipeline Python (specs prontos)
-│       └── caos-ninjascript-nucleo/    # Spec 3 — Núcleo C# (specs prontos)
-├── CAOS_Orchestrator/         # Spec 1 — orquestrador Python (540 testes verdes)
+│       ├── caos-walk-forward/          # Spec 2 — IMPLEMENTADO
+│       ├── caos-ninjascript-nucleo/    # Spec 3 — IMPLEMENTADO
+│       └── caos-orb/                   # Spec 4 — IMPLEMENTADO (ORB)
+├── CAOS_Orchestrator/         # Specs 1, 2 e 4 — orquestrador Python (832 testes verdes)
 ├── CAOS_Council/              # Logs de Debate e Decisões do Conselho
 ├── CAOS_Zettelkasten/         # Notas de conhecimento interligadas
-├── 04_CODIGO/ninjascript/     # Spec 3 — código C# (a implementar)
+├── 04_CODIGO/ninjascript/     # Specs 3 e 4 — código C# (compila no NT8 via F5)
 ├── 05_BACKTEST/               # Spec 2 — saídas de Walk-Forward
 └── dados/MNQ/                 # CSVs históricos do MNQ + manifesto.json
 ```
@@ -27,9 +28,10 @@ e:\CAOS\
 
 | Spec | Status | O que entrega |
 |---|---|---|
-| **Spec 1** — Infraestrutura do Conselho | ✅ **Implementado** (770 testes verdes, 12 properties via Hypothesis) | Orquestrador Python, 9 agentes, 8 skills, Council_Recorder, state machine completa, CLI com 7 subcomandos |
-| **Spec 2** — Pipeline de Walk-Forward | ✅ **Implementado** (130 testes unit + 3 properties novas) | Motor Python que valida estratégias contra os 12 meses de MNQ via Walk-Forward, com agregação por mediana, detecção de look-ahead e relatório auditável |
-| **Spec 3** — Núcleo NinjaScript C# | ✅ **Implementado** (788 testes totais, 18 properties via Hypothesis) | Strategy_CAOS base, Cerberus em tempo real, Trailing 3 fases, MFE/MAE tracker, Logger estruturado — compilação direta via NinjaScript Editor (F5) |
+| **Spec 1** — Infraestrutura do Conselho | ✅ **Implementado** | Orquestrador Python, 9 agentes, 8 skills, Council_Recorder, state machine completa, CLI com 7 subcomandos |
+| **Spec 2** — Pipeline de Walk-Forward | ✅ **Implementado** | Motor Python que valida estratégias contra os 12 meses de MNQ via Walk-Forward, com agregação por mediana, detecção de look-ahead e relatório auditável |
+| **Spec 3** — Núcleo NinjaScript C# | ✅ **Implementado** | Strategy_CAOS base, Cerberus em tempo real, Trailing 3 fases, MFE/MAE tracker, Logger estruturado — compilação direta via NinjaScript Editor (F5) |
+| **Spec 4** — Estratégia ORB | ✅ **Implementado** (832 testes verdes, 20 properties) | Opening Range Breakout em Python (plugin do Walk-Forward) + C# (subclasse de Strategy_CAOS no NT8); paridade Python↔C# certificada via Property 19 |
 
 ## Pré-requisitos antes de operar
 
@@ -55,16 +57,16 @@ Isso valida que os 9 perfis dos agentes carregam corretamente e a árvore de pas
 
 1. **Recolocar os dados MNQ** em `dados\MNQ\` (1m e/ou tick).
 2. Rodar `caos manifesto build --root e:\CAOS` para gerar `dados\MNQ\manifesto.json` com SHA-256 de cada arquivo.
-3. Rodar Walk-Forward fim-a-fim contra os dados restaurados:
+3. Rodar Walk-Forward fim-a-fim com a ORB sobre os dados restaurados:
    ```cmd
    caos walk-forward run ^
-     --estrategia caos.walk_forward.estrategias.exemplos:EstrategiaExemplo ^
+     --estrategia caos.walk_forward.estrategias.orb:EstrategiaORB ^
      --identificador 2026-01-15-01 ^
      --root e:\CAOS
    caos walk-forward status --root e:\CAOS
    ```
-4. **Instalar o núcleo C# no NT8** (Spec 3): copiar os 5 `.cs` de `04_CODIGO\ninjascript\` para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\` e compilar via F5 no NinjaScript Editor. Detalhes em `04_CODIGO\ninjascript\README.md`.
-5. Abrir Specs 4+ para cada estratégia plugável (Odin/Mister M/Manolo/Rodrigo) — cada uma vira (a) um módulo Python em `caos/walk_forward/estrategias/` para Walk-Forward e (b) uma classe C# herdando de `Strategy_CAOS` para operação real no NT8.
+4. **Habilitar a ORB no NT8**: copiar os 7 `.cs` de `04_CODIGO\ninjascript\` para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\` e dar F5 no NinjaScript Editor. Adicionar `StrategyORB` em chart MNQ + conta `Sim101`.
+5. Abrir Specs 5+ para cada estratégia plugável adicional (Odin/Mister M/Manolo/Rodrigo) — cada uma vira (a) um módulo Python em `caos/walk_forward/estrategias/` para Walk-Forward e (b) uma classe C# herdando de `Strategy_CAOS` para operação real no NT8.
 
 ## CLI rápida (Spec 1 + Spec 2)
 
