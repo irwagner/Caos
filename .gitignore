@@ -1,0 +1,73 @@
+# Projeto CAOS — .gitignore
+# Cobre artefatos Python, Hypothesis, pytest, instalações editáveis
+# e estado runtime do orquestrador (cache + budget) que NÃO deve ser
+# versionado.
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuição / instalação editável
+*.egg-info/
+*.egg
+build/
+dist/
+.installed.cfg
+
+# ---------- Pytest / Hypothesis ----------
+.pytest_cache/
+.hypothesis/
+
+# ---------- Cobertura ----------
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# ---------- VS Code / IDEs ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---------- OS ----------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# ---------- Estado runtime do CAOS_Orchestrator ----------
+# R16 — cache de respostas LLM (gerado a cada Debate)
+CAOS_Orchestrator/.cache/
+# R17 — orçamento diário de tokens (gerado a cada invocação)
+CAOS_Orchestrator/.budget/
+
+# ---------- Hydra (cópia somente-leitura, R13) ----------
+# A cópia do Hydra é regenerada por `caos hydra sync`; não versionamos
+# o conteúdo do clone porque é deliberadamente reproduzível.
+04_CODIGO/ninjascript/reference_hydra/
+
+# ---------- NinjaScript (Spec 3) ----------
+# Artefatos de build do MSBuild não vão para o repo.
+04_CODIGO/ninjascript/**/bin/
+04_CODIGO/ninjascript/**/obj/
+04_CODIGO/ninjascript/**/*.user
+
+# ---------- Backtest e dados ----------
+# Arquivos brutos do MNQ ficam em dados/MNQ/ mas são grandes;
+# mantemos o manifesto.json versionado e o conteúdo bruto fora do Git.
+# Comente esta seção se quiser commitar os dados crus.
+dados/MNQ/**/*.csv
+dados/MNQ/**/*.txt
+dados/MNQ/**/*.parquet
+
+# Logs de execução do robô
+05_BACKTEST/**/*.log
+05_BACKTEST/**/*.csv
+
+# ---------- Temporários ----------
+*.tmp
+*.bak
+*~

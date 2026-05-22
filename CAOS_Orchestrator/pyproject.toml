@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "caos-orchestrator"
+version = "0.1.0"
+description = "Orquestrador Python do Conselho Multi-Agente do projeto CAOS."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Projeto CAOS" },
+]
+license = { text = "Proprietary" }
+keywords = ["caos", "trading", "ninjatrader", "council", "multi-agent", "llm"]
+
+# Dependencias mínimas para o orquestrador rodar.
+# Observação: tudo aqui é necessário para Tasks futuras (modelos Pydantic,
+# leitura de frontmatter, integração com Git, parsing YAML, etc.).
+dependencies = [
+    "pytest>=8",
+    "hypothesis>=6",
+    "pyyaml>=6",
+    "gitpython>=3.1",
+    "python-frontmatter>=1.1",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest-cov>=5",
+]
+
+[project.scripts]
+# Entry point oficial: `caos init`, `caos debate`, etc. são despachados em caos.main:cli.
+caos = "caos.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["caos*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+# Cobre as duas suítes (unit + property) num único `pytest` (Task 18).
+# `tests/property/conftest.py` registra os profiles Hypothesis `default`
+# e `gate`; o profile ativo é selecionado via env var
+# ``HYPOTHESIS_PROFILE`` (default = "default"; "gate" eleva
+# ``max_examples`` para 100 nos testes que herdam do profile).
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+markers = [
+    "property: testes property-based via Hypothesis (Properties 1-12)",
+]
