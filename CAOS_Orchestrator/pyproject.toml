@@ -24,6 +24,7 @@ dependencies = [
     "gitpython>=3.1",
     "python-frontmatter>=1.1",
     "pydantic>=2.7",
+    "pandas>=2.0",
 ]
 
 [project.optional-dependencies]

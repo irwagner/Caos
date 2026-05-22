@@ -1,7 +1,7 @@
 """
 CLI do CAOS_Orchestrator.
 
-Esta versão expõe (Task 17 / Spec 1):
+Esta versão expõe (Task 17 / Spec 1 + Task 8 / Spec 2):
 
 * ``caos init`` (R1) — bootstrap idempotente do workspace.
 * ``caos manifesto build|verify`` (R15) — gerência de
@@ -16,6 +16,9 @@ Esta versão expõe (Task 17 / Spec 1):
   ``.kiro/agents/``.
 * ``caos cache stats`` (R16) — sumariza ``CAOS_Orchestrator/.cache/``.
 * ``caos budget status`` (R17) — mostra consumo diário de tokens.
+* ``caos walk-forward run|status`` (R9 do Spec 2) — orquestra o
+  pipeline Walk-Forward sobre ``dados/MNQ/`` e lista relatórios
+  gerados em ``05_BACKTEST/walk_forward/relatorios/``.
 
 Idioma da saída: pt-BR. Plataforma alvo: Windows + cmd (R3.2, R3.3).
 """
@@ -23,11 +26,14 @@ Idioma da saída: pt-BR. Plataforma alvo: Windows + cmd (R3.2, R3.3).
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
+
+import yaml
 
 from caos import init_workspace
 from caos.data_manifest import DataManifestManager
@@ -57,6 +63,12 @@ _DIR_CACHE_RELATIVO = Path("CAOS_Orchestrator/.cache")
 #: Caminho relativo do diretório de orçamento de tokens (R17.5).
 _DIR_BUDGET_RELATIVO = Path("CAOS_Orchestrator/.budget")
 
+#: Caminho relativo da raiz do Walk-Forward (Spec 2 — R1.1).
+_DIR_WALK_FORWARD_RELATIVO = Path("05_BACKTEST/walk_forward")
+
+#: Caminho relativo do subdiretório de relatórios do Walk-Forward.
+_DIR_RELATORIOS_WF_RELATIVO = _DIR_WALK_FORWARD_RELATIVO / "relatorios"
+
 
 # ---------------------------------------------------------------------------
 # Construção do parser
@@ -69,7 +81,8 @@ def _construir_parser() -> argparse.ArgumentParser:
         prog="caos",
         description=(
             "Orquestrador do Conselho Multi-Agente CAOS. Subcomandos: "
-            "init, manifesto, hydra, debate, perfil, cache, budget."
+            "init, manifesto, hydra, debate, perfil, cache, budget, "
+            "walk-forward."
         ),
     )
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -311,6 +324,101 @@ def _construir_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="dia no formato AAAA-MM-DD (default: hoje UTC).",
+    )
+
+    # ---- caos walk-forward run|status ----
+    wf_parser = sub.add_parser(
+        "walk-forward",
+        help="executa e inspeciona o pipeline de Walk-Forward (Spec 2)",
+        description=(
+            "Comandos do pipeline de Walk-Forward sobre dados do MNQ. "
+            "Subcomandos: run (executa um Walk-Forward fim-a-fim) e "
+            "status (lista relatórios já gerados em "
+            "05_BACKTEST/walk_forward/relatorios/)."
+        ),
+    )
+    wf_sub = wf_parser.add_subparsers(
+        dest="walk_forward_comando", required=True
+    )
+
+    wf_run_parser = wf_sub.add_parser(
+        "run",
+        help="executa um Walk-Forward fim-a-fim",
+        description=(
+            "Carrega a estratégia indicada por --estrategia (formato "
+            "'pacote.modulo:Classe'), aplica a configuração de --config "
+            "(YAML) ou os defaults documentados, executa o "
+            "WalkForwardEngine sobre dados/MNQ/ e grava o relatório em "
+            "05_BACKTEST/walk_forward/relatorios/<identificador>/."
+        ),
+    )
+    wf_run_parser.add_argument(
+        "--estrategia",
+        type=str,
+        required=True,
+        help=(
+            "import path da Estrategia no formato "
+            "'pacote.modulo:Classe' (ex.: "
+            "caos.walk_forward.estrategias.exemplos:EstrategiaExemplo)."
+        ),
+    )
+    wf_run_parser.add_argument(
+        "--identificador",
+        type=str,
+        required=True,
+        help="identificador da execução no formato AAAA-MM-DD-NN.",
+    )
+    wf_run_parser.add_argument(
+        "--config",
+        type=Path,
+        default=None,
+        help=(
+            "path para arquivo YAML com ConfiguracaoWalkForward; se "
+            "omitido, usa defaults: treino=60, teste=10, granularidade=1m, "
+            "instrumento=MNQ, seed=42."
+        ),
+    )
+    wf_run_parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="raiz do workspace; default = cwd.",
+    )
+    wf_run_parser.add_argument(
+        "--commit",
+        action="store_true",
+        help=(
+            "após gravar o relatório, sintetiza Debate + DecisaoDoConselho "
+            "e invoca CouncilRecorder.gravar (commit dedicado em Git)."
+        ),
+    )
+
+    wf_status_parser = wf_sub.add_parser(
+        "status",
+        help="lista relatórios de Walk-Forward já gerados",
+        description=(
+            "Varre 05_BACKTEST/walk_forward/relatorios/ procurando "
+            "diretórios <identificador>/resultado.json e imprime, por "
+            "linha, o identificador, o status, a estratégia e o "
+            "manifesto_hash. Sem --id, ordena por identificador "
+            "decrescente e mostra os 10 mais recentes."
+        ),
+    )
+    wf_status_parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="raiz do workspace; default = cwd.",
+    )
+    wf_status_parser.add_argument(
+        "--id",
+        type=str,
+        default=None,
+        dest="identificador",
+        help=(
+            "se fornecido, mostra apenas o relatório com este "
+            "identificador (formato AAAA-MM-DD-NN)."
+        ),
     )
 
     return parser
@@ -687,6 +795,317 @@ def _comando_budget(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Despachador: walk-forward run|status (Spec 2 — R9)
+# ---------------------------------------------------------------------------
+
+
+def _resolver_estrategia(import_path: str) -> Any:
+    """Importa e instancia a Estrategia indicada por ``pacote.modulo:Classe``.
+
+    Retorna a instância pronta para ser passada ao
+    :class:`WalkForwardEngine`. Levanta :class:`ValueError` com mensagem
+    pt-BR em qualquer falha de import, atributo ou instanciação.
+    """
+    if ":" not in import_path:
+        raise ValueError(
+            "--estrategia deve estar no formato 'pacote.modulo:Classe'; "
+            f"recebido {import_path!r}"
+        )
+    modulo_path, _, classe_nome = import_path.partition(":")
+    modulo_path = modulo_path.strip()
+    classe_nome = classe_nome.strip()
+    if not modulo_path or not classe_nome:
+        raise ValueError(
+            "--estrategia deve estar no formato 'pacote.modulo:Classe'; "
+            f"recebido {import_path!r}"
+        )
+    try:
+        modulo = importlib.import_module(modulo_path)
+    except ImportError as exc:
+        raise ValueError(
+            f"módulo da estratégia não encontrado: {modulo_path!r} ({exc})"
+        ) from exc
+    try:
+        classe = getattr(modulo, classe_nome)
+    except AttributeError as exc:
+        raise ValueError(
+            f"classe {classe_nome!r} não encontrada em {modulo_path!r} "
+            f"({exc})"
+        ) from exc
+    try:
+        return classe()
+    except Exception as exc:
+        raise ValueError(
+            f"falha ao instanciar {import_path!r}: "
+            f"{type(exc).__name__}: {exc}"
+        ) from exc
+
+
+def _carregar_configuracao_walk_forward(caminho_config: Optional[Path]):
+    """Carrega :class:`ConfiguracaoWalkForward` do YAML ou aplica defaults.
+
+    Quando ``caminho_config`` é ``None``, devolve uma configuração default
+    válida (treino=60, teste=10, granularidade=1m, seed=42, instrumento=MNQ).
+    """
+    # Importação tardia para evitar custo de carga quando a CLI não usa WF.
+    from caos.walk_forward import ConfiguracaoWalkForward
+
+    if caminho_config is None:
+        return ConfiguracaoWalkForward(
+            tamanho_treino_dias_uteis=60,
+            tamanho_teste_dias_uteis=10,
+            granularidade="1m",
+            seed=42,
+        )
+
+    caminho = Path(caminho_config).expanduser().resolve()
+    if not caminho.is_file():
+        raise ValueError(
+            f"--config aponta para arquivo inexistente: {caminho}"
+        )
+    try:
+        bruto = caminho.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ValueError(
+            f"falha ao ler --config {caminho}: {exc}"
+        ) from exc
+    try:
+        payload = yaml.safe_load(bruto)
+    except yaml.YAMLError as exc:
+        raise ValueError(
+            f"YAML inválido em --config {caminho}: {exc}"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise ValueError(
+            "--config deve ser um mapeamento YAML no topo; "
+            f"recebido {type(payload).__name__}"
+        )
+    return ConfiguracaoWalkForward(**payload)
+
+
+def _comando_walk_forward_run(args: argparse.Namespace) -> int:
+    """Executa ``caos walk-forward run`` e devolve o exit code."""
+    # Importações tardias evitam encarecer outros subcomandos.
+    from caos.walk_forward import RelatorioWriter, WalkForwardEngine
+
+    raiz = _resolver_raiz(args)
+    raiz_dados = raiz / _RAIZ_DADOS_MNQ_RELATIVO
+    if not raiz_dados.is_dir():
+        print(
+            f"ERRO: diretório de dados ausente em {raiz_dados}.\n"
+            "Execute 'caos init' e 'caos manifesto build' antes de "
+            "'caos walk-forward run'.",
+            file=sys.stderr,
+        )
+        return 1
+
+    raiz_relatorios = raiz / _DIR_RELATORIOS_WF_RELATIVO
+    raiz_relatorios.mkdir(parents=True, exist_ok=True)
+
+    try:
+        estrategia = _resolver_estrategia(args.estrategia)
+    except ValueError as exc:
+        print(f"ERRO: {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        configuracao = _carregar_configuracao_walk_forward(args.config)
+    except ValueError as exc:
+        print(f"ERRO: {exc}", file=sys.stderr)
+        return 1
+
+    recorder = None
+    if args.commit:
+        # Importação tardia também — evita custo do GitPython quando
+        # o commit não foi solicitado.
+        from caos.council_recorder import CouncilRecorder
+
+        try:
+            recorder = CouncilRecorder(raiz_workspace=raiz)
+        except (ValueError, OSError) as exc:
+            print(
+                "ERRO: não foi possível inicializar o CouncilRecorder em "
+                f"{raiz}: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+    engine = WalkForwardEngine(raiz_dados=raiz_dados)
+    try:
+        resultado = engine.executar(
+            estrategia=estrategia,
+            configuracao=configuracao,
+            fonte_dados=raiz_dados,
+            identificador=args.identificador,
+        )
+    except ValueError as exc:
+        # ConfiguracaoWalkForward inválida ou histórico insuficiente
+        # (R3.2) chegam aqui — ambas são erros de uso, exit 1.
+        print(f"ERRO: {exc}", file=sys.stderr)
+        return 1
+
+    writer = RelatorioWriter(recorder=recorder)
+    try:
+        diretorio = writer.escrever(
+            resultado=resultado,
+            raiz_saida=raiz_relatorios,
+            commit_council=args.commit,
+        )
+    except (ValueError, OSError) as exc:
+        print(
+            f"ERRO: falha ao gravar relatório em {raiz_relatorios}: {exc}",
+            file=sys.stderr,
+        )
+        return 1
+
+    print("Walk-Forward concluído.")
+    print(f"  identificador:   {resultado.identificador}")
+    print(f"  estrategia:      {resultado.estrategia}")
+    print(f"  status:          {resultado.status}")
+    print(f"  janelas:         {len(resultado.janelas)}")
+    print(f"  manifesto_hash:  {resultado.manifesto_hash}")
+    print(f"  relatorio:       {diretorio}")
+    if args.commit:
+        print("  commit_council:  sim (Debate + Decisao gravados)")
+
+    if resultado.status == "concluido":
+        return 0
+    # Status terminal não-feliz é registrado como saída != 0 para
+    # facilitar integração com automações e CI.
+    return 1
+
+
+def _resolver_raiz_relatorios_wf(args: argparse.Namespace) -> Path:
+    return _resolver_raiz(args) / _DIR_RELATORIOS_WF_RELATIVO
+
+
+def _coletar_relatorios(raiz_relatorios: Path) -> list[dict[str, Any]]:
+    """Lista os relatórios encontrados em ``raiz_relatorios``.
+
+    Cada entrada é um dicionário com campos mínimos extraídos do
+    ``resultado.json`` (identificador, status, estrategia, manifesto_hash,
+    num_janelas) ou um marcador de leitura inválida quando o JSON está
+    corrompido. Diretórios sem ``resultado.json`` são silenciosamente
+    ignorados (não é um relatório).
+    """
+    if not raiz_relatorios.is_dir():
+        return []
+
+    relatorios: list[dict[str, Any]] = []
+    for entrada in sorted(raiz_relatorios.iterdir(), key=lambda p: p.name):
+        if not entrada.is_dir():
+            continue
+        arquivo_json = entrada / "resultado.json"
+        if not arquivo_json.is_file():
+            continue
+        try:
+            payload = json.loads(arquivo_json.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            relatorios.append(
+                {
+                    "identificador": entrada.name,
+                    "status": "ilegivel",
+                    "estrategia": "?",
+                    "manifesto_hash": "?",
+                    "num_janelas": 0,
+                    "caminho": entrada,
+                    "erro": f"{type(exc).__name__}: {exc}",
+                }
+            )
+            continue
+        if not isinstance(payload, dict):
+            relatorios.append(
+                {
+                    "identificador": entrada.name,
+                    "status": "ilegivel",
+                    "estrategia": "?",
+                    "manifesto_hash": "?",
+                    "num_janelas": 0,
+                    "caminho": entrada,
+                    "erro": "payload JSON não é um objeto",
+                }
+            )
+            continue
+        relatorios.append(
+            {
+                "identificador": str(payload.get("identificador", entrada.name)),
+                "status": str(payload.get("status", "?")),
+                "estrategia": str(payload.get("estrategia", "?")),
+                "manifesto_hash": str(payload.get("manifesto_hash", "?")),
+                "num_janelas": len(payload.get("janelas") or []),
+                "caminho": entrada,
+            }
+        )
+    return relatorios
+
+
+def _formatar_relatorios(
+    relatorios: list[dict[str, Any]],
+) -> str:
+    """Formata a lista de relatórios em texto humano (pt-BR)."""
+    linhas: list[str] = []
+    for item in relatorios:
+        linhas.append(
+            f"  - {item['identificador']}  status={item['status']:<22}  "
+            f"estrategia={item['estrategia']}  "
+            f"janelas={item['num_janelas']}"
+        )
+        linhas.append(f"      manifesto={item['manifesto_hash']}")
+        linhas.append(f"      caminho={item['caminho']}")
+        if item.get("erro"):
+            linhas.append(f"      ERRO: {item['erro']}")
+    return "\n".join(linhas)
+
+
+def _comando_walk_forward_status(args: argparse.Namespace) -> int:
+    """Executa ``caos walk-forward status`` e devolve o exit code."""
+    raiz_relatorios = _resolver_raiz_relatorios_wf(args)
+    print(f"Relatórios de Walk-Forward em: {raiz_relatorios}")
+
+    relatorios = _coletar_relatorios(raiz_relatorios)
+
+    if args.identificador is not None:
+        alvo = args.identificador.strip()
+        filtrados = [
+            r for r in relatorios if r["identificador"] == alvo
+        ]
+        if not filtrados:
+            print(
+                f"  nenhum relatório encontrado para --id {alvo!r}.",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"  relatório {alvo}:")
+        print(_formatar_relatorios(filtrados))
+        return 0
+
+    if not relatorios:
+        print("  nenhum relatório encontrado.")
+        return 0
+
+    # Ordena por identificador decrescente (ordem alfabética estável de
+    # AAAA-MM-DD-NN funciona como cronológica).
+    relatorios.sort(key=lambda r: r["identificador"], reverse=True)
+    relatorios_topo = relatorios[:10]
+    print(f"  {len(relatorios_topo)} de {len(relatorios)} relatório(s):")
+    print(_formatar_relatorios(relatorios_topo))
+    return 0
+
+
+def _comando_walk_forward(args: argparse.Namespace) -> int:
+    if args.walk_forward_comando == "run":
+        return _comando_walk_forward_run(args)
+    if args.walk_forward_comando == "status":
+        return _comando_walk_forward_status(args)
+    print(
+        "subcomando walk-forward desconhecido: "
+        f"{args.walk_forward_comando!r}",
+        file=sys.stderr,
+    )
+    return 2  # pragma: no cover
+
+
+# ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
 
@@ -709,6 +1128,8 @@ def cli(argv: Sequence[str] | None = None) -> int:
         return _comando_cache(args)
     if args.comando == "budget":
         return _comando_budget(args)
+    if args.comando == "walk-forward":
+        return _comando_walk_forward(args)
     parser.error(f"subcomando desconhecido: {args.comando!r}")
     return 2  # pragma: no cover
 

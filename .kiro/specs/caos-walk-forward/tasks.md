@@ -50,39 +50,39 @@ graph TD
 
 ## Tasks
 
-- [ ] 1. Modelos Pydantic do Walk-Forward (`caos/walk_forward/models.py`)
+- [x] 1. Modelos Pydantic do Walk-Forward (`caos/walk_forward/models.py`)
   - Implementar `ConfiguracaoWalkForward`, `JanelaWF`, `ResultadoJanela`, `ResultadoWalkForward` com validators.
   - Testes unitários cobrindo limites (Treino ≥ Teste, ranges).
   - **Cobre**: R2, R6.
 
-- [ ] 2. Skill_Data_Reader e schema CSV (`caos/walk_forward/data_reader.py`)
+- [x] 2. Skill_Data_Reader e schema CSV (`caos/walk_forward/data_reader.py`)
   - Carrega CSVs ordenados cronologicamente; valida schema (`timestamp,open,high,low,close,volume`).
   - Invoca `Skill_Data_Integrity` (Spec 1) antes da primeira leitura.
   - Testes unitários com CSVs sintéticos em `tmp_path`.
   - **Cobre**: R4.
 
-- [ ] 3. JanelaGenerator (`caos/walk_forward/janelas.py`)
+- [x] 3. JanelaGenerator (`caos/walk_forward/janelas.py`)
   - Produz lista determinística de `JanelaWF` dado um intervalo de barras + `ConfiguracaoWalkForward`.
   - Testes unitários para casos: 0 janelas (dados insuficientes), 1 janela, N janelas, passo customizado.
   - **Cobre**: R3.
 
-- [ ] 4. BacktestRunner + LookAhead detection (`caos/walk_forward/runner.py`)
+- [x] 4. BacktestRunner + LookAhead detection (`caos/walk_forward/runner.py`)
   - Executa uma janela; envolve barras do Teste em `BarrasTesteIterator` que detecta look-ahead.
   - Testes unitários: estratégia válida, estratégia que tenta look-ahead (esperado `LookAheadException`).
   - **Cobre**: R5.
 
-- [ ] 5. MetricasCalculator (`caos/walk_forward/metricas.py`)
+- [x] 5. MetricasCalculator (`caos/walk_forward/metricas.py`)
   - Sharpe anualizado, Calmar, drawdown máx (%, dias), win_rate, payoff médio, MFE/MAE médios, número de trades, PnL total.
   - Testes com séries sintéticas: 0 trades, 1 trade, sequências de losses, sequências de wins.
   - **Cobre**: R6.
 
-- [ ] 6. WalkForwardEngine (`caos/walk_forward/engine.py`)
+- [x] 6. WalkForwardEngine (`caos/walk_forward/engine.py`)
   - Orquestra: integridade → geração de janelas → execução por janela → agregação.
   - Aborta se >30% das janelas falharem.
   - Testes unitários ponta-a-ponta com fixture sintético.
   - **Cobre**: R7, R10.
 
-- [ ] 7. RelatorioWriter + integração com Council (`caos/walk_forward/relatorio.py`)
+- [x] 7. RelatorioWriter + integração com Council (`caos/walk_forward/relatorio.py`)
   - Serializa `ResultadoWalkForward` em JSON canônico + Markdown.
   - Frontmatter compatível com `NotaZettel` (área `Decisoes_do_Conselho`).
   - Opcional: chama `CouncilRecorder.gravar` quando flag `--commit` for usada na CLI.
@@ -93,7 +93,7 @@ graph TD
   - Testes via subprocess (mesmo padrão do Task 17 do Spec 1).
   - **Cobre**: R9.
 
-- [ ] 9. Suite PBT: Properties 13, 14, 15
+- [x] 9. Suite PBT: Properties 13, 14, 15
   - `tests/property/test_walk_forward_no_lookahead.py` — Property 13.
   - `tests/property/test_walk_forward_determinismo.py` — Property 14.
   - `tests/property/test_walk_forward_janelas.py` — Property 15.
