@@ -29,7 +29,7 @@ e:\CAOS\
 |---|---|---|
 | **Spec 1** — Infraestrutura do Conselho | ✅ **Implementado** (770 testes verdes, 12 properties via Hypothesis) | Orquestrador Python, 9 agentes, 8 skills, Council_Recorder, state machine completa, CLI com 7 subcomandos |
 | **Spec 2** — Pipeline de Walk-Forward | ✅ **Implementado** (130 testes unit + 3 properties novas) | Motor Python que valida estratégias contra os 12 meses de MNQ via Walk-Forward, com agregação por mediana, detecção de look-ahead e relatório auditável |
-| **Spec 3** — Núcleo NinjaScript C# | 📋 Specs prontos | Strategy base C#, Cerberus em tempo real, Trailing 3 fases, MFE/MAE tracker |
+| **Spec 3** — Núcleo NinjaScript C# | ✅ **Implementado** (788 testes totais, 18 properties via Hypothesis) | Strategy_CAOS base, Cerberus em tempo real, Trailing 3 fases, MFE/MAE tracker, Logger estruturado — compilação direta via NinjaScript Editor (F5) |
 
 ## Pré-requisitos antes de operar
 
@@ -63,8 +63,8 @@ Isso valida que os 9 perfis dos agentes carregam corretamente e a árvore de pas
      --root e:\CAOS
    caos walk-forward status --root e:\CAOS
    ```
-4. Implementar **Spec 3** (Núcleo NinjaScript C#) — specs em `.kiro/specs/caos-ninjascript-nucleo/` (requer NinjaTrader 8 + `NT8_REFERENCES`).
-5. Após Spec 3 ter a Strategy base, abrir Specs 4+ para cada estratégia plugável (Odin/Mister M/Manolo/Rodrigo) — cada uma vira um módulo em `caos/walk_forward/estrategias/`.
+4. **Instalar o núcleo C# no NT8** (Spec 3): copiar os 5 `.cs` de `04_CODIGO\ninjascript\` para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\` e compilar via F5 no NinjaScript Editor. Detalhes em `04_CODIGO\ninjascript\README.md`.
+5. Abrir Specs 4+ para cada estratégia plugável (Odin/Mister M/Manolo/Rodrigo) — cada uma vira (a) um módulo Python em `caos/walk_forward/estrategias/` para Walk-Forward e (b) uma classe C# herdando de `Strategy_CAOS` para operação real no NT8.
 
 ## CLI rápida (Spec 1 + Spec 2)
 
