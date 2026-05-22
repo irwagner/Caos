@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -58,7 +59,7 @@ from typing import Any, Literal, Optional
 import frontmatter
 from pydantic import ValidationError
 
-from caos.models import NotaZettel
+from caos.models import NotaPaper, NotaZettel
 
 # ---------------------------------------------------------------------------
 # Constantes
@@ -80,6 +81,34 @@ _REGEX_WIKI_LINK = re.compile(r"\[\[([^\[\]]+?)\]\]")
 #: Regex que identifica menções literais a um arquivo ``.md`` em um texto.
 #: Captura apenas o ``stem`` (sem a extensão) — equivalente a um nome de Nota.
 _REGEX_ARQUIVO_MD = re.compile(r"\b([\w-]+)\.md\b")
+
+
+# ---------------------------------------------------------------------------
+# Resolução de nomes (R10.4 — case-insensitive + slug-fallback)
+# ---------------------------------------------------------------------------
+
+
+def _normalizar_para_slug(nome: str) -> str:
+    """Reduz ``nome`` ao mesmo formato slug usado por :mod:`caos.bias_filter`.
+
+    Estratégia idêntica à de :func:`caos.bias_filter._slug_simples`:
+    NFKD para remover acentos, ``lower()``, troca de não-alfanumérico por
+    ``-``, colapso de hifens consecutivos. Não trunca em 80 chars (não é
+    necessário aqui — só usamos para casar dois nomes).
+
+    Esse helper permite que um wiki-link em prosa humana
+    (``[[Property Antibias Paper]]``) seja resolvido para o stem do
+    arquivo gerado por componentes que slugificam o título antes de
+    gravar (``Papers/property-antibias-paper.md``).
+    """
+    if not nome:
+        return ""
+    texto = unicodedata.normalize("NFKD", nome)
+    texto = "".join(c for c in texto if not unicodedata.combining(c))
+    texto = texto.lower()
+    texto = re.sub(r"[^a-z0-9]+", "-", texto)
+    texto = texto.strip("-")
+    return texto
 
 
 # ---------------------------------------------------------------------------
@@ -357,8 +386,14 @@ def _carregar_e_validar(
     # ------------------------------------------------------------------
     # 2. Validação contra o schema NotaZettel
     # ------------------------------------------------------------------
+    # Notas de área "Papers" carregam campos extras exigidos pela
+    # subclasse NotaPaper (sharpe_replicado, sample_size, ...). Validar
+    # com a base NotaZettel (extra="forbid") rejeitaria todas. Por isso,
+    # escolhemos o modelo de validação a partir da ``area`` do
+    # frontmatter, caindo em NotaZettel para qualquer outra área.
+    schema = NotaPaper if metadata.get("area") == "Papers" else NotaZettel
     try:
-        nota = NotaZettel(**metadata)
+        nota = schema(**metadata)
     except ValidationError as exc:
         cat, msg = _categorizar_validation_error(exc)
         return None, NotaInvalida(
@@ -457,6 +492,12 @@ def carregar_contexto(
     # ------------------------------------------------------------------
     indice: dict[str, Path] = {}
     wiki_links_globais: dict[str, list[str]] = {}
+    # Índice secundário: slug normalizado → stem original. Permite que
+    # wiki-links em prosa humana (``[[Property Antibias Paper]]``) casem
+    # com arquivos cujo stem é o slug derivado do título
+    # (``property-antibias-paper.md``). O slug é equivalente ao gerado por
+    # :func:`caos.bias_filter._slug_simples`.
+    indice_por_slug: dict[str, str] = {}
     for caminho_md in sorted(raiz.rglob("*.md")):
         if not caminho_md.is_file():
             continue
@@ -468,10 +509,29 @@ def carregar_contexto(
             continue
         indice[stem] = caminho_md
         wiki_links_globais[stem] = _ler_wiki_links_de_arquivo(caminho_md)
+        slug = _normalizar_para_slug(stem)
+        # Mesma regra de colisão do índice principal: primeiro venceu.
+        if slug and slug not in indice_por_slug:
+            indice_por_slug[slug] = stem
 
     # ------------------------------------------------------------------
     # 3. BFS limitada a MAX_SALTOS
     # ------------------------------------------------------------------
+    def _resolver_nome(nome: str) -> Optional[str]:
+        """Resolve ``nome`` em um stem do índice, ou ``None`` se ausente.
+
+        Tenta primeiro casamento exato (ordem case-sensitive, comportamento
+        legado preservado pelos testes do Spec 1). Se falhar, normaliza
+        ``nome`` para slug e tenta o índice secundário — assim links em
+        prosa humana resolvem para arquivos cujos stems são slugs.
+        """
+        if nome in indice:
+            return nome
+        slug = _normalizar_para_slug(nome)
+        if slug and slug in indice_por_slug:
+            return indice_por_slug[slug]
+        return None
+
     visitadas: set[str] = set()
     fila: deque[tuple[int, str]] = deque((0, ref) for ref in referencias)
     notas_validas: list[NotaCarregada] = []
@@ -489,11 +549,12 @@ def carregar_contexto(
             # alguma futura modificação fizer isso o limite ainda vale.
             continue
 
-        if nome not in indice:
+        stem_resolvido = _resolver_nome(nome)
+        if stem_resolvido is None:
             notas_ausentes.append(nome)
             continue
 
-        caminho = indice[nome]
+        caminho = indice[stem_resolvido]
         nota_carregada, falha = _carregar_e_validar(caminho, nome, raiz)
         if falha is not None:
             notas_invalidas.append(falha)
@@ -503,7 +564,7 @@ def carregar_contexto(
 
         # Expansão: só adiciona próximos saltos enquanto há orçamento.
         if salto < MAX_SALTOS:
-            for link in wiki_links_globais.get(nome, []):
+            for link in wiki_links_globais.get(stem_resolvido, []):
                 if link not in visitadas:
                     fila.append((salto + 1, link))
 
@@ -516,8 +577,15 @@ def carregar_contexto(
     contagem_por_stem: dict[str, int] = {s: 0 for s in stems_validos}
     for src_stem, links in wiki_links_globais.items():
         for link in links:
-            if link in contagem_por_stem and link != src_stem:
-                contagem_por_stem[link] += 1
+            # Casa link contra stem direto OU contra slug normalizado
+            # (mesma resolução usada na BFS para wiki-links em prosa).
+            stem_alvo = link if link in contagem_por_stem else (
+                indice_por_slug.get(_normalizar_para_slug(link))
+            )
+            if stem_alvo is None:
+                continue
+            if stem_alvo in contagem_por_stem and stem_alvo != src_stem:
+                contagem_por_stem[stem_alvo] += 1
 
     # ------------------------------------------------------------------
     # 5. Truncagem para no máximo `limite_notas`
