@@ -428,6 +428,17 @@ def _construir_parser() -> argparse.ArgumentParser:
         ),
     )
     wf_run_parser.add_argument(
+        "--estrategia-args",
+        type=str,
+        default=None,
+        help=(
+            "JSON com kwargs a serem passados ao construtor da "
+            "Estrategia (ex.: '{\"caminho_meetings_csv\": "
+            "\"e:/CAOS/dados/macros/fomc_meetings.csv\"}'). Quando "
+            "omitido, a Estrategia é instanciada sem argumentos."
+        ),
+    )
+    wf_run_parser.add_argument(
         "--identificador",
         type=str,
         required=True,
@@ -1006,12 +1017,21 @@ def _comando_budget(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _resolver_estrategia(import_path: str) -> Any:
+def _resolver_estrategia(
+    import_path: str,
+    *,
+    kwargs_json: Optional[str] = None,
+) -> Any:
     """Importa e instancia a Estrategia indicada por ``pacote.modulo:Classe``.
 
     Retorna a instância pronta para ser passada ao
     :class:`WalkForwardEngine`. Levanta :class:`ValueError` com mensagem
     pt-BR em qualquer falha de import, atributo ou instanciação.
+
+    Quando ``kwargs_json`` é fornecido, espera um JSON-objeto cujas
+    chaves serão passadas como kwargs ao construtor. Valores cujo nome
+    de chave contém ``caminho`` ou termina em ``_csv`` / ``_path`` são
+    convertidos para :class:`pathlib.Path` antes de serem passados.
     """
     if ":" not in import_path:
         raise ValueError(
@@ -1039,8 +1059,30 @@ def _resolver_estrategia(import_path: str) -> Any:
             f"classe {classe_nome!r} não encontrada em {modulo_path!r} "
             f"({exc})"
         ) from exc
+
+    kwargs: dict[str, Any] = {}
+    if kwargs_json:
+        try:
+            payload = json.loads(kwargs_json)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"--estrategia-args não é JSON válido: {exc}"
+            ) from exc
+        if not isinstance(payload, dict):
+            raise ValueError(
+                "--estrategia-args deve ser um objeto JSON (dict de kwargs); "
+                f"recebido {type(payload).__name__}"
+            )
+        for chave, valor in payload.items():
+            if isinstance(valor, str) and (
+                "caminho" in chave or chave.endswith(("_csv", "_path"))
+            ):
+                kwargs[chave] = Path(valor)
+            else:
+                kwargs[chave] = valor
+
     try:
-        return classe()
+        return classe(**kwargs)
     except Exception as exc:
         raise ValueError(
             f"falha ao instanciar {import_path!r}: "
@@ -1110,7 +1152,10 @@ def _comando_walk_forward_run(args: argparse.Namespace) -> int:
     raiz_relatorios.mkdir(parents=True, exist_ok=True)
 
     try:
-        estrategia = _resolver_estrategia(args.estrategia)
+        estrategia = _resolver_estrategia(
+            args.estrategia,
+            kwargs_json=getattr(args, "estrategia_args", None),
+        )
     except ValueError as exc:
         print(f"ERRO: {exc}", file=sys.stderr)
         return 1

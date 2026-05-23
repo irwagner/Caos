@@ -1,0 +1,25 @@
+# Configuracao do Walk-Forward para EstrategiaPreFomcDrift.
+#
+# Decorre do briefing do Explorador (commit c1b2bc6) que apontou o
+# Pre-FOMC drift (Lucca-Moench 2015) como direcao com edge documentado
+# compativel com a caracterizacao do MNQ (autocorrelacao ~0 em 1m-60m).
+#
+# Notas:
+# - Teste de 120 dias uteis (~6 meses): cobre ~3-4 meetings FOMC por
+#   janela, dando amostra minima para estimar Sharpe da janela.
+# - Treino de 60 dias uteis: nao ha treino real (estrategia sem
+#   parametro), mas o Engine exige treino >= teste e a JanelaGenerator
+#   exige treino >= 60 (R2.1).
+# - Friccao Topstep: igual ao -02 da ORB, para comparabilidade.
+# - SEM hold-out nesta primeira execucao. Walk-Forward rolante ja e
+#   OOS por construcao. Hold-out cego entra na proxima rodada se
+#   resultado preliminar > 0.
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0

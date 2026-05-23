@@ -1,0 +1,210 @@
+{
+  "agregado_media": {
+    "calmar": -1.0172497965829628,
+    "drawdown_maximo_dias": 10.5,
+    "drawdown_maximo_percentual": 0.5,
+    "mae_medio": -219.9375,
+    "mfe_medio": 217.40625,
+    "numero_trades": 2.0,
+    "payoff_medio": 0.7577976674802469,
+    "pnl_total": 3.0099999999947613,
+    "sharpe_anualizado": 31.74264450202464,
+    "win_rate": 0.625
+  },
+  "agregado_mediana": {
+    "calmar": -1.0172497965829628,
+    "drawdown_maximo_dias": 0.0,
+    "drawdown_maximo_percentual": 0.5,
+    "mae_medio": -230.8125,
+    "mfe_medio": 227.75,
+    "numero_trades": 2.0,
+    "payoff_medio": 0.7577976674802469,
+    "pnl_total": 119.00999999999476,
+    "sharpe_anualizado": 7.49454215317358,
+    "win_rate": 0.75
+  },
+  "configuracao": {
+    "custos": {
+      "comissao_usd_por_contrato_por_lado": 0.62,
+      "slippage_pontos_por_lado": 0.25,
+      "usd_por_ponto": 2.0
+    },
+    "granularidade": "1m",
+    "holdout_dias_uteis": null,
+    "instrumento": "MNQ",
+    "passo_dias_uteis": 60,
+    "seed": 42,
+    "tamanho_teste_dias_uteis": 60,
+    "tamanho_treino_dias_uteis": 60
+  },
+  "estrategia": "EstrategiaPreFomcDrift",
+  "holdout_dias_uteis": null,
+  "holdout_fim": null,
+  "holdout_inicio": null,
+  "identificador": "2026-05-23-04",
+  "janelas": [
+    {
+      "calmar": null,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 0,
+      "drawdown_maximo_percentual": 0.0,
+      "duracao_ms": 3703,
+      "estrategia": "EstrategiaPreFomcDrift",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 0,
+        "teste_fim": "2025-09-01T00:00:00Z",
+        "teste_inicio": "2025-06-09T00:00:00Z",
+        "treino_fim": "2025-06-09T00:00:00Z",
+        "treino_inicio": "2025-03-17T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -94.625,
+      "mfe_medio": 229.25,
+      "motivo_falha": null,
+      "numero_trades": 2,
+      "payoff_medio": null,
+      "pnl_total": 219.00999999999476,
+      "sharpe_anualizado": 12.688418853326576,
+      "status": "ok",
+      "win_rate": 1.0
+    },
+    {
+      "calmar": 2.1655004068340746,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 0,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 3704,
+      "estrategia": "EstrategiaPreFomcDrift",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 1,
+        "teste_fim": "2025-11-24T00:00:00Z",
+        "teste_inicio": "2025-09-01T00:00:00Z",
+        "treino_fim": "2025-09-01T00:00:00Z",
+        "treino_inicio": "2025-06-09T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -259.5,
+      "mfe_medio": 161.125,
+      "motivo_falha": null,
+      "numero_trades": 2,
+      "payoff_medio": 1.5155953349604938,
+      "pnl_total": 19.00999999999476,
+      "sharpe_anualizado": 2.3006654530205832,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": null,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 0,
+      "drawdown_maximo_percentual": 0.0,
+      "duracao_ms": 3609,
+      "estrategia": "EstrategiaPreFomcDrift",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 2,
+        "teste_fim": "2026-02-17T00:00:00Z",
+        "teste_inicio": "2025-11-24T00:00:00Z",
+        "treino_fim": "2025-11-24T00:00:00Z",
+        "treino_inicio": "2025-09-01T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -202.125,
+      "mfe_medio": 226.25,
+      "motivo_falha": null,
+      "numero_trades": 2,
+      "payoff_medio": null,
+      "pnl_total": 223.25999999999476,
+      "sharpe_anualizado": 125.30436422566959,
+      "status": "ok",
+      "win_rate": 1.0
+    },
+    {
+      "calmar": -4.2,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 42,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 3734,
+      "estrategia": "EstrategiaPreFomcDrift",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 3,
+        "teste_fim": "2026-05-12T00:00:00Z",
+        "teste_inicio": "2026-02-17T00:00:00Z",
+        "treino_fim": "2026-02-17T00:00:00Z",
+        "treino_inicio": "2025-11-24T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -323.5,
+      "mfe_medio": 253.0,
+      "motivo_falha": null,
+      "numero_trades": 2,
+      "payoff_medio": 0.0,
+      "pnl_total": -449.24000000000524,
+      "sharpe_anualizado": -13.32287052391819,
+      "status": "ok",
+      "win_rate": 0.0
+    }
+  ],
+  "manifesto_hash": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+  "status": "concluido",
+  "versoes_dependencias": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.0",
+    "python": "3.11.9"
+  }
+}
