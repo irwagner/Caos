@@ -74,6 +74,7 @@ from caos.walk_forward.metricas import (
 )
 from caos.walk_forward.models import (
     ConfiguracaoWalkForward,
+    CustosOperacionais,
     JanelaWF,
     ResultadoJanela,
     ResultadoWalkForward,
@@ -110,6 +111,7 @@ from caos.walk_forward.runner import (
 __all__ = [
     # Modelos (Task 1)
     "ConfiguracaoWalkForward",
+    "CustosOperacionais",
     "JanelaWF",
     "ResultadoJanela",
     "ResultadoWalkForward",

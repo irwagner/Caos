@@ -71,8 +71,104 @@ TAMANHO_TESTE_MIN = 10
 TAMANHO_TESTE_MAX = 120
 PASSO_MIN = 1
 
+#: USD por ponto do índice — multiplicador do MNQ (CME). Constante de
+#: instrumento usada para converter ``comissao_usd_por_contrato_por_lado``
+#: em pontos antes de aplicar fricção. Outros instrumentos exigirão
+#: override no Decisao_Do_Conselho que troque ``instrumento``.
+USD_POR_PONTO_MNQ: float = 2.0
+
 # Padrões reutilizados em validações de regex.
 _REGEX_HASH_SHA256 = r"^[0-9a-f]{64}$"
+
+
+# ---------------------------------------------------------------------------
+# 3.0 — CustosOperacionais (slippage + comissão modelados)
+# ---------------------------------------------------------------------------
+
+
+class CustosOperacionais(BaseModel):
+    """Modelo de fricção de execução aplicado a cada trade do Walk-Forward.
+
+    Emergiu da Decisao_Do_Conselho ``2026-05-23-01`` (Devils_Advocate
+    apontou que WF sem fricção é otimista). É opcional —
+    :class:`ConfiguracaoWalkForward.custos` defaulta para ``None``, o
+    que mantém o comportamento legado (sem fricção, equivalente a
+    ``CustosOperacionais.zerados()``).
+
+    Modelo simples por design: cada trade paga 2 lados (entrada e
+    saída). O custo total em **pontos** descontado do PnL bruto é:
+
+    ``custo_pontos = 2 * (slippage_pontos_por_lado +
+                          comissao_usd_por_contrato_por_lado / usd_por_ponto)
+                       * contratos``
+
+    Campos:
+
+    - ``slippage_pontos_por_lado``: deslocamento (em pontos do índice)
+      assumido entre o preço de execução teórico e o preço efetivo
+      em cada perna do trade. Default 0.0 (sem slippage).
+    - ``comissao_usd_por_contrato_por_lado``: comissão fixa (USD) por
+      contrato em cada perna. Para o MNQ na Topstep o round-trip
+      típico é ~$1.24 → 0.62 USD/lado. Para a Tradovate é
+      $0.39 USD/contrato/lado. Default 0.0.
+    - ``usd_por_ponto``: multiplicador do instrumento. Default 2.0 (MNQ).
+      Override só se ``ConfiguracaoWalkForward.instrumento`` for outro.
+
+    Aplicado pelo :class:`BacktestRunner` antes de invocar o
+    :class:`MetricasCalculator`, então Sharpe/Calmar/drawdown são
+    calculados sobre **PnL líquido**.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    slippage_pontos_por_lado: Annotated[float, Field(ge=0.0, le=10.0)] = 0.0
+    comissao_usd_por_contrato_por_lado: Annotated[
+        float, Field(ge=0.0, le=20.0)
+    ] = 0.0
+    usd_por_ponto: Annotated[float, Field(gt=0.0, le=1000.0)] = USD_POR_PONTO_MNQ
+
+    @classmethod
+    def zerados(cls) -> "CustosOperacionais":
+        """Atalho para configuração sem fricção (compatibilidade legada)."""
+        return cls()
+
+    @classmethod
+    def topstep_mnq(cls, slippage_pontos_por_lado: float = 0.25) -> "CustosOperacionais":
+        """Atalho com defaults Topstep (corretora popular para futures
+        intraday): comissão round-trip ~USD 1.24 e slippage default
+        de 0.25 pontos/lado (1 tick) — conservador para MNQ minute.
+        """
+        return cls(
+            slippage_pontos_por_lado=slippage_pontos_por_lado,
+            comissao_usd_por_contrato_por_lado=0.62,
+            usd_por_ponto=USD_POR_PONTO_MNQ,
+        )
+
+    def custo_total_pontos(self, contratos: int) -> float:
+        """Calcula o custo total (em pontos × contratos) de 1 trade
+        round-trip com ``contratos`` contratos.
+
+        Garante ``>= 0`` por construção (todos os campos validados em
+        ``ge=0`` e ``contratos >= 1``).
+        """
+        if contratos < 1:
+            raise ValueError(
+                f"contratos deve ser >= 1; recebido {contratos}"
+            )
+        comissao_pontos_por_lado = (
+            self.comissao_usd_por_contrato_por_lado / self.usd_por_ponto
+        )
+        custo_por_lado = self.slippage_pontos_por_lado + comissao_pontos_por_lado
+        # 2 lados (entrada + saida) × contratos.
+        return 2.0 * custo_por_lado * float(contratos)
+
+    def eh_zerado(self) -> bool:
+        """``True`` se ambos os componentes (slippage e comissão) são
+        zero — equivalente ao comportamento pré-Decisao_2026-05-23-01."""
+        return (
+            self.slippage_pontos_por_lado == 0.0
+            and self.comissao_usd_por_contrato_por_lado == 0.0
+        )
 _REGEX_IDENTIFICADOR_WF = r"^\d{4}-\d{2}-\d{2}-\d{2}$"
 
 
@@ -149,6 +245,11 @@ class ConfiguracaoWalkForward(BaseModel):
     - ``granularidade``: ``"1m"`` ou ``"tick"`` — granularidade das barras.
     - ``seed``: inteiro usado por ``random.seed`` / ``numpy.random.seed``
       antes de cada janela (R7.1).
+    - ``custos``: :class:`CustosOperacionais` opcional. Quando ``None``
+      o pipeline roda sem fricção (modo legado, equivalente ao default
+      pré-Decisao_2026-05-23-01). Quando preenchido, o
+      :class:`BacktestRunner` aplica slippage + comissão a cada trade
+      antes de agregar.
 
     Validador cruzado (R2.2): ``tamanho_teste_dias_uteis`` não pode
     exceder ``tamanho_treino_dias_uteis`` — o Treino é sempre maior ou
@@ -167,6 +268,7 @@ class ConfiguracaoWalkForward(BaseModel):
     instrumento: Annotated[str, Field(min_length=1, max_length=20)] = "MNQ"
     granularidade: Granularidade
     seed: int = 42
+    custos: Optional[CustosOperacionais] = None
 
     @model_validator(mode="after")
     def _check_treino_maior_que_teste(self) -> "ConfiguracaoWalkForward":
@@ -483,8 +585,10 @@ __all__ = [
     "TAMANHO_TESTE_MIN",
     "TAMANHO_TESTE_MAX",
     "PASSO_MIN",
+    "USD_POR_PONTO_MNQ",
     # Modelos
     "ConfiguracaoWalkForward",
+    "CustosOperacionais",
     "JanelaWF",
     "ResultadoJanela",
     "ResultadoWalkForward",

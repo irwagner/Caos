@@ -88,6 +88,7 @@ from pydantic import BaseModel, ConfigDict
 
 from caos.walk_forward.models import (
     ConfiguracaoWalkForward,
+    CustosOperacionais,
     JanelaWF,
     ResultadoJanela,
 )
@@ -521,6 +522,10 @@ class BacktestRunner:
             trades_brutos = []
         trades = _normalizar_trades(trades_brutos)
 
+        # Aplica fricção (slippage + comissão) — Decisao_2026-05-23-01.
+        # Quando configuracao.custos é None ou zerado, é no-op.
+        trades = _aplicar_custos_operacionais(trades, configuracao.custos)
+
         numero_trades = len(trades)
 
         if numero_trades == 0:
@@ -622,6 +627,67 @@ def _normalizar_trades(trades_brutos: list[Any]) -> list[Any]:
                 "ou dict"
             )
     return trades
+
+
+def _aplicar_custos_operacionais(
+    trades: list[Any],
+    custos: Optional[CustosOperacionais],
+) -> list[Any]:
+    """Aplica fricção de execução (slippage + comissão) a cada trade.
+
+    Modelo: cada trade paga 2 lados (entrada + saída). Para preservar
+    a semântica de ``trade.pnl_pontos()`` (geometria entrada→saída em
+    pontos × contratos), deslocamos o ``entrada_preco`` e o
+    ``saida_preco`` na direção desfavorável pela metade do custo total
+    em pontos por contrato. Trades ``long`` ficam com entrada um pouco
+    mais cara e saída um pouco mais barata; ``short`` o oposto.
+
+    Trades do modelo mínimo (:class:`runner.Trade`) recebem desconto
+    direto no campo ``pnl`` — não têm preços a deslocar.
+
+    Quando ``custos`` é ``None`` ou ``custos.eh_zerado()``, devolve a
+    lista original sem cópia (no-op rápido para o caminho legado).
+    """
+    if custos is None or custos.eh_zerado():
+        return trades
+
+    # Importação local para evitar ciclo.
+    from caos.walk_forward.metricas import Trade as _TradeMetricas
+
+    ajustados: list[Any] = []
+    for t in trades:
+        if isinstance(t, _TradeMetricas):
+            # Custo total round-trip em pontos × contratos.
+            custo_total_pts = custos.custo_total_pontos(t.contratos)
+            # Custo por lado em pontos (já dividido por contratos).
+            custo_por_lado_pts_unit = custo_total_pts / (2.0 * t.contratos)
+            if t.lado == "long":
+                # Pago caro na entrada, vendo barato na saída.
+                novo_entrada = t.entrada_preco + custo_por_lado_pts_unit
+                nova_saida = t.saida_preco - custo_por_lado_pts_unit
+            else:  # short
+                novo_entrada = t.entrada_preco - custo_por_lado_pts_unit
+                nova_saida = t.saida_preco + custo_por_lado_pts_unit
+            ajustados.append(
+                t.model_copy(
+                    update={
+                        "entrada_preco": novo_entrada,
+                        "saida_preco": nova_saida,
+                    }
+                )
+            )
+        elif isinstance(t, Trade):
+            # Modelo mínimo: trade não conhece ``contratos``; assumimos
+            # 1 contrato (caminho legado de testes da Task 4).
+            custo_total_pts = custos.custo_total_pontos(1)
+            ajustados.append(
+                t.model_copy(update={"pnl": float(t.pnl) - custo_total_pts})
+            )
+        else:
+            # Tipo desconhecido — passa adiante intacto. O caller já
+            # validou em _normalizar_trades.
+            ajustados.append(t)
+    return ajustados
 
 
 def _resultado_falha(
