@@ -72,6 +72,20 @@ from caos.walk_forward.metricas import (
     LadoTrade,
     MetricasCalculator,
 )
+from caos.walk_forward.caracterizacao import (
+    LAGS_AUTOCORRELACAO_MINUTOS,
+    LIMIAR_GAP_SIGNIFICATIVO_PCT,
+    RelatorioCaracterizacao,
+    SumarioAutocorrelacao,
+    SumarioGaps,
+    SumarioRangeDiario,
+    SumarioVolatilidadeIntradia,
+    calcular_autocorrelacao,
+    calcular_gaps,
+    calcular_range_diario,
+    calcular_volatilidade_intradia,
+    caracterizar_serie,
+)
 from caos.walk_forward.models import (
     ConfiguracaoWalkForward,
     CustosOperacionais,
@@ -140,6 +154,19 @@ __all__ = [
     "DIAS_UTEIS_POR_ANO",
     "LadoTrade",
     "MetricasCalculator",
+    # Caracterizacao do instrumento (Decisao 2026-05-23-01 item 3)
+    "LAGS_AUTOCORRELACAO_MINUTOS",
+    "LIMIAR_GAP_SIGNIFICATIVO_PCT",
+    "RelatorioCaracterizacao",
+    "SumarioAutocorrelacao",
+    "SumarioGaps",
+    "SumarioRangeDiario",
+    "SumarioVolatilidadeIntradia",
+    "calcular_autocorrelacao",
+    "calcular_gaps",
+    "calcular_range_diario",
+    "calcular_volatilidade_intradia",
+    "caracterizar_serie",
     # WalkForwardEngine (Task 6)
     "FonteDados",
     "LIMIAR_TAXA_FALHAS",
