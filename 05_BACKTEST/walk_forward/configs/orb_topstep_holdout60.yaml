@@ -1,0 +1,16 @@
+# Configuracao do Walk-Forward com friccao Topstep MNQ + hold-out de 60 dias uteis.
+# Decorrente da Decisao_Do_Conselho 2026-05-23-01.
+#
+# Cobertura total: ~371 dias uteis (5 contratos minute concatenados).
+# Hold-out: 60 dias uteis no FINAL da serie (~16% do total) ficam selados
+# para validacao cega futura. WF rolante ve apenas os primeiros ~311 dias.
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 10
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+holdout_dias_uteis: 60

@@ -240,6 +240,29 @@ def _renderizar_corpo_markdown(resultado: ResultadoWalkForward) -> str:
         ("Seed", str(cfg.seed)),
         ("Total de janelas", str(len(resultado.janelas))),
     ]
+    if resultado.holdout_dias_uteis:
+        resumo.append(("Hold-out (dias úteis)", str(resultado.holdout_dias_uteis)))
+        if resultado.holdout_inicio is not None:
+            resumo.append(
+                ("Hold-out início", resultado.holdout_inicio.isoformat())
+            )
+        if resultado.holdout_fim is not None:
+            resumo.append(
+                ("Hold-out fim", resultado.holdout_fim.isoformat())
+            )
+    if cfg.custos is not None and not cfg.custos.eh_zerado():
+        resumo.append(
+            (
+                "Slippage (pts/lado)",
+                str(cfg.custos.slippage_pontos_por_lado),
+            )
+        )
+        resumo.append(
+            (
+                "Comissão (USD/lado/contrato)",
+                str(cfg.custos.comissao_usd_por_contrato_por_lado),
+            )
+        )
     linhas.append("| Campo | Valor |")
     linhas.append("|---|---|")
     for campo, valor in resumo:

@@ -230,11 +230,28 @@ class WalkForwardEngine:
                 agregado_media={},
                 versoes_dependencias=versoes,
                 status="manifesto-invalido",
+                holdout_dias_uteis=configuracao.holdout_dias_uteis,
             )
 
         # Hash agregado dos CSVs efetivamente lidos (R4.3).
         paths_lidos = _resolver_paths_lidos(self._raiz_dados, fonte_dados)
         manifesto_hash = _hash_agregado_arquivos(paths_lidos)
+
+        # ------------------------------------------------------------------
+        # Fase 1.5 — split tripartite (Decisao_2026-05-23-01).
+        # Quando configuracao.holdout_dias_uteis está preenchido, as
+        # ÚLTIMAS N barras úteis são reservadas como hold-out cego e
+        # NÃO entram no Walk-Forward rolante. Isso é o que viabiliza
+        # validação cega após sweeps paramétricos.
+        # ------------------------------------------------------------------
+        holdout_dias_uteis = configuracao.holdout_dias_uteis
+        holdout_inicio: Optional[datetime] = None
+        holdout_fim: Optional[datetime] = None
+        if holdout_dias_uteis is not None and holdout_dias_uteis > 0:
+            barras, holdout_inicio, holdout_fim = _separar_holdout(
+                barras=barras,
+                holdout_dias_uteis=holdout_dias_uteis,
+            )
 
         # ------------------------------------------------------------------
         # Fase 2 — geração de janelas (R3).
@@ -286,6 +303,9 @@ class WalkForwardEngine:
                 agregado_media={},
                 versoes_dependencias=versoes,
                 status="abortado-por-falhas",
+                holdout_inicio=holdout_inicio,
+                holdout_fim=holdout_fim,
+                holdout_dias_uteis=holdout_dias_uteis,
             )
 
         # ------------------------------------------------------------------
@@ -304,6 +324,9 @@ class WalkForwardEngine:
             agregado_media=agregado_media,
             versoes_dependencias=versoes,
             status="concluido",
+            holdout_inicio=holdout_inicio,
+            holdout_fim=holdout_fim,
+            holdout_dias_uteis=holdout_dias_uteis,
         )
 
 
@@ -400,6 +423,71 @@ def _hash_agregado_arquivos(paths: Iterable[Path]) -> str:
                     digest.update(chunk)
         digest.update(b"\x00")
     return digest.hexdigest()
+
+
+def _separar_holdout(
+    *,
+    barras: pandas.DataFrame,
+    holdout_dias_uteis: int,
+) -> tuple[pandas.DataFrame, datetime, datetime]:
+    """Reserva os ÚLTIMOS ``holdout_dias_uteis`` dias úteis como hold-out.
+
+    Implementa o split tripartite decorrente da Decisao_Do_Conselho
+    2026-05-23-01: as últimas N barras úteis ficam **fora** do
+    Walk-Forward rolante. Caller recebe:
+
+    - ``barras_wf``: DataFrame com apenas os primeiros (total-N) dias
+      úteis. É o que entra no :class:`JanelaGenerator`.
+    - ``holdout_inicio`` / ``holdout_fim``: limites UTC do hold-out
+      reservado, gravados no :class:`ResultadoWalkForward` para
+      auditoria.
+
+    Por convenção, ``holdout_inicio`` é o início do PRIMEIRO dia útil
+    reservado (00:00 UTC) e ``holdout_fim`` é o fim do ÚLTIMO (23:59:59
+    UTC). Esses são timestamps simbólicos — o que importa de fato é que
+    qualquer barra com ``timestamp >= holdout_inicio`` está fora do
+    DataFrame devolvido em ``barras_wf``.
+
+    Levanta :class:`ValueError` se houver menos dias úteis disponíveis
+    do que o hold-out solicitado.
+    """
+    from caos.walk_forward.janelas import JanelaGenerator
+
+    dias = JanelaGenerator._extrair_dias_uteis(barras)
+    if len(dias) <= holdout_dias_uteis:
+        raise ValueError(
+            f"holdout_dias_uteis={holdout_dias_uteis} >= total de dias úteis "
+            f"disponíveis ({len(dias)}); não restam dados para o "
+            "Walk-Forward rolante. Reduza holdout_dias_uteis ou colete "
+            "mais histórico."
+        )
+
+    # Primeiro dia útil reservado para hold-out.
+    primeiro_dia_holdout = dias[-holdout_dias_uteis]
+    ultimo_dia_holdout = dias[-1]
+
+    # Filtra: barras_wf = tudo strictly antes do primeiro dia hold-out.
+    coluna_ts = "timestamp"
+    if coluna_ts not in barras.columns:
+        raise ValueError(
+            f"DataFrame de barras não contém coluna {coluna_ts!r}"
+        )
+    mascara_wf = barras[coluna_ts] < primeiro_dia_holdout
+    barras_wf = barras[mascara_wf].reset_index(drop=True)
+
+    holdout_inicio = primeiro_dia_holdout.to_pydatetime()
+    # holdout_fim aponta o INÍCIO do dia seguinte ao último dia útil
+    # reservado — convenção semi-aberta consistente com JanelaWF.
+    holdout_fim_ts = ultimo_dia_holdout + pandas.Timedelta(days=1)
+    holdout_fim = holdout_fim_ts.to_pydatetime()
+
+    # Garante UTC.
+    if holdout_inicio.tzinfo is None:
+        holdout_inicio = holdout_inicio.replace(tzinfo=timezone.utc)
+    if holdout_fim.tzinfo is None:
+        holdout_fim = holdout_fim.replace(tzinfo=timezone.utc)
+
+    return barras_wf, holdout_inicio, holdout_fim
 
 
 def _agregar(

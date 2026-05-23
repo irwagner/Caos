@@ -250,6 +250,14 @@ class ConfiguracaoWalkForward(BaseModel):
       pré-Decisao_2026-05-23-01). Quando preenchido, o
       :class:`BacktestRunner` aplica slippage + comissão a cada trade
       antes de agregar.
+    - ``holdout_dias_uteis``: número de dias úteis no FINAL da série
+      reservados como hold-out cego (split tripartite — Decorre da
+      Decisao_2026-05-23-01). Valor em [10, 2520] ou ``None`` (default
+      = sem hold-out, modo legado). Quando preenchido, o
+      :class:`WalkForwardEngine` corta as últimas N barras úteis ANTES
+      de gerar janelas; essas barras NÃO são usadas em nenhuma janela
+      WF e ficam reservadas para validação final cega após sweeps
+      paramétricos.
 
     Validador cruzado (R2.2): ``tamanho_teste_dias_uteis`` não pode
     exceder ``tamanho_treino_dias_uteis`` — o Treino é sempre maior ou
@@ -269,6 +277,7 @@ class ConfiguracaoWalkForward(BaseModel):
     granularidade: Granularidade
     seed: int = 42
     custos: Optional[CustosOperacionais] = None
+    holdout_dias_uteis: Optional[Annotated[int, Field(ge=10, le=2520)]] = None
 
     @model_validator(mode="after")
     def _check_treino_maior_que_teste(self) -> "ConfiguracaoWalkForward":
@@ -496,6 +505,13 @@ class ResultadoWalkForward(BaseModel):
       (R7.2).
     - ``status``: ``"concluido"``, ``"abortado-por-falhas"``,
       ``"manifesto-invalido"``.
+    - ``holdout_inicio`` / ``holdout_fim``: limites UTC do hold-out cego
+      reservado pelo :class:`WalkForwardEngine` quando
+      ``configuracao.holdout_dias_uteis`` foi preenchido. Ambos ``None``
+      no modo legado.
+    - ``holdout_dias_uteis``: cópia do valor declarado em
+      ``configuracao``, útil para auditoria histórica mesmo se a
+      configuração for modificada depois.
 
     Validação cruzada (R3.1, R10.2):
     - Janelas devem ter ``indice`` único e estritamente crescente
@@ -518,6 +534,9 @@ class ResultadoWalkForward(BaseModel):
     agregado_media: dict[str, float] = Field(default_factory=dict)
     versoes_dependencias: dict[str, str] = Field(default_factory=dict)
     status: StatusWalkForward
+    holdout_inicio: Optional[datetime] = None
+    holdout_fim: Optional[datetime] = None
+    holdout_dias_uteis: Optional[Annotated[int, Field(ge=0)]] = None
 
     @model_validator(mode="after")
     def _check_janelas_e_status(self) -> "ResultadoWalkForward":
