@@ -6,7 +6,7 @@ Cobre os 7 subcomandos integrados no Spec 1:
 - ``caos manifesto build|verify`` (já testado em test_skills_data.py;
   aqui só validamos a presença no ``--help``)
 - ``caos hydra sync``
-- ``caos debate <tema>``
+- ``caos debate iniciar|fechar`` (Spec 5)
 - ``caos perfil validar [nome]``
 - ``caos cache stats``
 - ``caos budget status``
@@ -289,41 +289,67 @@ class TestCliHydraSync:
 
 
 # ---------------------------------------------------------------------------
-# 4. caos debate
+# 4. caos debate {iniciar,fechar} (Spec 5)
 # ---------------------------------------------------------------------------
 
 
 class TestCliDebate:
-    def test_cli_debate_imprime_mensagem(self, tmp_path: Path) -> None:
-        """``caos debate <tema>`` retorna 0 e cita backend/produção/property."""
+    """Testa o fluxo `caos debate iniciar` (Spec 5 — Task 2).
+
+    O subgrupo `caos debate fechar` é testado em
+    `tests/unit/test_caos_debate_iniciar_fechar.py` (Spec 5 — Task 4),
+    que cobre o caminho-feliz com Git real. Aqui só validamos a CLI no
+    nível de argparse + smoke do iniciar.
+    """
+
+    def test_cli_debate_iniciar_cria_starter(self, tmp_path: Path) -> None:
         raiz = tmp_path / "workspace"
         raiz.mkdir()
         res = _run_cli(
             "debate",
-            "Adicionar filtro de horario",
-            "--descricao",
-            "Estudo de filtro de sessao",
-            "--tags",
-            "ninjascript,risco",
-            "--csharp",
-            "--exposicao",
+            "iniciar",
+            "estudo-orb-baseline",
+            "--gatilho",
+            "G3",
+            "--altera-exposicao",
             "--root",
             str(raiz),
             timeout=15,
         )
         assert res.returncode == 0, (
-            f"debate falhou: stdout={res.stdout!r} stderr={res.stderr!r}"
+            f"debate iniciar falhou: stdout={res.stdout!r} stderr={res.stderr!r}"
         )
-        out = res.stdout
-        assert "Adicionar filtro de horario" in out
-        # A mensagem em pt-BR deve mencionar backend Kiro e a suíte property-based.
-        assert "backend" in out.lower()
-        assert "property" in out.lower() or "property-based" in out.lower()
+        assert "Debate iniciado." in res.stdout
+        assert "estudo-orb-baseline" in res.stdout
+        # Arquivo deve ter sido criado em CAOS_Council/debates/.
+        debates = list((raiz / "CAOS_Council" / "debates").glob("*.md"))
+        assert len(debates) == 1
+        assert debates[0].name.endswith("-estudo-orb-baseline.md")
 
-    def test_cli_debate_sem_tema_falha(self) -> None:
-        """Sem ``tema_titulo`` argparse deve falhar."""
-        res = _run_cli("debate", timeout=15)
+    def test_cli_debate_iniciar_slug_invalido_falha(self, tmp_path: Path) -> None:
+        raiz = tmp_path / "workspace"
+        raiz.mkdir()
+        res = _run_cli(
+            "debate",
+            "iniciar",
+            "Slug Invalido com espacos",
+            "--root",
+            str(raiz),
+            timeout=15,
+        )
+        assert res.returncode == 1
+        assert "slug-invalido" in res.stderr or "slug" in res.stderr.lower()
+
+    def test_cli_debate_iniciar_sem_slug_falha(self) -> None:
+        """Sem o argumento `slug` argparse deve falhar."""
+        res = _run_cli("debate", "iniciar", timeout=15)
         assert res.returncode != 0
+
+    def test_cli_debate_help_lista_iniciar_fechar(self) -> None:
+        res = _run_cli("debate", "--help", timeout=15)
+        assert res.returncode == 0
+        assert "iniciar" in res.stdout
+        assert "fechar" in res.stdout
 
 
 # ---------------------------------------------------------------------------

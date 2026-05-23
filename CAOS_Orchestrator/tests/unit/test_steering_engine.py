@@ -4,9 +4,10 @@ Cobre R3.1–R3.6, R7.3, R7.4, R13.4, R17.2 e R17.6 do ``requirements.md``.
 
 Estratégia geral:
 
-- Os 8 arquivos reais entregues por Task 4 ficam em
-  ``<workspace_root>/.kiro/steering/``. A fixture ``dir_steering_real``
-  aponta diretamente para esse caminho — testes apenas leem.
+- Os 9 arquivos reais entregues por Task 4 (Spec 1) + Task 1 (Spec 5)
+  ficam em ``<workspace_root>/.kiro/steering/``. A fixture
+  ``dir_steering_real`` aponta diretamente para esse caminho —
+  testes apenas leem.
 - Para cenários que exigem manipular o conteúdo (orçamento configurado,
   valor inválido, frontmatter ausente), criamos diretórios temporários em
   ``tmp_path`` e escrevemos arquivos sintéticos.
@@ -40,7 +41,9 @@ from caos.steering_engine import (
 ROOT_WORKSPACE = Path(__file__).resolve().parents[3]
 DIR_STEERING_REAL = ROOT_WORKSPACE / ".kiro" / "steering"
 
-#: Os 8 arquivos esperados conforme Task 4.
+#: Os 9 arquivos esperados — 8 entregues pela Task 4 (Spec 1) +
+#: ``protocolo-debate-no-chat`` (Spec 5 — Task 1) que ativa o Conselho
+#: dentro do Kiro IDE.
 ARQUIVOS_ESPERADOS_REAIS: tuple[str, ...] = (
     "idioma-pt-br",
     "instrumento-mnq",
@@ -49,6 +52,7 @@ ARQUIVOS_ESPERADOS_REAIS: tuple[str, ...] = (
     "orcamento-de-tokens",
     "orcamento-de-turnos",
     "plataforma-windows-cmd",
+    "protocolo-debate-no-chat",
     "reference-hydra-readonly",
 )
 
@@ -101,7 +105,7 @@ def _escrever_regra_minima(
 
 
 class TestCarregaArquivosReais:
-    def test_carrega_8_regras_validas(self, dir_steering_real: Path) -> None:
+    def test_carrega_9_regras_validas(self, dir_steering_real: Path) -> None:
         resultado = carregar_regras(dir_steering_real)
 
         assert isinstance(resultado, ResultadoCarregamentoSteering)

@@ -8,10 +8,11 @@ Esta versão expõe (Task 17 / Spec 1 + Task 8 / Spec 2):
   ``dados/MNQ/manifesto.json``.
 * ``caos hydra sync`` (R13) — sincroniza a cópia somente-leitura do
   Hydra em ``04_CODIGO/ninjascript/reference_hydra/``.
-* ``caos debate <tema>`` — placeholder do fluxo de Debate. No Spec 1,
-  apenas informa que a integração com o backend de subagente Kiro será
-  habilitada em modo de produção; testes ponta-a-ponta de orquestração
-  ficam na suíte property-based.
+* ``caos debate iniciar|fechar`` (Spec 5) — gera o starter de Debate em
+  ``CAOS_Council/debates/`` e finaliza o Debate gerando a Decisao_Do_Conselho
+  e delegando o commit Git para CouncilRecorder. Os turnos do Debate são
+  preenchidos pelo Conselho-no-Chat (Kiro_Brain) seguindo o protocolo em
+  ``.kiro/steering/protocolo-debate-no-chat.md``.
 * ``caos perfil validar [nome]`` (R2) — valida 1 ou os 9 perfis em
   ``.kiro/agents/``.
 * ``caos cache stats`` (R16) — sumariza ``CAOS_Orchestrator/.cache/``.
@@ -187,45 +188,106 @@ def _construir_parser() -> argparse.ArgumentParser:
         help="raiz do workspace; default = cwd.",
     )
 
-    # ---- caos debate <tema> ----
+    # ---- caos debate {iniciar,fechar} ----
     debate_parser = sub.add_parser(
         "debate",
-        help="abre um Debate sobre <tema> no Conselho",
+        help="abre, gera Decisão e fecha Debates do Conselho (Spec 5)",
         description=(
-            "No Spec 1, este comando NÃO chama o backend de subagente "
-            "(integração entrega no modo de produção do orquestrador). "
-            "Para validação automatizada, use a suíte property-based em "
-            "CAOS_Orchestrator/tests/property/."
+            "Subcomandos: 'iniciar' gera o starter do Debate em "
+            "CAOS_Council/debates/AAAA-MM-DD-NN-{slug}.md com cabeçalho "
+            "YAML compatível com o schema Debate do Spec 1. 'fechar' lê "
+            "um Debate preenchido pelo Conselho-no-Chat (Spec 5), "
+            "monta a Decisao_Do_Conselho e delega a gravação + commit "
+            "Git para CouncilRecorder (Spec 1). Para o protocolo "
+            "narrativo do Conselho, ver "
+            ".kiro/steering/protocolo-debate-no-chat.md."
         ),
     )
-    debate_parser.add_argument(
-        "tema_titulo",
-        type=str,
-        help="título curto do Debate (obrigatório).",
+    debate_sub = debate_parser.add_subparsers(
+        dest="debate_comando", required=True
     )
-    debate_parser.add_argument(
-        "--descricao",
-        type=str,
-        default="",
-        help="descrição livre opcional.",
+
+    debate_iniciar_parser = debate_sub.add_parser(
+        "iniciar",
+        help="cria CAOS_Council/debates/AAAA-MM-DD-NN-{slug}.md (starter)",
+        description=(
+            "Gera o starter do Debate com cabeçalho YAML válido. O "
+            "Kiro_Brain (Spec 5) preenche os turnos no chat respeitando "
+            "o protocolo. Sequencial NN é incrementado automaticamente "
+            "quando já existe arquivo no mesmo dia."
+        ),
     )
-    debate_parser.add_argument(
-        "--tags",
+    debate_iniciar_parser.add_argument(
+        "slug",
         type=str,
-        default="",
-        help="tags separadas por vírgula (ex.: ninjascript,risco).",
+        help="slug kebab-case do Debate (regex ^[a-z0-9-]{1,60}$).",
     )
-    debate_parser.add_argument(
+    debate_iniciar_parser.add_argument(
+        "--titulo",
+        type=str,
+        default=None,
+        help=(
+            "título humano opcional (default = slug com hifens trocados "
+            "por espaços). Não afeta o frontmatter — entra apenas no "
+            "cabeçalho Markdown."
+        ),
+    )
+    debate_iniciar_parser.add_argument(
+        "--gatilho",
+        type=str,
+        default="usuario",
+        choices=["G1", "G2", "G3", "G4", "G5", "usuario"],
+        help=(
+            "gatilho que disparou o Debate (R2 do Spec 5). Default 'usuario' "
+            "para Debate manual. G1..G5 para Debates automáticos."
+        ),
+    )
+    debate_iniciar_parser.add_argument(
+        "--altera-exposicao",
+        action="store_true",
+        help=(
+            "marca o tema como exigindo fase AVALIACAO_RISCO (Cerberus)."
+        ),
+    )
+    debate_iniciar_parser.add_argument(
         "--csharp",
         action="store_true",
-        help="marca o Debate como envolvendo código C#.",
+        help=(
+            "marca o tema como exigindo fase AVALIACAO_TECNICA (Hermes)."
+        ),
     )
-    debate_parser.add_argument(
-        "--exposicao",
+    debate_iniciar_parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="raiz do workspace; default = cwd.",
+    )
+
+    debate_fechar_parser = debate_sub.add_parser(
+        "fechar",
+        help="finaliza o Debate, monta a Decisão e delega o commit Git",
+        description=(
+            "Lê o arquivo do Debate por identificador AAAA-MM-DD-NN, "
+            "valida cabeçalho + turnos contra o schema do Spec 1, "
+            "monta a DecisaoDoConselho a partir dos blocos ```proposta/"
+            "```veto/```sintese inseridos pelo Kiro_Brain, e invoca "
+            "CouncilRecorder.gravar (Spec 1 — R8) que cria o commit "
+            "dedicado e a Tag_De_Congelamento se aprovado_walk_forward."
+        ),
+    )
+    debate_fechar_parser.add_argument(
+        "identificador",
+        type=str,
+        help="identificador AAAA-MM-DD-NN do Debate.",
+    )
+    debate_fechar_parser.add_argument(
+        "--dry-run",
         action="store_true",
-        help="marca o Debate como envolvendo alteração de exposição.",
+        help=(
+            "valida e imprime a Decisão derivada sem gravar nem commitar."
+        ),
     )
-    debate_parser.add_argument(
+    debate_fechar_parser.add_argument(
         "--root",
         type=Path,
         default=None,
@@ -556,40 +618,114 @@ def _comando_hydra(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Despachador: debate (placeholder do Spec 1)
+# Despachador: debate {iniciar,fechar} (Spec 5)
 # ---------------------------------------------------------------------------
 
 
-def _comando_debate(args: argparse.Namespace) -> int:
-    """Stub do fluxo de Debate (Spec 1).
+def _comando_debate_iniciar(args: argparse.Namespace) -> int:
+    """Executa ``caos debate iniciar``."""
+    from caos.debate_io import (
+        DebateIoError,
+        FlagsDebateIniciar,
+        iniciar_debate,
+    )
 
-    No Spec 1 não há API direta de subagente exposta ao orquestrador para
-    consumo ponta-a-ponta em CLI. Este comando documenta o formato dos
-    argumentos e instrui o usuário sobre a suíte property-based.
-    """
-    tags = [t.strip() for t in (args.tags or "").split(",") if t.strip()]
-    flags: list[str] = []
-    if args.csharp:
-        flags.append("csharp")
-    if args.exposicao:
-        flags.append("exposicao")
+    raiz = _resolver_raiz(args)
+    flags = FlagsDebateIniciar(
+        slug=args.slug,
+        titulo=args.titulo,
+        gatilho=args.gatilho,
+        altera_exposicao=bool(args.altera_exposicao),
+        csharp=bool(args.csharp),
+        raiz_workspace=raiz,
+    )
+    try:
+        resultado = iniciar_debate(flags)
+    except DebateIoError as exc:
+        print(f"ERRO [{exc.categoria}]: {exc.mensagem}", file=sys.stderr)
+        return 1
 
-    print("CAOS — comando 'debate'")
-    print(f"  tema:       {args.tema_titulo}")
-    if args.descricao:
-        print(f"  descricao:  {args.descricao}")
-    if tags:
-        print(f"  tags:       {', '.join(tags)}")
-    if flags:
-        print(f"  flags:      {', '.join(flags)}")
-    print()
+    print("Debate iniciado.")
+    print(f"  identificador: {resultado.identificador}")
+    print(f"  slug:          {resultado.slug}")
+    print(f"  arquivo:       {resultado.caminho_debate}")
     print(
-        "O comando 'debate' requer integração com o backend de subagente "
-        "Kiro, que será habilitada quando o orquestrador for executado em "
-        "modo de produção. Para teste em CI, use a suíte property-based em "
-        "CAOS_Orchestrator/tests/property/."
+        "Próximo passo: Conselho-no-Chat (Kiro_Brain) preenche os turnos "
+        "respeitando .kiro/steering/protocolo-debate-no-chat.md, depois "
+        f"você executa 'caos debate fechar {resultado.identificador}'."
     )
     return 0
+
+
+def _comando_debate_fechar(args: argparse.Namespace) -> int:
+    """Executa ``caos debate fechar``."""
+    from caos.debate_io import (
+        DebateIoError,
+        FlagsDebateFechar,
+        fechar_debate,
+    )
+
+    raiz = _resolver_raiz(args)
+    flags = FlagsDebateFechar(
+        identificador=args.identificador,
+        dry_run=bool(args.dry_run),
+        raiz_workspace=raiz,
+    )
+    try:
+        resultado = fechar_debate(flags)
+    except DebateIoError as exc:
+        print(f"ERRO [{exc.categoria}]: {exc.mensagem}", file=sys.stderr)
+        return 1
+
+    decisao = resultado.decisao
+    print(
+        f"Debate {decisao.identificador} {'(dry-run)' if resultado.dry_run else 'fechado'}."
+    )
+    print(f"  arquivo:               {resultado.caminho_debate}")
+    print(f"  proposta_aceita:       {decisao.decisao_final.proposta_aceita}")
+    print(f"  vetos:                 {len(decisao.vetos)}")
+    print(f"  links_zettel:          {len(decisao.links_zettel)}")
+    print(f"  aprovado_walk_forward: {decisao.aprovado_walk_forward}")
+    print(f"  reproduzivel:          {decisao.reproduzivel}")
+    print(f"  status:                {decisao.status}")
+
+    if resultado.dry_run:
+        print("(dry-run — nenhuma escrita ou commit Git foi efetuada)")
+        return 0
+
+    grav = resultado.resultado_gravacao
+    if grav is None:
+        # Não deveria acontecer fora do dry-run, mas defensivo.
+        print("ERRO [sem-resultado-gravacao]: recorder não devolveu resultado.", file=sys.stderr)
+        return 1
+    if not grav.sucesso:
+        falha = grav.falha
+        print("Gravação FALHOU; arquivos preservados em disco.", file=sys.stderr)
+        if falha is not None:
+            print(f"  categoria: {falha.categoria}", file=sys.stderr)
+            print(f"  mensagem:  {falha.mensagem}", file=sys.stderr)
+        print(f"  caminho_debate:   {grav.caminho_debate}", file=sys.stderr)
+        print(f"  caminho_decisao:  {grav.caminho_decisao}", file=sys.stderr)
+        return 1
+    print("Decisão gravada e commit Git criado.")
+    print(f"  caminho_decisao: {grav.caminho_decisao}")
+    if grav.commit_sha:
+        print(f"  commit_sha:      {grav.commit_sha}")
+    if grav.tag_aplicada:
+        print(f"  tag_aplicada:    {grav.tag_aplicada}")
+    return 0
+
+
+def _comando_debate(args: argparse.Namespace) -> int:
+    if args.debate_comando == "iniciar":
+        return _comando_debate_iniciar(args)
+    if args.debate_comando == "fechar":
+        return _comando_debate_fechar(args)
+    print(
+        f"subcomando debate desconhecido: {args.debate_comando!r}",
+        file=sys.stderr,
+    )
+    return 2  # pragma: no cover
 
 
 # ---------------------------------------------------------------------------

@@ -75,9 +75,11 @@ PROPERTIES_ESPERADAS: dict[str, tuple[int, ...]] = {
     # --- Spec 4: caos-orb (Properties 19..20) ---
     "test_orb_python_csharp_paridade.py": (19,),
     "test_orb_determinismo.py": (20,),
+    # --- Spec 5: caos-conselho-no-chat (Property 21) ---
+    "test_debate_no_chat_conformidade.py": (21,),
 }
 
-NUMEROS_PROPERTY_ESPERADOS = tuple(range(1, 21))  # 1..20
+NUMEROS_PROPERTY_ESPERADOS = tuple(range(1, 22))  # 1..21
 
 # Cada spec declara um subconjunto contíguo das Properties do catálogo.
 DESIGN_MD_PROPERTIES_POR_SPEC: dict[str, tuple[int, ...]] = {
@@ -85,6 +87,7 @@ DESIGN_MD_PROPERTIES_POR_SPEC: dict[str, tuple[int, ...]] = {
     "caos-walk-forward": (13, 14, 15),
     "caos-ninjascript-nucleo": (16, 17, 18),
     "caos-orb": (19, 20),
+    "caos-conselho-no-chat": (21,),
 }
 
 DIR_KIRO_SPECS = Path(__file__).resolve().parents[3] / ".kiro" / "specs"
