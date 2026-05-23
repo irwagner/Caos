@@ -721,6 +721,56 @@
       "tamanho_bytes": 7218
     },
     {
+      "hash_sha256": "4bfe5679286b0671cb50484be0d46462032a736c926c20f21f9856cd85fc7237",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "_concat_day_last/01_MNQ_06-25.csv",
+      "num_linhas": 65,
+      "periodo_final": "2025-06-13T03:00:00Z",
+      "periodo_inicial": "2025-03-17T03:00:00Z",
+      "tamanho_bytes": 3918
+    },
+    {
+      "hash_sha256": "3239a39f2b9155fb91e91f88c18ad55f052e1b719fa68e2ec4ad430bd794f51e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "_concat_day_last/02_MNQ_09-25.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-09-12T03:00:00Z",
+      "periodo_inicial": "2025-06-16T03:00:00Z",
+      "tamanho_bytes": 3915
+    },
+    {
+      "hash_sha256": "25742192825401d24c5f74696df17ba51eaa7c846257320d696cccfb36bbe8c2",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "_concat_day_last/03_MNQ_12-25.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-12-12T03:00:00Z",
+      "periodo_inicial": "2025-09-15T03:00:00Z",
+      "tamanho_bytes": 3925
+    },
+    {
+      "hash_sha256": "b1300ff2124782192ddeb8cf7dc162bf1f96944a893ec11b9b9b7c0b8714773b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:11Z",
+      "nome_arquivo": "_concat_day_last/04_MNQ_03-26.csv",
+      "num_linhas": 64,
+      "periodo_final": "2026-03-13T03:00:00Z",
+      "periodo_inicial": "2025-12-15T03:00:00Z",
+      "tamanho_bytes": 3783
+    },
+    {
+      "hash_sha256": "dccf01177f11bbabf40da8bac0bcfa2c4e0fd47bccd9ee6444504ed6d41c5beb",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "_concat_day_last/05_MNQ_06-26.csv",
+      "num_linhas": 42,
+      "periodo_final": "2026-05-11T03:00:00Z",
+      "periodo_inicial": "2026-03-16T03:00:00Z",
+      "tamanho_bytes": 2489
+    },
+    {
       "hash_sha256": "511d3f23fc155a47dd2aaba5c137dfda32a7c2ae70fd9cf77860d7ba0ec573e7",
       "instrumento": "MNQ",
       "mtime": "2026-05-23T02:26:18Z",
@@ -773,7 +823,7 @@
   ],
   "falhas": [],
   "geracao": {
-    "data_iso8601_utc": "2026-05-23T04:02:42Z",
+    "data_iso8601_utc": "2026-05-23T12:33:10Z",
     "instrumento": "MNQ"
   }
 }
