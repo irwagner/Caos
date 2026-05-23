@@ -154,15 +154,16 @@ CERBERUS_TIMEOUT (Cerberus não respondeu em prazo).
 - **Empate:** segue tag/intersecção descrita no perfil de Athena (R4.6 do Spec 1).
 - **Sem vencedor após votos:** Decisão sai com `status: pendente-usuario` e a tag de congelamento NÃO é aplicada.
 
-## Os 5 freios humanos (NUNCA negociáveis)
+## Os 4 freios humanos (NUNCA negociáveis)
 
 O Kiro_Brain, mesmo interpretando Athena, NUNCA pode:
 
-1. **Executar `caos walk-forward run`.** Apenas o usuário roda Walk-Forward. O Kiro_Brain pode preparar configuração e sugerir o comando, mas não invocar.
-2. **Copiar arquivos para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\`.** O Kiro_Brain só edita versão em `04_CODIGO/ninjascript/`. A instalação no NT8 é manual do usuário.
-3. **Modificar Debate ou Decisão já commitado em Git.** Reabertura exige novo Debate com referência ao anterior em `notas_injetadas`.
-4. **Aplicar `Tag_De_Congelamento` (`caos-frozen-AAAA-MM-DD-NN`) sem `aprovado_walk_forward=true`** na Decisão. A regra é do Spec 1 R8.6; aqui é apenas reafirmada.
-5. **Rodar Debate sem anunciar primeiro no chat.** Antes do Turno 1, o Kiro_Brain SEMPRE imprime uma linha "**[Conselho]** abrindo Debate_Auto `<id>-<slug>` (gatilho: G<N>)" para que o usuário saiba o que está acontecendo. Quando o usuário responder "para o Conselho", o Debate é pausado (status: em-pausa) e a conversa volta ao normal.
+1. **Copiar arquivos para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\`.** O Kiro_Brain só edita versão em `04_CODIGO/ninjascript/`. A instalação no NT8 é manual do usuário.
+2. **Modificar Debate ou Decisão já commitado em Git.** Reabertura exige novo Debate com referência ao anterior em `notas_injetadas`.
+3. **Aplicar `Tag_De_Congelamento` (`caos-frozen-AAAA-MM-DD-NN`) sem `aprovado_walk_forward=true`** na Decisão. A regra é do Spec 1 R8.6; aqui é apenas reafirmada.
+4. **Rodar Debate sem anunciar primeiro no chat.** Antes do Turno 1, o Kiro_Brain SEMPRE imprime uma linha "**[Conselho]** abrindo Debate_Auto `<id>-<slug>` (gatilho: G<N>)" para que o usuário saiba o que está acontecendo. Quando o usuário responder "para o Conselho", o Debate é pausado (status: em-pausa) e a conversa volta ao normal.
+
+> **Histórico:** o freio "não executar `caos walk-forward run`" foi removido por decisão direta do usuário em 22/mai/2026. O Kiro_Brain agora pode invocar Walk-Forward quando fizer sentido (depois de gatilho ou pedido explícito), mas SEMPRE anuncia no chat antes de executar e SEMPRE roda com `--identificador` derivado de data/UTC + sequencial. Os 4 freios restantes seguem válidos.
 
 ## Como abrir e fechar Debate (passo-a-passo)
 

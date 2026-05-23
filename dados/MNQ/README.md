@@ -8,10 +8,16 @@ Esta pasta acolhe os dados históricos do **MNQ** (Micro E-mini Nasdaq-100 Futur
 dados/MNQ/
 ├── MNQ_03-26/                # Contrato com vencimento mar/2026
 │   ├── minute/
-│   │   ├── ask.csv
+│   │   ├── MNQ 03-26.Ask.txt    (export bruto do NT8 — auditoria)
+│   │   ├── MNQ 03-26.Bid.txt
+│   │   ├── MNQ 03-26.Last.txt
+│   │   ├── ask.csv              (gerados por 'caos dados normalizar')
 │   │   ├── bid.csv
 │   │   └── last.csv
 │   └── day/
+│       ├── MNQ 03-26.Ask.txt
+│       ├── MNQ 03-26.Bid.txt
+│       ├── MNQ 03-26.Last.txt
 │       ├── ask.csv
 │       ├── bid.csv
 │       └── last.csv
@@ -41,7 +47,7 @@ Total: ~371 dias úteis (~17 meses) de cobertura contínua, com pequena sobrepos
 
 ## Procedimento de exportação no NT8 (manual, 1 contrato + 1 série + 1 granularidade por vez)
 
-O NT8 armazena dados em formato `.ncd` (NinjaTrader Compressed Data) — proprietário, binário, ilegível por Python. Para usar no pipeline CAOS é preciso exportar para CSV/TSV via UI do NinjaTrader.
+O NT8 armazena dados em formato `.ncd` (NinjaTrader Compressed Data) — proprietário, binário, ilegível por Python. Para usar no pipeline CAOS é preciso exportar para arquivo texto via UI do NinjaTrader.
 
 1. Abra o NinjaTrader 8.
 2. Menu **Tools → Historical Data**.
@@ -51,12 +57,13 @@ O NT8 armazena dados em formato `.ncd` (NinjaTrader Compressed Data) — proprie
    - **Type:** `Minute` ou `Day` conforme a granularidade pretendida.
    - **Trade Type:** uma de `Ask`, `Bid`, `Last`. **Faça uma exportação por trade type** (3 arquivos por contrato/granularidade).
    - **From / To:** intervalo cobrindo todo o histórico do contrato (use as datas da tabela acima).
-   - **Format:** `Tab-separated values` ou `Comma-separated values`. Tab é mais robusto a colunas com vírgula em decimal.
-5. Clique **Export** e salve em:
+5. Clique **Export** e salve o arquivo gerado pelo NT8 em:
    ```
-   e:\CAOS\dados\MNQ\<MNQ_MM-YY>\<minute|day>\<ask|bid|last>.csv
+   e:\CAOS\dados\MNQ\<MNQ_MM-YY>\<minute|day>\MNQ <MM>-<YY>.<Serie>.txt
    ```
-   Exemplo: para Last/minute do MNQ 03-26 → `e:\CAOS\dados\MNQ\MNQ_03-26\minute\last.csv`.
+   Exemplo: para Last/minute do MNQ 03-26 → `e:\CAOS\dados\MNQ\MNQ_03-26\minute\MNQ 03-26.Last.txt`.
+
+> O NT8 exporta como arquivo texto com extensão `.txt`, separador `;`, sem cabeçalho e timestamp em horário local da máquina. Esse arquivo é o **input** do passo de normalização descrito a seguir — não tente alimentar o `Skill_Data_Reader` diretamente com ele.
 
 ## Schema esperado pelo `Skill_Data_Reader` (Spec 2)
 
@@ -73,6 +80,29 @@ Particularmente:
 - `timestamp` em UTC (NT8 exporta em fuso local do PC; o normalizador converte).
 - Linhas em ordem cronológica estritamente crescente (sem duplicatas e sem retorno no tempo).
 - Sem linhas em branco entre barras.
+
+## Pós-exportação: normalizar arquivos `.txt` do NT8 → `.csv` canônico
+
+O NT8 exporta arquivos com extensão `.txt` (não `.csv`), nome com espaço (`MNQ 03-26.Last.txt`), separador `;`, sem cabeçalho e timestamp em horário local da máquina (`AAAAMMDD HHMMSS` para minute, `AAAAMMDD` para day). Antes de gerar o manifesto, traduza para o schema canônico:
+
+```cmd
+caos dados normalizar --root e:\CAOS
+```
+
+Por padrão assume fuso `America/Sao_Paulo` (UTC-3 fixo desde fim do horário de verão brasileiro em 2019). Se a máquina onde o NT8 exporta usa outro fuso:
+
+```cmd
+caos dados normalizar --root e:\CAOS --fuso UTC
+caos dados normalizar --root e:\CAOS --fuso America/New_York
+```
+
+Características:
+
+- Os arquivos `.txt` originais ficam intactos (auditoria).
+- Cada `.txt` gera `<serie>.csv` no mesmo diretório (`Last.txt → last.csv`, `Ask.txt → ask.csv`, `Bid.txt → bid.csv`).
+- Idempotente: se o `.csv` já existe e é mais novo que o `.txt`, é pulado. Use `--forcar` para reprocessar.
+- Validações automáticas: schema correto (6 campos por linha), timestamps parseáveis e estritamente crescentes, valores numéricos.
+- Em caso de erro o `.csv` parcial é descartado (escrita atômica via `.csv.tmp`).
 
 ## Pós-exportação: gerar manifesto
 

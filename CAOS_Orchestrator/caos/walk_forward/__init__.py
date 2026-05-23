@@ -81,6 +81,14 @@ from caos.walk_forward.models import (
     StatusWalkForward,
     Granularidade,
 )
+from caos.walk_forward.normalizador_nt8 import (
+    FUSO_DEFAULT_NT8,
+    NormalizadorNt8Error,
+    ResultadoNormalizacao,
+    detectar_destino_canonico,
+    normalizar_arquivo,
+    varrer_e_normalizar,
+)
 from caos.walk_forward.relatorio import (
     AREA_NOTA_ZETTEL,
     AGENTE_AUTOR_PADRAO,
@@ -148,6 +156,13 @@ __all__ = [
     "validar_contrato",
     "validar_granularidade",
     "validar_serie",
+    # Normalizador NT8 (importação de dados reais — pos-export do usuário)
+    "FUSO_DEFAULT_NT8",
+    "NormalizadorNt8Error",
+    "ResultadoNormalizacao",
+    "detectar_destino_canonico",
+    "normalizar_arquivo",
+    "varrer_e_normalizar",
     # RelatorioWriter (Task 7)
     "AREA_NOTA_ZETTEL",
     "AGENTE_AUTOR_PADRAO",

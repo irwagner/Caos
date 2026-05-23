@@ -1,0 +1,779 @@
+{
+  "entradas": [
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-22T12:23:29Z",
+      "nome_arquivo": ".gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_03-26/day/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "408639bb69b53433dc44f9c3bb2f041da889be71143aad94c545a09882589f5e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:43:32Z",
+      "nome_arquivo": "MNQ_03-26/day/MNQ 03-26.Ask.txt",
+      "num_linhas": 63,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3124
+    },
+    {
+      "hash_sha256": "24edc1a008313ea43d3c3bbac1f9fc9db5bd6f020916bbd20ac15e72ee125b51",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:43:22Z",
+      "nome_arquivo": "MNQ_03-26/day/MNQ 03-26.Bid.txt",
+      "num_linhas": 63,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3161
+    },
+    {
+      "hash_sha256": "b3b0a8c6bbad96e2479d2386cf39b782ad60cde5d863cd6d75ccf1e6cf8cdd2c",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:43:09Z",
+      "nome_arquivo": "MNQ_03-26/day/MNQ 03-26.Last.txt",
+      "num_linhas": 63,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3053
+    },
+    {
+      "hash_sha256": "d2e3c52f58180a8205d9cea8b98afc1b099e6bf101f1dd4f28462ad5d8a65fc6",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:11Z",
+      "nome_arquivo": "MNQ_03-26/day/ask.csv",
+      "num_linhas": 64,
+      "periodo_final": "2026-03-13T03:00:00Z",
+      "periodo_inicial": "2025-12-15T03:00:00Z",
+      "tamanho_bytes": 3854
+    },
+    {
+      "hash_sha256": "ce29d65a84b7da2be90b9450c46e9b8d2ea97382e3d33ab3c52f0a1b2b0814b2",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:11Z",
+      "nome_arquivo": "MNQ_03-26/day/bid.csv",
+      "num_linhas": 64,
+      "periodo_final": "2026-03-13T03:00:00Z",
+      "periodo_inicial": "2025-12-15T03:00:00Z",
+      "tamanho_bytes": 3891
+    },
+    {
+      "hash_sha256": "b1300ff2124782192ddeb8cf7dc162bf1f96944a893ec11b9b9b7c0b8714773b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:11Z",
+      "nome_arquivo": "MNQ_03-26/day/last.csv",
+      "num_linhas": 64,
+      "periodo_final": "2026-03-13T03:00:00Z",
+      "periodo_inicial": "2025-12-15T03:00:00Z",
+      "tamanho_bytes": 3783
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_03-26/minute/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "f9e3c73e5167b2d30b1ccbcbc39e12c29af7b431d7f4a81bd52039836560e4fa",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:41:55Z",
+      "nome_arquivo": "MNQ_03-26/minute/MNQ 03-26.Ask.txt",
+      "num_linhas": 86330,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4697866
+    },
+    {
+      "hash_sha256": "df425651f57769f854e411598266154c750069ef17e419a1e0d93caac87e3a19",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:42:08Z",
+      "nome_arquivo": "MNQ_03-26/minute/MNQ 03-26.Bid.txt",
+      "num_linhas": 86023,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4683662
+    },
+    {
+      "hash_sha256": "0baa448d3fb803d6bee0374eacedcebcba5663ca8f8440d1dbffab3a327d19ad",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:42:24Z",
+      "nome_arquivo": "MNQ_03-26/minute/MNQ 03-26.Last.txt",
+      "num_linhas": 86003,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4571303
+    },
+    {
+      "hash_sha256": "4666c7037e3d5890ec485054221085b865810f17d30f774d5032ff6c4639bb18",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:12Z",
+      "nome_arquivo": "MNQ_03-26/minute/ask.csv",
+      "num_linhas": 86331,
+      "periodo_final": "2026-03-14T00:01:00Z",
+      "periodo_inicial": "2025-12-15T06:01:00Z",
+      "tamanho_bytes": 5043223
+    },
+    {
+      "hash_sha256": "94e148edbc1d60a5541a5a4c04fe198cd88e37afc6ce51741ce78025afc916cc",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:13Z",
+      "nome_arquivo": "MNQ_03-26/minute/bid.csv",
+      "num_linhas": 86024,
+      "periodo_final": "2026-03-14T00:01:00Z",
+      "periodo_inicial": "2025-12-15T06:01:00Z",
+      "tamanho_bytes": 5027791
+    },
+    {
+      "hash_sha256": "378256fe4a0c6e8220c0ad31635e2bf3bb8301cc66e8c84dc4da47b37de5a92f",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "MNQ_03-26/minute/last.csv",
+      "num_linhas": 86004,
+      "periodo_final": "2026-03-14T00:00:00Z",
+      "periodo_inicial": "2025-12-15T06:01:00Z",
+      "tamanho_bytes": 4915352
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_06-25/day/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "00d179765b099431b9c6e3d11747f8b65d04ea2cc2ced76ccc43951161742501",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:28:10Z",
+      "nome_arquivo": "MNQ_06-25/day/MNQ 06-25.Ask.txt",
+      "num_linhas": 64,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3207
+    },
+    {
+      "hash_sha256": "8ca043bc6f4cafe5997709b7f9a58b298bebc790c370cb1a819ee793b374ea34",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:28:00Z",
+      "nome_arquivo": "MNQ_06-25/day/MNQ 06-25.Bid.txt",
+      "num_linhas": 64,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3196
+    },
+    {
+      "hash_sha256": "6885ec6ba35c116cbb4c6ebc0d18783cf57a98995e5bc3cfd717eac1df230bd4",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:27:49Z",
+      "nome_arquivo": "MNQ_06-25/day/MNQ 06-25.Last.txt",
+      "num_linhas": 64,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3177
+    },
+    {
+      "hash_sha256": "ccced990d25c8fcfec28bd60b9b44d43ef8f464ae3279bea8bce1cc1a99505f2",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "MNQ_06-25/day/ask.csv",
+      "num_linhas": 65,
+      "periodo_final": "2025-06-13T03:00:00Z",
+      "periodo_inicial": "2025-03-17T03:00:00Z",
+      "tamanho_bytes": 3948
+    },
+    {
+      "hash_sha256": "e912520ca65ac0d452eac09122d37c431f6db8840cb9eb50e0382ebfd7b34f63",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "MNQ_06-25/day/bid.csv",
+      "num_linhas": 65,
+      "periodo_final": "2025-06-13T03:00:00Z",
+      "periodo_inicial": "2025-03-17T03:00:00Z",
+      "tamanho_bytes": 3937
+    },
+    {
+      "hash_sha256": "4bfe5679286b0671cb50484be0d46462032a736c926c20f21f9856cd85fc7237",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "MNQ_06-25/day/last.csv",
+      "num_linhas": 65,
+      "periodo_final": "2025-06-13T03:00:00Z",
+      "periodo_inicial": "2025-03-17T03:00:00Z",
+      "tamanho_bytes": 3918
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_06-25/minute/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "d1cc60049262a390be2e93ab50f907b993783151cdfcb61dd268fc15a1142313",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:22:33Z",
+      "nome_arquivo": "MNQ_06-25/minute/MNQ 06-25.Ask.txt",
+      "num_linhas": 88164,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4763727
+    },
+    {
+      "hash_sha256": "f9a26b2986cd066015761771e4557919d17f81c5b51a06d6a25f71db272ef29e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:26:32Z",
+      "nome_arquivo": "MNQ_06-25/minute/MNQ 06-25.Bid.txt",
+      "num_linhas": 88119,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4760458
+    },
+    {
+      "hash_sha256": "ecb0b0e6a3deeaca7bd3b81b9126cf8434c9b71a7d82cfbce7c3548120b7a375",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:27:09Z",
+      "nome_arquivo": "MNQ_06-25/minute/MNQ 06-25.Last.txt",
+      "num_linhas": 87843,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4662669
+    },
+    {
+      "hash_sha256": "4c8d5ceb991e9abcc7836b3e02779dac462e053dac4e8519cf3233449de12d06",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:15Z",
+      "nome_arquivo": "MNQ_06-25/minute/ask.csv",
+      "num_linhas": 88165,
+      "periodo_final": "2025-06-14T00:01:00Z",
+      "periodo_inicial": "2025-03-17T06:01:00Z",
+      "tamanho_bytes": 5116420
+    },
+    {
+      "hash_sha256": "a208a54c908121e381644a480094a11410be25b00055ec8b6077a2955c50087e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:16Z",
+      "nome_arquivo": "MNQ_06-25/minute/bid.csv",
+      "num_linhas": 88120,
+      "periodo_final": "2025-06-14T00:01:00Z",
+      "periodo_inicial": "2025-03-17T06:01:00Z",
+      "tamanho_bytes": 5112971
+    },
+    {
+      "hash_sha256": "511d3f23fc155a47dd2aaba5c137dfda32a7c2ae70fd9cf77860d7ba0ec573e7",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "MNQ_06-25/minute/last.csv",
+      "num_linhas": 87844,
+      "periodo_final": "2025-06-14T02:28:00Z",
+      "periodo_inicial": "2025-03-17T06:01:00Z",
+      "tamanho_bytes": 5014078
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_06-26/day/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "b8bf0b637a00bfb23b5c814c42c473efdb05d79f980fe2c3250a48b0a628a755",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:04:28Z",
+      "nome_arquivo": "MNQ_06-26/day/MNQ 06-26.Ask.txt",
+      "num_linhas": 38,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 1896
+    },
+    {
+      "hash_sha256": "6d8dbc64a294642298c702bb9a2185c9c307e098042b23a84bea7fc5961dcdf8",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:00:08Z",
+      "nome_arquivo": "MNQ_06-26/day/MNQ 06-26.Bid.txt",
+      "num_linhas": 38,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 1878
+    },
+    {
+      "hash_sha256": "09b41fcfc3b6b42f250fe5eb9a38d943dc8109c78e4e071de3b1b8bfefcf8b31",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:56:24Z",
+      "nome_arquivo": "MNQ_06-26/day/MNQ 06-26.Last.txt",
+      "num_linhas": 41,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 2001
+    },
+    {
+      "hash_sha256": "c8b8159c0cbc4b63d6fedbcc5909d79c241b5075f256c0d834b07afdb25f6a25",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "MNQ_06-26/day/ask.csv",
+      "num_linhas": 39,
+      "periodo_final": "2026-05-06T03:00:00Z",
+      "periodo_inicial": "2026-03-16T03:00:00Z",
+      "tamanho_bytes": 2351
+    },
+    {
+      "hash_sha256": "43407c0b6332d0a12d96a9abc29956e08f922a46413f631cacc343f7b3bc0cf5",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "MNQ_06-26/day/bid.csv",
+      "num_linhas": 39,
+      "periodo_final": "2026-05-06T03:00:00Z",
+      "periodo_inicial": "2026-03-16T03:00:00Z",
+      "tamanho_bytes": 2333
+    },
+    {
+      "hash_sha256": "dccf01177f11bbabf40da8bac0bcfa2c4e0fd47bccd9ee6444504ed6d41c5beb",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "MNQ_06-26/day/last.csv",
+      "num_linhas": 42,
+      "periodo_final": "2026-05-11T03:00:00Z",
+      "periodo_inicial": "2026-03-16T03:00:00Z",
+      "tamanho_bytes": 2489
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_06-26/minute/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "c79418d1c7ae4fe15130e224f409e640f963ac73f6777d31787bb8d6170c250b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:53:43Z",
+      "nome_arquivo": "MNQ_06-26/minute/MNQ 06-26.Ask.txt",
+      "num_linhas": 52499,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 2856157
+    },
+    {
+      "hash_sha256": "349a10db6cc6eb2abf297610346607d3557d00b9fd80474a155264cd201fb774",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:54:16Z",
+      "nome_arquivo": "MNQ_06-26/minute/MNQ 06-26.Bid.txt",
+      "num_linhas": 52459,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 2856430
+    },
+    {
+      "hash_sha256": "a102f016abc7c5a9b5751ab4bd7cd0594d8c13835007359208da9d2a450f188f",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:54:25Z",
+      "nome_arquivo": "MNQ_06-26/minute/MNQ 06-26.Last.txt",
+      "num_linhas": 61724,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3282366
+    },
+    {
+      "hash_sha256": "204e3444c444725bd8fd6e3533d2bc9e6d207815ea01d51ef660d9a8324702e1",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "MNQ_06-26/minute/ask.csv",
+      "num_linhas": 52500,
+      "periodo_final": "2026-05-07T06:00:00Z",
+      "periodo_inicial": "2026-03-16T00:46:00Z",
+      "tamanho_bytes": 3066190
+    },
+    {
+      "hash_sha256": "62dde3e0d868bd89f0bdb10fb89a06756f7ec209690977493d76947c06a97a31",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:19Z",
+      "nome_arquivo": "MNQ_06-26/minute/bid.csv",
+      "num_linhas": 52460,
+      "periodo_final": "2026-05-07T06:00:00Z",
+      "periodo_inicial": "2026-03-16T00:34:00Z",
+      "tamanho_bytes": 3066303
+    },
+    {
+      "hash_sha256": "8c68e34d44d0dd18761e84f4e3d59f2bf031425db8f75f409b6a60eab337163a",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "MNQ_06-26/minute/last.csv",
+      "num_linhas": 61725,
+      "periodo_final": "2026-05-18T02:27:00Z",
+      "periodo_inicial": "2026-03-16T01:01:00Z",
+      "tamanho_bytes": 3529299
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_09-25/day/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "49dd58ae0616278709450e3a83bf2d6978966fe6dd55fa47b739ca572df29e4d",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:32:08Z",
+      "nome_arquivo": "MNQ_09-25/day/MNQ 09-25.Ask.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3272
+    },
+    {
+      "hash_sha256": "25d4648a26d555e0a3c0b54e9307ac7fd572da09e94674a1501762c3b46ce60f",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:32:17Z",
+      "nome_arquivo": "MNQ_09-25/day/MNQ 09-25.Bid.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3272
+    },
+    {
+      "hash_sha256": "60e57886e8166b9e7c2081eecde4aaa357730d08e0b2c6e5dd1cb4b932bdafde",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:32:26Z",
+      "nome_arquivo": "MNQ_09-25/day/MNQ 09-25.Last.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3163
+    },
+    {
+      "hash_sha256": "6951ef0353ecb0a9c71754493ec00ad0041f92a223d20d5b2724c907702ac3bf",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "MNQ_09-25/day/ask.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-09-12T03:00:00Z",
+      "periodo_inicial": "2025-06-16T03:00:00Z",
+      "tamanho_bytes": 4024
+    },
+    {
+      "hash_sha256": "99a382c06985dd1ff7767e6471944d6aab267d99d389c54402ca61d1399d6193",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "MNQ_09-25/day/bid.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-09-12T03:00:00Z",
+      "periodo_inicial": "2025-06-16T03:00:00Z",
+      "tamanho_bytes": 4024
+    },
+    {
+      "hash_sha256": "3239a39f2b9155fb91e91f88c18ad55f052e1b719fa68e2ec4ad430bd794f51e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "MNQ_09-25/day/last.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-09-12T03:00:00Z",
+      "periodo_inicial": "2025-06-16T03:00:00Z",
+      "tamanho_bytes": 3915
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_09-25/minute/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "3f7ae5e5f9c1157ad8d80e375add931d6ceada259c58d3358238897863c59d17",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:33:27Z",
+      "nome_arquivo": "MNQ_09-25/minute/MNQ 09-25.Ask.txt",
+      "num_linhas": 88825,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4807112
+    },
+    {
+      "hash_sha256": "1a2a2824ab0d0a93e367b58a3f69648687ed37f59e47e84c92074218a7a64edc",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:33:17Z",
+      "nome_arquivo": "MNQ_09-25/minute/MNQ 09-25.Bid.txt",
+      "num_linhas": 88790,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4804750
+    },
+    {
+      "hash_sha256": "e07e9f18a26c0bce2930ef16c2db77861fce9a8ce58c07e3a4de356b525310e5",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:33:06Z",
+      "nome_arquivo": "MNQ_09-25/minute/MNQ 09-25.Last.txt",
+      "num_linhas": 88480,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4685279
+    },
+    {
+      "hash_sha256": "601c6e29b9422d7dc4ba485d38288b370cd176d5e3e62c9a08f1cf4ef07b39e0",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:21Z",
+      "nome_arquivo": "MNQ_09-25/minute/ask.csv",
+      "num_linhas": 88826,
+      "periodo_final": "2025-09-13T00:01:00Z",
+      "periodo_inicial": "2025-06-16T06:01:00Z",
+      "tamanho_bytes": 5162449
+    },
+    {
+      "hash_sha256": "b09b5d1944cef424500b508d157d7953fdd0585842c78926e8c19423eb041369",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:22Z",
+      "nome_arquivo": "MNQ_09-25/minute/bid.csv",
+      "num_linhas": 88791,
+      "periodo_final": "2025-09-13T00:01:00Z",
+      "periodo_inicial": "2025-06-16T06:01:00Z",
+      "tamanho_bytes": 5159947
+    },
+    {
+      "hash_sha256": "f6cecabac01b14adb35391deffe055a361bac294408336fe69e53b0a6ec7459e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "MNQ_09-25/minute/last.csv",
+      "num_linhas": 88481,
+      "periodo_final": "2025-09-13T00:00:00Z",
+      "periodo_inicial": "2025-06-16T06:01:00Z",
+      "tamanho_bytes": 5039236
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_12-25/day/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "aa866fc3629659f1964a8d14b714f9be0cb322d6883071d1fc4b0f6431819b47",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:36:39Z",
+      "nome_arquivo": "MNQ_12-25/day/MNQ 12-25.Ask.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3242
+    },
+    {
+      "hash_sha256": "aef00aeb4cd53ed541f5f840cfc7e291b58a2eb3f08a4372e803d76144f55579",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:36:24Z",
+      "nome_arquivo": "MNQ_12-25/day/MNQ 12-25.Bid.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3225
+    },
+    {
+      "hash_sha256": "bcf938382a1dac26abc4cf96b52ac64032c53aaec24da91e801f3934e036d695",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:36:13Z",
+      "nome_arquivo": "MNQ_12-25/day/MNQ 12-25.Last.txt",
+      "num_linhas": 65,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3173
+    },
+    {
+      "hash_sha256": "3335ff731819199d4def1d90e36ce5773a282d7716a5f13ad3a4d5e0be61b23f",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "MNQ_12-25/day/ask.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-12-12T03:00:00Z",
+      "periodo_inicial": "2025-09-15T03:00:00Z",
+      "tamanho_bytes": 3994
+    },
+    {
+      "hash_sha256": "e5ef9ce45c10939e03ddda3b524faf1968f09ccbee00be40947e378a0854fe29",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "MNQ_12-25/day/bid.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-12-12T03:00:00Z",
+      "periodo_inicial": "2025-09-15T03:00:00Z",
+      "tamanho_bytes": 3977
+    },
+    {
+      "hash_sha256": "25742192825401d24c5f74696df17ba51eaa7c846257320d696cccfb36bbe8c2",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "MNQ_12-25/day/last.csv",
+      "num_linhas": 66,
+      "periodo_final": "2025-12-12T03:00:00Z",
+      "periodo_inicial": "2025-09-15T03:00:00Z",
+      "tamanho_bytes": 3925
+    },
+    {
+      "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:14:32Z",
+      "nome_arquivo": "MNQ_12-25/minute/.gitkeep",
+      "num_linhas": 0,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 0
+    },
+    {
+      "hash_sha256": "511dd99ba8c2e61093aee01de9ded3fecae30d6e8cfcc3be58052ad0f7f5f0f6",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:35:21Z",
+      "nome_arquivo": "MNQ_12-25/minute/MNQ 12-25.Ask.txt",
+      "num_linhas": 88844,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4827397
+    },
+    {
+      "hash_sha256": "3aa1d811e6f6f9f31c50df509a19e81a2fe95a86f743c6e2a2f51e46bf5d5d87",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:35:32Z",
+      "nome_arquivo": "MNQ_12-25/minute/MNQ 12-25.Bid.txt",
+      "num_linhas": 88865,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4827376
+    },
+    {
+      "hash_sha256": "8a12b63a15789f7e42f2a2234669d133e44f276dc3332191cff3179b8fcd07ab",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T01:35:49Z",
+      "nome_arquivo": "MNQ_12-25/minute/MNQ 12-25.Last.txt",
+      "num_linhas": 88543,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4701328
+    },
+    {
+      "hash_sha256": "1333bb02eec2dcfc07e3c222c48016ec08d10a800c6f15b54d35888d663cff6e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:25Z",
+      "nome_arquivo": "MNQ_12-25/minute/ask.csv",
+      "num_linhas": 88845,
+      "periodo_final": "2025-12-15T06:00:00Z",
+      "periodo_inicial": "2025-09-15T06:01:00Z",
+      "tamanho_bytes": 5182810
+    },
+    {
+      "hash_sha256": "876739dd4e8687be390a35d9a252f1db97d507ef7f9e539dd85642d790eeff71",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:26Z",
+      "nome_arquivo": "MNQ_12-25/minute/bid.csv",
+      "num_linhas": 88866,
+      "periodo_final": "2025-12-15T06:00:00Z",
+      "periodo_inicial": "2025-09-15T06:01:00Z",
+      "tamanho_bytes": 5182873
+    },
+    {
+      "hash_sha256": "d841243109dd5cb80f05ac8de78abf343e25ba619de7fab6f04f11fd3e11e26b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:27Z",
+      "nome_arquivo": "MNQ_12-25/minute/last.csv",
+      "num_linhas": 88544,
+      "periodo_final": "2025-12-15T06:00:00Z",
+      "periodo_inicial": "2025-09-15T06:01:00Z",
+      "tamanho_bytes": 5055537
+    },
+    {
+      "hash_sha256": "c373a7433c10b3a69fe7e7996862f474038200149d02b40dabb5c4874ec2bb0d",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:21:07Z",
+      "nome_arquivo": "README.md",
+      "num_linhas": 137,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 7218
+    },
+    {
+      "hash_sha256": "511d3f23fc155a47dd2aaba5c137dfda32a7c2ae70fd9cf77860d7ba0ec573e7",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:18Z",
+      "nome_arquivo": "_concat_minute_last/01_MNQ_06-25.csv",
+      "num_linhas": 87844,
+      "periodo_final": "2025-06-14T02:28:00Z",
+      "periodo_inicial": "2025-03-17T06:01:00Z",
+      "tamanho_bytes": 5014078
+    },
+    {
+      "hash_sha256": "f6cecabac01b14adb35391deffe055a361bac294408336fe69e53b0a6ec7459e",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:24Z",
+      "nome_arquivo": "_concat_minute_last/02_MNQ_09-25.csv",
+      "num_linhas": 88481,
+      "periodo_final": "2025-09-13T00:00:00Z",
+      "periodo_inicial": "2025-06-16T06:01:00Z",
+      "tamanho_bytes": 5039236
+    },
+    {
+      "hash_sha256": "d841243109dd5cb80f05ac8de78abf343e25ba619de7fab6f04f11fd3e11e26b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:27Z",
+      "nome_arquivo": "_concat_minute_last/03_MNQ_12-25.csv",
+      "num_linhas": 88544,
+      "periodo_final": "2025-12-15T06:00:00Z",
+      "periodo_inicial": "2025-09-15T06:01:00Z",
+      "tamanho_bytes": 5055537
+    },
+    {
+      "hash_sha256": "378256fe4a0c6e8220c0ad31635e2bf3bb8301cc66e8c84dc4da47b37de5a92f",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:14Z",
+      "nome_arquivo": "_concat_minute_last/04_MNQ_03-26.csv",
+      "num_linhas": 86004,
+      "periodo_final": "2026-03-14T00:00:00Z",
+      "periodo_inicial": "2025-12-15T06:01:00Z",
+      "tamanho_bytes": 4915352
+    },
+    {
+      "hash_sha256": "8c68e34d44d0dd18761e84f4e3d59f2bf031425db8f75f409b6a60eab337163a",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-23T02:26:20Z",
+      "nome_arquivo": "_concat_minute_last/05_MNQ_06-26.csv",
+      "num_linhas": 61725,
+      "periodo_final": "2026-05-18T02:27:00Z",
+      "periodo_inicial": "2026-03-16T01:01:00Z",
+      "tamanho_bytes": 3529299
+    }
+  ],
+  "falhas": [],
+  "geracao": {
+    "data_iso8601_utc": "2026-05-23T02:30:53Z",
+    "instrumento": "MNQ"
+  }
+}

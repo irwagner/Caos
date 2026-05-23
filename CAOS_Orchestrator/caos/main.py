@@ -20,6 +20,9 @@ Esta versão expõe (Task 17 / Spec 1 + Task 8 / Spec 2):
 * ``caos walk-forward run|status`` (R9 do Spec 2) — orquestra o
   pipeline Walk-Forward sobre ``dados/MNQ/`` e lista relatórios
   gerados em ``05_BACKTEST/walk_forward/relatorios/``.
+* ``caos dados normalizar`` — traduz arquivos ``.txt`` exportados
+  pelo NT8 (formato ``MNQ XX-YY.<Serie>.txt``) em ``.csv`` canônico
+  no schema do Spec 2.
 
 Idioma da saída: pt-BR. Plataforma alvo: Windows + cmd (R3.2, R3.3).
 """
@@ -83,7 +86,7 @@ def _construir_parser() -> argparse.ArgumentParser:
         description=(
             "Orquestrador do Conselho Multi-Agente CAOS. Subcomandos: "
             "init, manifesto, hydra, debate, perfil, cache, budget, "
-            "walk-forward."
+            "walk-forward, dados."
         ),
     )
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -454,6 +457,20 @@ def _construir_parser() -> argparse.ArgumentParser:
             "e invoca CouncilRecorder.gravar (commit dedicado em Git)."
         ),
     )
+    wf_run_parser.add_argument(
+        "--fonte",
+        type=Path,
+        default=None,
+        help=(
+            "path explícito do CSV (ou diretório) a usar como fonte de "
+            "dados. Quando omitido, o Engine recebe a raiz "
+            "dados/MNQ/ e tenta concatenar TODOS os CSVs descobertos "
+            "recursivamente — isso só funciona quando há um único "
+            "stream cronológico. Para WFs sobre 1 contrato/granularidade/"
+            "série específicos, use ex.: "
+            "'--fonte e:\\CAOS\\dados\\MNQ\\MNQ_03-26\\minute\\last.csv'."
+        ),
+    )
 
     wf_status_parser = wf_sub.add_parser(
         "status",
@@ -480,6 +497,60 @@ def _construir_parser() -> argparse.ArgumentParser:
         help=(
             "se fornecido, mostra apenas o relatório com este "
             "identificador (formato AAAA-MM-DD-NN)."
+        ),
+    )
+
+    # ---- caos dados normalizar ----
+    dados_parser = sub.add_parser(
+        "dados",
+        help="utilitários sobre dados/MNQ/ (importação e normalização)",
+        description=(
+            "Comandos auxiliares para ingerir dados exportados pelo "
+            "NinjaTrader 8 antes do Walk-Forward. Subcomando: "
+            "normalizar (traduz .txt do NT8 em .csv canônico)."
+        ),
+    )
+    dados_sub = dados_parser.add_subparsers(
+        dest="dados_comando", required=True
+    )
+    dados_normalizar_parser = dados_sub.add_parser(
+        "normalizar",
+        help="varre dados/MNQ/ e gera *.csv canônicos a partir de *.txt do NT8",
+        description=(
+            "Percorre dados/MNQ/<contrato>/<minute|day>/ procurando "
+            "arquivos exportados pelo NT8 (formato 'MNQ XX-YY.<Ask|"
+            "Bid|Last>.txt'), traduz para o schema canônico "
+            "(timestamp,open,high,low,close,volume com timestamp ISO "
+            "8601 UTC) e grava no mesmo diretório como '<serie>.csv'. "
+            "Os .txt originais ficam intactos. Idempotente — pula "
+            "arquivos cujo .csv já é mais novo (use --forcar para "
+            "reprocessar). Após este passo, rode 'caos manifesto build' "
+            "para gerar manifesto.json."
+        ),
+    )
+    dados_normalizar_parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="raiz do workspace; default = cwd.",
+    )
+    dados_normalizar_parser.add_argument(
+        "--fuso",
+        type=str,
+        default="America/Sao_Paulo",
+        help=(
+            "fuso IANA dos timestamps locais do NT8 (default: "
+            "America/Sao_Paulo, que é UTC-3 fixo desde fim do horário "
+            "de verão brasileiro em 2019). Use 'UTC' se sua máquina "
+            "exporta em UTC ou outro identificador IANA válido."
+        ),
+    )
+    dados_normalizar_parser.add_argument(
+        "--forcar",
+        action="store_true",
+        help=(
+            "reprocessa todos os arquivos, ignorando a verificação de "
+            "idempotência (mtime do .csv vs. do .txt)."
         ),
     )
 
@@ -1067,11 +1138,20 @@ def _comando_walk_forward_run(args: argparse.Namespace) -> int:
             return 1
 
     engine = WalkForwardEngine(raiz_dados=raiz_dados)
+    fonte = args.fonte if args.fonte is not None else raiz_dados
+    if args.fonte is not None:
+        fonte = Path(fonte).expanduser().resolve()
+        if not fonte.exists():
+            print(
+                f"ERRO: --fonte aponta para path inexistente: {fonte}",
+                file=sys.stderr,
+            )
+            return 1
     try:
         resultado = engine.executar(
             estrategia=estrategia,
             configuracao=configuracao,
-            fonte_dados=raiz_dados,
+            fonte_dados=fonte,
             identificador=args.identificador,
         )
     except ValueError as exc:
@@ -1242,6 +1322,90 @@ def _comando_walk_forward(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Despachador: dados normalizar (importação NT8 → CSV canônico)
+# ---------------------------------------------------------------------------
+
+
+def _comando_dados_normalizar(args: argparse.Namespace) -> int:
+    """Executa ``caos dados normalizar``."""
+    from caos.walk_forward.normalizador_nt8 import (
+        NormalizadorNt8Error,
+        varrer_e_normalizar,
+    )
+
+    raiz = _resolver_raiz(args)
+    raiz_dados = raiz / _RAIZ_DADOS_MNQ_RELATIVO
+    if not raiz_dados.is_dir():
+        print(
+            f"ERRO: diretório de dados ausente em {raiz_dados}.\n"
+            "Execute 'caos init' primeiro e exporte os arquivos do NT8 "
+            "antes de normalizar.",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(f"Normalização NT8 -> CSV canônico em: {raiz_dados}")
+    print(f"  fuso assumido: {args.fuso}")
+    if args.forcar:
+        print("  --forcar: reprocessando todos os arquivos.")
+
+    try:
+        resultados = varrer_e_normalizar(
+            raiz_workspace=raiz,
+            fuso=args.fuso,
+            forcar=bool(args.forcar),
+        )
+    except NormalizadorNt8Error as exc:
+        print(f"ERRO [{exc.categoria}]: {exc.mensagem}", file=sys.stderr)
+        return 1
+
+    if not resultados:
+        print(
+            "  nenhum arquivo .txt no padrão NT8 encontrado. "
+            "Verifique se exportou para o caminho correto "
+            "(dados/MNQ/<contrato>/<minute|day>/MNQ XX-YY.<Ask|Bid|"
+            "Last>.txt)."
+        )
+        return 0
+
+    total_processados = sum(1 for r in resultados if not r.pulado)
+    total_pulados = sum(1 for r in resultados if r.pulado)
+    total_linhas = sum(r.linhas_escritas for r in resultados)
+    total_ms = sum(r.tempo_ms for r in resultados)
+    print(
+        f"  {len(resultados)} arquivo(s) processado(s) "
+        f"({total_processados} novo(s), {total_pulados} pulado(s) por "
+        f"idempotência)."
+    )
+    print(f"  total de linhas gravadas: {total_linhas}")
+    print(f"  duração total: {total_ms} ms")
+    print()
+    print("  detalhes (relativo à raiz):")
+    for r in resultados:
+        relativo_txt = r.arquivo_txt.relative_to(raiz)
+        relativo_csv = r.arquivo_csv.relative_to(raiz)
+        marca = "PULADO" if r.pulado else f"{r.linhas_escritas} linhas"
+        print(f"    - {relativo_txt}  ->  {relativo_csv}  [{marca}]")
+
+    print()
+    print(
+        "Próximo passo: 'caos manifesto build' para gerar dados/MNQ/"
+        "manifesto.json antes do Walk-Forward."
+    )
+    return 0
+
+
+def _comando_dados(args: argparse.Namespace) -> int:
+    if args.dados_comando == "normalizar":
+        return _comando_dados_normalizar(args)
+    print(
+        f"subcomando dados desconhecido: {args.dados_comando!r}",
+        file=sys.stderr,
+    )
+    return 2  # pragma: no cover
+
+
+# ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
 
@@ -1266,6 +1430,8 @@ def cli(argv: Sequence[str] | None = None) -> int:
         return _comando_budget(args)
     if args.comando == "walk-forward":
         return _comando_walk_forward(args)
+    if args.comando == "dados":
+        return _comando_dados(args)
     parser.error(f"subcomando desconhecido: {args.comando!r}")
     return 2  # pragma: no cover
 
