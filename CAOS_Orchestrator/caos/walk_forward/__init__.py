@@ -48,6 +48,20 @@ from caos.walk_forward.engine import (
     METRICAS_AGREGAVEIS,
     WalkForwardEngine,
 )
+from caos.walk_forward.fontes_dados import (
+    DIR_RAIZ_MNQ_RELATIVO,
+    FonteCsv,
+    FonteDadosError,
+    GRANULARIDADES_VALIDAS,
+    SERIES_VALIDAS,
+    SerieTrade,
+    listar_contratos_disponiveis,
+    listar_csvs_existentes,
+    resolver_fonte,
+    validar_contrato,
+    validar_granularidade,
+    validar_serie,
+)
 from caos.walk_forward.janelas import (
     EntradaDados,
     JanelaGenerator,
@@ -121,6 +135,19 @@ __all__ = [
     "LIMIAR_TAXA_FALHAS",
     "METRICAS_AGREGAVEIS",
     "WalkForwardEngine",
+    # FontesDados (refator pos-coleta de dados reais — Spec 5)
+    "DIR_RAIZ_MNQ_RELATIVO",
+    "FonteCsv",
+    "FonteDadosError",
+    "GRANULARIDADES_VALIDAS",
+    "SERIES_VALIDAS",
+    "SerieTrade",
+    "listar_contratos_disponiveis",
+    "listar_csvs_existentes",
+    "resolver_fonte",
+    "validar_contrato",
+    "validar_granularidade",
+    "validar_serie",
     # RelatorioWriter (Task 7)
     "AREA_NOTA_ZETTEL",
     "AGENTE_AUTOR_PADRAO",
