@@ -6,17 +6,21 @@
 
 ## Sumário executivo
 
-Três Walk-Forwards rodados em paralelo sobre o concat MNQ minute
+Quatro Walk-Forwards rodados sobre o concat MNQ minute
 (2025-03-17 → 2026-05-18). Resultado **negativo** para Noise Area
-(ambas as variantes, lookback 14 e 90), resultado **insuficiente**
-para Turn-of-the-Month (apenas 1 janela com 4 trades — amostra
-ridícula).
+em ambas as direções (momentum e mean-reversion), resultado
+**insuficiente** para Turn-of-the-Month (apenas 1 janela com 4
+trades — amostra ridícula). **Achado novo relevante:** o edge bruto
+de mean-reversion intraday em MNQ existe mas não é exploitável sob
+a fricção Topstep com estrutura "1 trade/dia por breakout" (motivo
+matemático detalhado abaixo).
 
-| ID            | Estratégia               | Janelas | Trades médios | Sharpe | Win rate | PnL total (pts) | Calmar |
-|---------------|--------------------------|---------|---------------|--------|----------|-----------------|--------|
-| 2026-05-24-02 | NoiseArea lookback=14    | 4       | 59.25         | **-8.64** | 10.9% | **-340.08**     | -4.14  |
-| 2026-05-24-03 | NoiseArea lookback=90    | 3       | 60.00         | **-10.08** | 8.3% | **-377.07**     | -4.20  |
-| 2026-05-24-04 | TurnOfMonth (5/3 paper)  | 1       | 4.00          | +0.44  | 50.0%    | +50.13          | +0.18  |
+| ID            | Estratégia                       | Janelas | Trades médios | Sharpe       | Win rate | PnL total (pts) | Calmar |
+|---------------|----------------------------------|---------|---------------|--------------|----------|-----------------|--------|
+| 2026-05-24-02 | NoiseArea k=14 (momentum)        | 4       | 59.25         | **−8.64**    | 10.9%    | **−340.08**     | −4.14  |
+| 2026-05-24-03 | NoiseArea k=90 (momentum)        | 3       | 60.00         | **−10.08**   | 8.3%     | **−377.07**     | −4.20  |
+| 2026-05-24-05 | NoiseArea k=14 (mean-reversion)  | 4       | 59.50         | **−3.45**    | 46.6%    | **−180.23**     | −3.80  |
+| 2026-05-24-04 | TurnOfMonth (5/3 paper)          | 1       | 4.00          | +0.44        | 50.0%    | +50.13          | +0.18  |
 
 > Métricas referem-se ao **agregado_mediana** (resumo robusto entre
 > janelas WF). PnL em pontos × contratos × USD2/ponto = USD efetivo.
@@ -63,6 +67,49 @@ filtrada (apenas em horário pré-market americano? só em dias com
 gap-overnight grande?), mas isso seria adicionar parâmetro novo —
 viola a regra anti-overfit. Encerrar este caminho.
 
+### Adendo (2026-05-24, WF 2026-05-24-05) — Inversão de sinais
+
+A hipótese natural após o resultado catastrófico era que o sinal
+correto fosse o inverso: breakout acima da banda dispara SHORT
+(mean-reversion), breakout abaixo dispara LONG. Adicionei o flag
+`inverter_sinais` e rodei o WF `2026-05-24-05`.
+
+| Métrica            | Momentum (paper) | Mean-reversion (inverter) |
+|--------------------|------------------|---------------------------|
+| Sharpe             | −8.26            | **−3.45**                 |
+| Win rate           | 11.0%            | **46.6%**                 |
+| PnL total (pts)    | −361             | −180                      |
+| Calmar             | −4.20            | −3.80                     |
+| Drawdown %         | 100%             | 100%                      |
+| Trades/janela      | 59.5             | 59.5                      |
+
+A inversão **melhorou substancialmente** mas **ainda perde** com
+fricção Topstep. O motivo é matemático e relevante para todo o
+projeto:
+
+- Versão momentum paga **fricção 2x dolorosa**: entra no topo (preço
+  alto) e sai mais barato.
+- Versão mean-reversion tem PnL bruto positivo (+~420 pts) mas
+  consome ~600 pts de custo total em 240 trades × ~2.5 pts/trade.
+
+Quer dizer: o **edge bruto de mean-reversion intraday existe**, mas é
+da ordem de 1.7 pts/trade — menor que a fricção realista (~2.5 pts).
+Para a estratégia virar viável seria necessário **um dos três:**
+
+1. Reduzir trades (filtro de qualidade) sem perder o PnL bruto.
+2. Provar que `slippage_fracao_range = 0.075` é alto demais (precisa
+   de tick data pra medir spread efetivo do MNQ).
+3. Aumentar tamanho do trade médio — mas isso requer alvo/stop
+   dinâmico, parâmetro novo, anti-overfit barra.
+
+**Decisão:** Noise Area encerrada nas duas direções. **Achado
+relevante: edge bruto de mean-reversion intraday em MNQ existe mas
+não é exploitável sob fricção Topstep com estrutura "1 trade/dia
+por breakout".** Esse achado vai pra base de hipóteses do
+Explorador como motivação para investigar **variantes seletivas**
+quando tick data chegar (filtrar por spread baixo, hora do dia
+com mais reversão, etc).
+
 ## Análise — Turn-of-the-Month (insuficiente, manter como candidata)
 
 ### Hipótese original
@@ -99,14 +146,15 @@ históricos completos do MNQ (anos anteriores), reabrir.
 
 ## Comparação cruzada com candidatas anteriores
 
-| Estratégia                     | Status          | Trades/ano | Sharpe       | PnL/ano (USD) |
-|--------------------------------|-----------------|------------|--------------|---------------|
-| ORB Crabel                     | rejeitada       | ~80        | <0           | negativo      |
-| Pre-FOMC drift                 | candidata frágil| 8-10       | ~0.8         | +1k-2k        |
-| Crabel NR7                     | candidata frágil| ~30        | ~0.5         | ~+500         |
-| Mini-portfolio (PreFOMC+NR7)   | candidata       | ~40        | combinado    | ~+2.5k        |
-| **Noise Area (k=14 ou 90)**    | **rejeitada**   | ~250       | **negativo** | **negativo**  |
-| **Turn-of-the-Month**          | bloqueada       | ~12        | ?            | ?             |
+| Estratégia                           | Status            | Trades/ano | Sharpe       | PnL/ano (USD) |
+|--------------------------------------|-------------------|------------|--------------|---------------|
+| ORB Crabel                           | rejeitada         | ~80        | <0           | negativo      |
+| Pre-FOMC drift                       | candidata frágil  | 8-10       | ~0.8         | +1k-2k        |
+| Crabel NR7                           | candidata frágil  | ~30        | ~0.5         | ~+500         |
+| Mini-portfolio (PreFOMC+NR7)         | candidata         | ~40        | combinado    | ~+2.5k        |
+| **Noise Area momentum (k=14 ou 90)** | **rejeitada**     | ~250       | **-8 a -10** | **-2k a -3k** |
+| **Noise Area mean-reversion**        | **rejeitada**     | ~250       | **-3.4**     | **-1.5k**     |
+| **Turn-of-the-Month**                | bloqueada (dados) | ~12        | ?            | ?             |
 
 ## Notas operacionais
 

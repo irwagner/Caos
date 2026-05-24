@@ -87,6 +87,11 @@ class ParametrosNoiseArea:
     minutos_lockout: int = MINUTOS_LOCKOUT_PRE_FECHAMENTO
     apenas_long: bool = False
     apenas_short: bool = False
+    #: Quando ``True``, inverte os sinais: breakout acima da banda
+    #: dispara SHORT, breakout abaixo dispara LONG. Hipótese de
+    #: mean-reversion (testada empiricamente em MNQ depois que a versão
+    #: momentum mostrou Sharpe -8.64 com win rate 11%).
+    inverter_sinais: bool = False
 
     def __post_init__(self) -> None:
         if not (5 <= self.lookback_dias <= 252):
@@ -172,6 +177,7 @@ class EstrategiaNoiseArea:
         apenas_long: Optional[bool] = None,
         apenas_short: Optional[bool] = None,
         minutos_lockout: Optional[int] = None,
+        inverter_sinais: Optional[bool] = None,
     ) -> None:
         # Se kwargs explicitos vierem, sobrescrevem o default. Permite
         # invocacao via --estrategia-args '{"lookback_dias": 90}' sem
@@ -189,6 +195,8 @@ class EstrategiaNoiseArea:
             overrides["apenas_short"] = apenas_short
         if minutos_lockout is not None:
             overrides["minutos_lockout"] = minutos_lockout
+        if inverter_sinais is not None:
+            overrides["inverter_sinais"] = inverter_sinais
         if overrides:
             from dataclasses import replace
             base = replace(base, **overrides)
@@ -318,30 +326,58 @@ class EstrategiaNoiseArea:
             if self._dia_ja_operou:
                 # Já operou hoje, não re-entra (regra do paper).
                 return
-            # Sinal LONG: close cruzou acima da upper_band.
-            if (
-                not self._parametros.apenas_short
-                and close > upper
-            ):
-                self._abrir_posicao("long", ts, close, high, low)
-                self._dia_ja_operou = True
+            # Determina lados conforme flag inverter_sinais.
+            # Versão momentum (paper original): close > upper => long,
+            # close < lower => short.
+            # Versão mean-reversion (inverter_sinais=True): close > upper
+            # => short, close < lower => long.
+            if not self._parametros.inverter_sinais:
+                lado_alto = "long"
+                lado_baixo = "short"
+            else:
+                lado_alto = "short"
+                lado_baixo = "long"
+
+            if close > upper:
+                if (
+                    lado_alto == "long" and not self._parametros.apenas_short
+                ) or (
+                    lado_alto == "short" and not self._parametros.apenas_long
+                ):
+                    self._abrir_posicao(lado_alto, ts, close, high, low)
+                    self._dia_ja_operou = True
                 return
-            # Sinal SHORT: close cruzou abaixo da lower_band.
-            if (
-                not self._parametros.apenas_long
-                and close < lower
-            ):
-                self._abrir_posicao("short", ts, close, high, low)
-                self._dia_ja_operou = True
+            if close < lower:
+                if (
+                    lado_baixo == "long" and not self._parametros.apenas_short
+                ) or (
+                    lado_baixo == "short" and not self._parametros.apenas_long
+                ):
+                    self._abrir_posicao(lado_baixo, ts, close, high, low)
+                    self._dia_ja_operou = True
                 return
         else:
-            # Posição aberta — checa saída por retorno à Noise Area.
-            if self._posicao.lado == "long" and close <= upper:
-                self._fechar_posicao(ts=ts, preco=close)
-                return
-            if self._posicao.lado == "short" and close >= lower:
-                self._fechar_posicao(ts=ts, preco=close)
-                return
+            # Posição aberta — checa saída.
+            # Versão momentum: long sai quando close <= upper (preço
+            # voltou pra dentro da Noise Area pelo lado de cima),
+            # short sai quando close >= lower.
+            # Versão mean-reversion: short sai quando close <= upper
+            # (preço já reverteu o suficiente), long sai quando close
+            # >= lower.
+            if not self._parametros.inverter_sinais:
+                if self._posicao.lado == "long" and close <= upper:
+                    self._fechar_posicao(ts=ts, preco=close)
+                    return
+                if self._posicao.lado == "short" and close >= lower:
+                    self._fechar_posicao(ts=ts, preco=close)
+                    return
+            else:
+                if self._posicao.lado == "short" and close <= upper:
+                    self._fechar_posicao(ts=ts, preco=close)
+                    return
+                if self._posicao.lado == "long" and close >= lower:
+                    self._fechar_posicao(ts=ts, preco=close)
+                    return
 
     def finalizar(self) -> Sequence[Trade]:
         """Fecha posição aberta com último close conhecido."""

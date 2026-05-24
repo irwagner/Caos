@@ -324,6 +324,38 @@ class TestBreakouts:
         datas_entrada = [t.entrada_timestamp.date() for t in trades]
         assert len(datas_entrada) == len(set(datas_entrada))
 
+    def test_inverter_sinais_breakout_alto_dispara_short(self) -> None:
+        # Hipótese mean-reversion: breakout up vira SHORT (em vez de
+        # long como no paper).
+        plugin = EstrategiaNoiseArea(
+            ParametrosNoiseArea(lookback_dias=14, inverter_sinais=True)
+        )
+        df_treino = _serie_rth_estavel(date(2025, 1, 6), num_dias_uteis=14)
+        df_teste = _serie_com_breakout_no_dia_alvo(
+            inicio=date(2025, 1, 24),
+            num_dias_uteis=3,
+            dia_breakout_idx=2,
+            direcao="up",
+        )
+        trades = _executar_plugin(plugin, df_treino, df_teste)
+        assert len(trades) >= 1
+        assert trades[0].lado == "short"
+
+    def test_inverter_sinais_breakout_baixo_dispara_long(self) -> None:
+        plugin = EstrategiaNoiseArea(
+            ParametrosNoiseArea(lookback_dias=14, inverter_sinais=True)
+        )
+        df_treino = _serie_rth_estavel(date(2025, 1, 6), num_dias_uteis=14)
+        df_teste = _serie_com_breakout_no_dia_alvo(
+            inicio=date(2025, 1, 24),
+            num_dias_uteis=3,
+            dia_breakout_idx=2,
+            direcao="down",
+        )
+        trades = _executar_plugin(plugin, df_treino, df_teste)
+        assert len(trades) >= 1
+        assert trades[0].lado == "long"
+
 
 # ---------------------------------------------------------------------------
 # Smoke: aderência ao Protocol Estrategia + integração

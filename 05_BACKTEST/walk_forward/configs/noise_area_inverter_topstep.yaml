@@ -1,0 +1,20 @@
+# Variante "mean-reversion" da Noise Area.
+#
+# A versao momentum (paper original Zarattini-Aziz-Barbon 2024) deu
+# Sharpe -8.64 e win rate 11% em MNQ minute (2026-05-24-02). Como o
+# resultado e fortemente assimetrico, hipotese natural e que o sinal
+# correto seja o INVERSO: quando close cruza acima da banda dinamica,
+# short (mean-reversion); quando cruza abaixo, long.
+#
+# Mesmos parametros do default lookback=14 + RTH NY. Unica mudanca:
+# inverter_sinais=True (passado via --estrategia-args).
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075
