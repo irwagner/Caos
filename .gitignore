@@ -63,6 +63,10 @@ dados/MNQ/**/*.csv
 dados/MNQ/**/*.txt
 dados/MNQ/**/*.parquet
 
+# Exceção: spread_minuto.csv é o tick agregado (~5-15 MB cada),
+# valioso para análise e versionável.
+!dados/MNQ/**/spread_minuto.csv
+
 # Diretórios auxiliares de execução do Walk-Forward (R5):
 # - _wf_isolada: cópia estável da fonte para evitar invalidacao de
 #   manifesto enquanto NT8 exporta tick.txt continuamente.
