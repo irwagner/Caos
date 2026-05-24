@@ -1,0 +1,21 @@
+# Variante TOM com janela menor (60+60) para ter mais janelas WF.
+#
+# Configuracao default (120+120) deu apenas 1 janela com 4 trades em
+# nossa serie de ~290 dias uteis. Aqui usamos 60+60 para conseguir
+# ~3-4 janelas com 2-3 trades cada - amostra agregada similar mas
+# Sharpe local mais robusto via mediana entre janelas.
+#
+# Edge bruto esperado: holding ~7 dias uteis com move medio de
+# 50-100 pts. Friccao Topstep (~2.5 pts/trade) representa <5% do
+# edge bruto - estrategia NAO deve ser dominada por friccao
+# (regra ouro do sweep 2026-05-24-10..14: edge bruto >= 5 pts/trade).
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075
