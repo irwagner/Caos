@@ -63,6 +63,15 @@ dados/MNQ/**/*.csv
 dados/MNQ/**/*.txt
 dados/MNQ/**/*.parquet
 
+# Diretórios auxiliares de execução do Walk-Forward (R5):
+# - _wf_isolada: cópia estável da fonte para evitar invalidacao de
+#   manifesto enquanto NT8 exporta tick.txt continuamente.
+# - _quarantine_*: arquivos .txt em export do NT8 movidos
+#   temporariamente para fora da raiz monitorada.
+dados/_wf_isolada/
+dados/_quarantine_tick_em_export/
+dados/_quarantine_export_temporario/
+
 # Logs de execução do robô
 05_BACKTEST/**/*.log
 05_BACKTEST/**/*.csv

@@ -1,0 +1,30 @@
+# Configuracao do Walk-Forward para EstrategiaNoiseArea.
+#
+# Decorre do briefing-explorador-2026-05-24-expandido (commit 259e1cd):
+# replicacao da estrategia "Beat the Market" de Zarattini-Aziz-Barbon
+# (2024). Quantitativo replicou em ES/NQ com Sharpe 1.67 (NQ) e
+# portfolio Sharpe 1.57.
+#
+# Versao default usa o lookback do paper original (14 dias).
+# Para variante Quantitativo lookback=90, ver
+# noise_area_lookback90_topstep.yaml.
+#
+# Notas:
+# - Teste de 60 dias uteis (~3 meses): com 1 trade/dia em RTH (~21
+#   pregoes/mes) potencialmente da 30-60 trades/janela.
+# - Treino de 60 dias uteis: estrategia precisa de 14 dias de
+#   historico minimo para popular o deque de retornos absolutos por
+#   minuto de sessao. Treino maior nao agrega valor (deque tem
+#   maxlen=14), mas atende a R2.1 do Spec 2 (treino >= 60).
+# - Friccao Topstep: igual ao Pre-FOMC e Crabel para comparabilidade
+#   entre estrategias.
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075

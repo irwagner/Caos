@@ -1,0 +1,31 @@
+# Configuracao do Walk-Forward para EstrategiaTurnOfMonth.
+#
+# Decorre do briefing-explorador-2026-05-24-tick-portfolio-microestrutura
+# (commit faea51c): unico calendar effect que sobreviveu ao rigor
+# estatistico em ES futures (Carchano-Tornero 2011, SSRN 1958587).
+#
+# Setup: long no fechamento do 5o ultimo dia util do mes -> exit no
+# fechamento do 3o dia util do mes seguinte. ~12 trades/ano.
+#
+# Notas:
+# - Teste de 120 dias uteis (~6 meses) para ter ~6 trades/janela —
+#   amostra minima para Sharpe local.
+# - Treino de 60 dias uteis: estrategia nao tem treino real, mas R2.1
+#   do Spec 2 exige.
+# - Granularidade: 1m suficiente porque entrada/saida sao no
+#   fechamento do dia (ultima barra do dia que tiver dados). day
+#   tambem funcionaria mas 1m mantem comparabilidade.
+# - Friccao Topstep: igual aos demais.
+# - Holding longo (~7-8 dias uteis) absorve facilmente slippage de
+#   0.25 pt/lado. Custos de 0.62 USD/contrato/lado representam <0.1%
+#   do PnL esperado.
+
+tamanho_treino_dias_uteis: 120
+tamanho_teste_dias_uteis: 120
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075

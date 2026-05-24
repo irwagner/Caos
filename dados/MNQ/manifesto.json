@@ -823,13 +823,13 @@
   ],
   "falhas": [
     {
-      "caminho_relativo": "MNQ_06-26/tick/MNQ 06-26.Ask.txt",
+      "caminho_relativo": "MNQ_03-26/tick/MNQ 03-26.Ask.txt",
       "categoria": "timeout",
       "mensagem": "timeout excedido após 60s"
     }
   ],
   "geracao": {
-    "data_iso8601_utc": "2026-05-24T03:09:32Z",
+    "data_iso8601_utc": "2026-05-24T03:49:07Z",
     "instrumento": "MNQ"
   }
 }

@@ -1,0 +1,22 @@
+# Variante "Quantitativo NQ replication" da Noise Area.
+#
+# Quantitativo (Christian Cole) replicou Beat the Market em NQ com
+# lookback=90 dias e leverage 8x — Sharpe 1.67 reportado. Aqui
+# replicamos lookback=90 mas SEM leverage (1 contrato fixo). O
+# multiplicador de exposicao e responsabilidade do BacktestRunner /
+# Topstep, nao da estrategia.
+#
+# Notas:
+# - Treino aumentado para 100 dias uteis para garantir que o deque
+#   tenha 90 dias completos antes do Teste comecar.
+# - Demais parametros identicos ao default Noise Area.
+
+tamanho_treino_dias_uteis: 100
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075
