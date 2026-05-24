@@ -178,6 +178,8 @@ class EstrategiaNoiseArea:
         apenas_short: Optional[bool] = None,
         minutos_lockout: Optional[int] = None,
         inverter_sinais: Optional[bool] = None,
+        sessao_inicio_hhmm: Optional[str] = None,
+        sessao_fim_hhmm: Optional[str] = None,
     ) -> None:
         # Se kwargs explicitos vierem, sobrescrevem o default. Permite
         # invocacao via --estrategia-args '{"lookback_dias": 90}' sem
@@ -197,6 +199,12 @@ class EstrategiaNoiseArea:
             overrides["minutos_lockout"] = minutos_lockout
         if inverter_sinais is not None:
             overrides["inverter_sinais"] = inverter_sinais
+        if sessao_inicio_hhmm is not None:
+            h, m = sessao_inicio_hhmm.split(":")
+            overrides["sessao_inicio_utc"] = time(int(h), int(m))
+        if sessao_fim_hhmm is not None:
+            h, m = sessao_fim_hhmm.split(":")
+            overrides["sessao_fim_utc"] = time(int(h), int(m))
         if overrides:
             from dataclasses import replace
             base = replace(base, **overrides)

@@ -11,7 +11,8 @@
 | 2026-05-22-01 | ORB Crabel original                      | 4       | ~80/ano    | <0     | <50%     | <0      | <2.5 pts         | rejeitada      |
 | 2026-05-23-01 | ORB s/ fricção (deprecated)              | -       | -          | 1.42   | -        | +6170   | -                | revogada       |
 | 2026-05-23-03 | ORB c/ hold-out                          | 4       | -          | 0.38   | -        | -       | -                | rejeitada      |
-| (pre-FOMC)    | EstrategiaPreFomcDrift                   | -       | ~10/ano    | ~0.8   | ~70%     | +723    | ~70 pts          | candidata frágil |
+| 2026-05-23-04 | Pre-FOMC (slippage fixo, 60/60)          | 4       | 2          | **+7.49** | 75% | +119  | ~60 pts          | candidata frágil |
+| 2026-05-23-05 | Pre-FOMC (slippage proporcional, 60/60)  | 4       | 2          | **+6.75** | 75% | +96   | ~50 pts          | candidata frágil |
 | (NR7)         | EstrategiaORBCrabel modo=nr7             | -       | ~30/ano    | ~0.5   | -        | +474    | ~10 pts          | candidata frágil |
 | 2026-05-24-02 | NoiseArea k=14 (momentum)                | 4       | 59.25      | **−8.64** | 10.9% | −340 | ~-1.4 pts | rejeitada |
 | 2026-05-24-03 | NoiseArea k=90 (momentum)                | 3       | 60.00      | **−10.08** | 8.3% | −377 | ~-2.1 pts | rejeitada |
@@ -20,6 +21,8 @@
 | 2026-05-24-10..14 | Sweep fricção (NoiseArea inverter)   | 4 ea    | 59.5       | -4.7 a +0.24 | varies | varies | -      | analítico      |
 | 2026-05-24-15 | TurnOfMonth (60+60, 4 janelas)           | 4       | 2.5        | **−1.07** | 50% | −85 | ~-34 pts/trade | rejeitada |
 | 2026-05-24-16 | OvernightDrift (Cooper 2008)             | 4       | 49.50      | **−1.07** | 49.9% | −487 | ~-9.8 pts | rejeitada |
+| 2026-05-24-17 | NoiseArea inverter h=14:30-19:00 UTC     | 4       | 59.50      | **−3.47** | 50.0% | −193 | ~-0.8 pts | rejeitada |
+| 2026-05-24-18 | Pre-FOMC 120/120 (1 janela)              | 1       | 4          | **−0.58** | 50% | −10 | ~-2.6 pts/trade | rejeitada (esta config) |
 
 ## Achados gerais
 
@@ -59,9 +62,39 @@ Hipótese: efeito calendar pode ter desaparecido em ES/MNQ desde
 
 ### 4. As únicas candidatas frágeis sobreviventes
 
-- **Pre-FOMC drift**: ~10 trades/ano, edge bruto ~70 pts/trade, Sharpe ~0.8.
-  Edge bem acima do threshold de 5 pts. Frágil só por baixa frequência.
+- **Pre-FOMC drift (60/60)**: ~2 trades/janela, Sharpe local +6.75 a +7.49,
+  win rate 75%, edge bruto ~50-60 pts/trade. Edge bem acima do
+  threshold de 5 pts. Frágil só por baixa frequência (4 janelas
+  com 8 trades totais). Configurações maiores (120/120) **degradam**
+  o resultado — provavelmente porque incluem meetings 2025 com
+  cortes/aumentos abruptos que invalidam o drift.
 - **Crabel NR7**: ~30 trades/ano, edge bruto ~10 pts/trade, Sharpe ~0.5.
+
+### 5. Caracterização tick MNQ (2026-05-24, contrato 06-25)
+
+Processado 12 GB de tick (~338M linhas, 43 min em ~131k lin/s puro
+Python) → spread_minuto.csv com 34k minutos.
+
+**Spread efetivo medido:**
+
+| Regime           | Spread mediano | Spread p90 |
+|------------------|---------------|------------|
+| Geral            | 0.5145 pts    | 0.7344 pts |
+| **RTH NY (14-19h UTC)** | **0.40-0.41 pts** | 0.61 pts |
+| Overnight        | 0.5455 pts    | 0.7693 pts |
+| Pico de iliquidez (h=22 UTC) | 0.6683 pts | - |
+
+**Razão spread / range_minuto:** mediana 0.0812. **Validado: o
+`slippage_fracao_range=0.075` usado no sweep é praticamente o
+valor real.** Não foi exagero — a regra de ouro de 5 pts/trade está
+empiricamente correta.
+
+**Achado operacional:** filtro de horário ótimo (sessão restrita
+14:30-19:00 UTC) **não melhorou** o resultado da Noise Area
+mean-reversion (WF 2026-05-24-17, Sharpe −3.47 vs −3.45 da sessão
+completa). O lockout pré-fechamento de 30 min já protege contra os
+horários de maior fricção. **Confirma:** o problema é edge bruto,
+não calibração de fricção.
 
 ### 5. Padrão claro
 

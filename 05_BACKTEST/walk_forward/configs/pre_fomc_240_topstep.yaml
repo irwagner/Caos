@@ -1,0 +1,22 @@
+# Pre-FOMC drift com janela maior (treino 120 + teste 240).
+#
+# WFs anteriores 2026-05-23-04/-05 usaram treino=60 e teste=60 com 4
+# janelas, gerando apenas 1-2 trades/janela e variancia alta apesar
+# de Sharpe local positivo (~7).
+#
+# Aumentando teste para 240 dias uteis (~12 meses), cada janela
+# captura ~7-10 meetings FOMC. Trade-off: menos janelas (1 ou 2)
+# mas amostra dentro de cada janela maior.
+#
+# Edge bruto Pre-FOMC: ~60 pts/trade (holding 24h pre-FOMC).
+# Friccao Topstep ~2.5 pts/trade << edge. NAO eh dominada por friccao.
+
+tamanho_treino_dias_uteis: 120
+tamanho_teste_dias_uteis: 120
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075
