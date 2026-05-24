@@ -1,0 +1,13 @@
+# Configuracao do Walk-Forward com slippage PROPORCIONAL ao range
+# (modelo Hydra v1, mediana 7.5% × range_referencia + comissao Topstep).
+# Revalidacao da ORB sob modelo de slippage realista.
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 10
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  slippage_fracao_range: 0.075
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0

@@ -657,8 +657,24 @@ def _aplicar_custos_operacionais(
     ajustados: list[Any] = []
     for t in trades:
         if isinstance(t, _TradeMetricas):
-            # Custo total round-trip em pontos × contratos.
-            custo_total_pts = custos.custo_total_pontos(t.contratos)
+            # Range de referência do trade: usa amplitude DAS EXCURSÕES
+            # (MFE + |MAE|) como proxy do "range típico de execução"
+            # do trade — é proporcional à volatilidade enfrentada,
+            # NÃO à direção líquida.
+            #
+            # Cuidado importante: usar |saida - entrada| como proxy
+            # superestima slippage em trades de longa duração (24h+
+            # tipo Pre-FOMC), onde o "range observado" é o do
+            # caminho geométrico, não da execução barra-a-barra.
+            # MFE + |MAE| reflete a faixa que o preço efetivamente
+            # ocupou — proxy mais robusto.
+            range_proxy = abs(t.mfe_pontos) + abs(t.mae_pontos)
+            if range_proxy == 0.0:
+                range_proxy = abs(t.saida_preco - t.entrada_preco)
+            custo_total_pts = custos.custo_total_pontos(
+                t.contratos,
+                range_referencia=range_proxy if range_proxy > 0 else None,
+            )
             # Custo por lado em pontos (já dividido por contratos).
             custo_por_lado_pts_unit = custo_total_pts / (2.0 * t.contratos)
             if t.lado == "long":
@@ -677,9 +693,14 @@ def _aplicar_custos_operacionais(
                 )
             )
         elif isinstance(t, Trade):
-            # Modelo mínimo: trade não conhece ``contratos``; assumimos
-            # 1 contrato (caminho legado de testes da Task 4).
-            custo_total_pts = custos.custo_total_pontos(1)
+            # Modelo mínimo: trade não conhece ``contratos`` nem range
+            # detalhado; assumimos 1 contrato e usamos |pnl|+|mfe|+|mae|
+            # como proxy de range para slippage proporcional.
+            range_proxy = abs(t.pnl) + abs(t.mfe) + abs(t.mae)
+            custo_total_pts = custos.custo_total_pontos(
+                1,
+                range_referencia=range_proxy if range_proxy > 0 else None,
+            )
             ajustados.append(
                 t.model_copy(update={"pnl": float(t.pnl) - custo_total_pts})
             )

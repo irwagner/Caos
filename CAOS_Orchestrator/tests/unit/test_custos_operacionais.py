@@ -290,3 +290,90 @@ def test_custos_operacionais_reexportado() -> None:
     from caos.walk_forward import CustosOperacionais as REEXP
 
     assert REEXP is CustosOperacionais
+
+
+
+# ---------------------------------------------------------------------------
+# Slippage proporcional (Hydra v1 lesson — commit c1b2bc6 anexo)
+# ---------------------------------------------------------------------------
+
+
+class TestSlippageProporcional:
+    def test_topstep_proporcional_default_e_7_5_pct(self) -> None:
+        c = CustosOperacionais.topstep_mnq_proporcional()
+        assert c.slippage_fracao_range == 0.075
+        assert c.slippage_pontos_por_lado == 0.25  # piso = 1 tick
+        assert c.comissao_usd_por_contrato_por_lado == 0.62
+
+    def test_proporcional_aciona_quando_range_dado(self) -> None:
+        # Range 100 pts × 7.5% = 7.5 pts/lado.
+        c = CustosOperacionais.topstep_mnq_proporcional()
+        # Sem range_referencia, fallback ao fixo + comissão.
+        sem_range = c.custo_total_pontos(1)
+        # 0.25 + 0.31 = 0.56/lado × 2 lados = 1.12.
+        assert sem_range == pytest.approx(1.12)
+
+        com_range = c.custo_total_pontos(1, range_referencia=100.0)
+        # max(0.25, 7.5) + 0.31 = 7.81 por lado × 2 = 15.62.
+        assert com_range == pytest.approx((7.5 + 0.31) * 2)
+
+    def test_piso_minimo_aplicado_quando_range_pequeno(self) -> None:
+        # Range 1 pt × 7.5% = 0.075 < piso 0.25.
+        c = CustosOperacionais.topstep_mnq_proporcional()
+        custo = c.custo_total_pontos(1, range_referencia=1.0)
+        # max(0.25, 0.075) = 0.25 → 0.25 + 0.31 = 0.56 × 2 = 1.12.
+        assert custo == pytest.approx(1.12)
+
+    def test_eh_zerado_falso_quando_proporcional_setado(self) -> None:
+        c = CustosOperacionais(
+            slippage_fracao_range=0.075,
+            comissao_usd_por_contrato_por_lado=0.0,
+        )
+        assert c.eh_zerado() is False
+
+    def test_aplicacao_no_runner_com_proporcional(self) -> None:
+        """Trade rico com MFE 10 + |MAE| 2 = range proxy 12 pts deve
+        sofrer slippage proporcional baseado em MFE+|MAE|."""
+        # PnL bruto: (110-100)*1 = 10 pts.
+        # Range proxy = MFE + |MAE| = 10 + 2 = 12.
+        # Slip por lado = max(0.25, 0.075 × 12) = 0.9 pts.
+        # Comissão por lado = 0.62/2.0 = 0.31 pts.
+        # Custo total = 2 × (0.9 + 0.31) × 1 = 2.42 pts.
+        # PnL líquido esperado: 10 - 2.42 = 7.58.
+        t = _trade_long(entrada=100.0, saida=110.0)
+        custos = CustosOperacionais.topstep_mnq_proporcional()
+        [t_ajustado] = _aplicar_custos_operacionais([t], custos)
+        assert t_ajustado.pnl_pontos() == pytest.approx(10.0 - 2.42, rel=1e-3)
+
+    def test_proporcional_escala_com_volatilidade(self) -> None:
+        """Trade com MFE/MAE maior deve sofrer mais slippage que MFE/MAE menor."""
+        # Helper _trade_long fixa MFE=10, MAE=-2 → range_proxy=12.
+        # Pra criar diferença real, construo trades com excursões
+        # diferentes diretamente.
+        t_calmo = TradeMetricas(
+            entrada_timestamp=datetime(2026, 1, 5, 14, 0, tzinfo=timezone.utc),
+            saida_timestamp=datetime(2026, 1, 5, 15, 0, tzinfo=timezone.utc),
+            entrada_preco=100.0, saida_preco=110.0,
+            lado="long", contratos=1,
+            mfe_pontos=10.0, mae_pontos=-2.0,  # range_proxy 12
+        )
+        t_volatil = TradeMetricas(
+            entrada_timestamp=datetime(2026, 1, 5, 14, 0, tzinfo=timezone.utc),
+            saida_timestamp=datetime(2026, 1, 5, 15, 0, tzinfo=timezone.utc),
+            entrada_preco=100.0, saida_preco=110.0,
+            lado="long", contratos=1,
+            mfe_pontos=30.0, mae_pontos=-10.0,  # range_proxy 40
+        )
+        custos = CustosOperacionais.topstep_mnq_proporcional()
+
+        [tc] = _aplicar_custos_operacionais([t_calmo], custos)
+        [tv] = _aplicar_custos_operacionais([t_volatil], custos)
+
+        custo_c = 10.0 - tc.pnl_pontos()
+        custo_v = 10.0 - tv.pnl_pontos()
+        # Calmo: max(0.25, 0.075×12) + 0.31 = 1.21/lado × 2 = 2.42.
+        # Volátil: max(0.25, 0.075×40) + 0.31 = 3.31/lado × 2 = 6.62.
+        assert custo_c == pytest.approx(2.42, rel=1e-3)
+        assert custo_v == pytest.approx(6.62, rel=1e-3)
+        # Volátil deve ter custo significativamente maior.
+        assert custo_v > 2 * custo_c

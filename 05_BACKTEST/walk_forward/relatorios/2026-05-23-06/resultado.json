@@ -1,0 +1,1015 @@
+{
+  "agregado_media": {
+    "calmar": -4.7459824097070795,
+    "drawdown_maximo_dias": 6.75,
+    "drawdown_maximo_percentual": 0.926051910587027,
+    "mae_medio": -130.41585648148148,
+    "mfe_medio": 146.08090277777777,
+    "numero_trades": 9.833333333333334,
+    "payoff_medio": 0.9246362208443144,
+    "pnl_total": -285.8117708333287,
+    "sharpe_anualizado": -2.358554363710042,
+    "win_rate": 0.4513888888888889
+  },
+  "agregado_mediana": {
+    "calmar": -10.549033610998503,
+    "drawdown_maximo_dias": 7.0,
+    "drawdown_maximo_percentual": 1.0,
+    "mae_medio": -131.825,
+    "mfe_medio": 138.75694444444446,
+    "numero_trades": 10.0,
+    "payoff_medio": 0.7233212349656502,
+    "pnl_total": -231.30624999999054,
+    "sharpe_anualizado": -2.3122963804584327,
+    "win_rate": 0.4222222222222222
+  },
+  "configuracao": {
+    "custos": {
+      "comissao_usd_por_contrato_por_lado": 0.62,
+      "slippage_fracao_range": 0.075,
+      "slippage_pontos_por_lado": 0.25,
+      "usd_por_ponto": 2.0
+    },
+    "granularidade": "1m",
+    "holdout_dias_uteis": null,
+    "instrumento": "MNQ",
+    "passo_dias_uteis": 10,
+    "seed": 42,
+    "tamanho_teste_dias_uteis": 10,
+    "tamanho_treino_dias_uteis": 60
+  },
+  "estrategia": "EstrategiaORB",
+  "holdout_dias_uteis": null,
+  "holdout_fim": null,
+  "holdout_inicio": null,
+  "identificador": "2026-05-23-06",
+  "janelas": [
+    {
+      "calmar": -5.587290502793298,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 3,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 718,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 0,
+        "teste_fim": "2025-06-23T00:00:00Z",
+        "teste_inicio": "2025-06-09T00:00:00Z",
+        "treino_fim": "2025-06-09T00:00:00Z",
+        "treino_inicio": "2025-03-17T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -83.025,
+      "mfe_medio": 125.775,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.2287952897629622,
+      "pnl_total": -88.90000000000146,
+      "sharpe_anualizado": -1.2871474180770681,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -18.546849940970024,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 9,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 719,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 1,
+        "teste_fim": "2025-07-07T00:00:00Z",
+        "teste_inicio": "2025-06-23T00:00:00Z",
+        "treino_fim": "2025-06-23T00:00:00Z",
+        "treino_inicio": "2025-03-31T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -109.02777777777777,
+      "mfe_medio": 88.33333333333333,
+      "motivo_falha": null,
+      "numero_trades": 9,
+      "payoff_medio": 0.6282176767712824,
+      "pnl_total": -480.01750000000175,
+      "sharpe_anualizado": -7.201294555481029,
+      "status": "ok",
+      "win_rate": 0.3333333333333333
+    },
+    {
+      "calmar": -11.781568765388553,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 3,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 875,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 2,
+        "teste_fim": "2025-07-21T00:00:00Z",
+        "teste_inicio": "2025-07-07T00:00:00Z",
+        "treino_fim": "2025-07-07T00:00:00Z",
+        "treino_inicio": "2025-04-14T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -95.225,
+      "mfe_medio": 81.975,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.6704375225993118,
+      "pnl_total": -159.5,
+      "sharpe_anualizado": -2.500946309467067,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -25.2,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 11,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 3,
+        "teste_fim": "2025-08-04T00:00:00Z",
+        "teste_inicio": "2025-07-21T00:00:00Z",
+        "treino_fim": "2025-07-21T00:00:00Z",
+        "treino_inicio": "2025-04-28T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -107.375,
+      "mfe_medio": 87.1,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.4549872947310493,
+      "pnl_total": -502.41249999999127,
+      "sharpe_anualizado": -6.519199434926819,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -25.2,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 11,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 890,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 4,
+        "teste_fim": "2025-08-18T00:00:00Z",
+        "teste_inicio": "2025-08-04T00:00:00Z",
+        "treino_fim": "2025-08-04T00:00:00Z",
+        "treino_inicio": "2025-05-12T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -159.625,
+      "mfe_medio": 67.6,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.6090103561060347,
+      "pnl_total": -894.5374999999913,
+      "sharpe_anualizado": -8.418781781273264,
+      "status": "ok",
+      "win_rate": 0.3
+    },
+    {
+      "calmar": -16.883463070078772,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 10,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 907,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 5,
+        "teste_fim": "2025-09-01T00:00:00Z",
+        "teste_inicio": "2025-08-18T00:00:00Z",
+        "treino_fim": "2025-08-18T00:00:00Z",
+        "treino_inicio": "2025-05-26T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -137.275,
+      "mfe_medio": 99.775,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.7569811094014226,
+      "pnl_total": -474.0249999999869,
+      "sharpe_anualizado": -4.4472134718475695,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -0.377687431094517,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 8,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 890,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 6,
+        "teste_fim": "2025-09-15T00:00:00Z",
+        "teste_inicio": "2025-09-01T00:00:00Z",
+        "treino_fim": "2025-09-01T00:00:00Z",
+        "treino_inicio": "2025-06-09T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -64.625,
+      "mfe_medio": 113.025,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.4862953278093483,
+      "pnl_total": -2.1750000000174623,
+      "sharpe_anualizado": -0.06294742996288395,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -14.199616122840121,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 8,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 7,
+        "teste_fim": "2025-09-29T00:00:00Z",
+        "teste_inicio": "2025-09-15T00:00:00Z",
+        "treino_fim": "2025-09-15T00:00:00Z",
+        "treino_inicio": "2025-06-23T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -95.275,
+      "mfe_medio": 96.0,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.23378083909875755,
+      "pnl_total": -303.1124999999811,
+      "sharpe_anualizado": -3.4620336160044896,
+      "status": "ok",
+      "win_rate": 0.7
+    },
+    {
+      "calmar": -19.520718553581364,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 2,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 890,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 8,
+        "teste_fim": "2025-10-13T00:00:00Z",
+        "teste_inicio": "2025-09-29T00:00:00Z",
+        "treino_fim": "2025-09-29T00:00:00Z",
+        "treino_inicio": "2025-07-07T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -140.575,
+      "mfe_medio": 96.15,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.3772224945412379,
+      "pnl_total": -698.7875000000058,
+      "sharpe_anualizado": -4.249339242218441,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -1.980269967679773,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 2,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 9,
+        "teste_fim": "2025-10-27T00:00:00Z",
+        "teste_inicio": "2025-10-13T00:00:00Z",
+        "treino_fim": "2025-10-13T00:00:00Z",
+        "treino_inicio": "2025-07-21T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -135.15,
+      "mfe_medio": 186.35,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.4376663417794742,
+      "pnl_total": -37.19999999999709,
+      "sharpe_anualizado": -0.28610306115277545,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -19.618470107851348,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 10,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 906,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 10,
+        "teste_fim": "2025-11-10T00:00:00Z",
+        "teste_inicio": "2025-10-27T00:00:00Z",
+        "treino_fim": "2025-10-27T00:00:00Z",
+        "treino_inicio": "2025-08-04T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -197.575,
+      "mfe_medio": 110.625,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.045416263106926,
+      "pnl_total": -1403.2499999999927,
+      "sharpe_anualizado": -7.747322150900881,
+      "status": "ok",
+      "win_rate": 0.2
+    },
+    {
+      "calmar": 20.34611792234853,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 6,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 875,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 11,
+        "teste_fim": "2025-11-24T00:00:00Z",
+        "teste_inicio": "2025-11-10T00:00:00Z",
+        "treino_fim": "2025-11-10T00:00:00Z",
+        "treino_inicio": "2025-08-18T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -142.0,
+      "mfe_medio": 278.8,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.5364602897225212,
+      "pnl_total": 410.59999999999854,
+      "sharpe_anualizado": 2.684018441924039,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -5.59608590848026,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 9,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 812,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 12,
+        "teste_fim": "2025-12-08T00:00:00Z",
+        "teste_inicio": "2025-11-24T00:00:00Z",
+        "treino_fim": "2025-11-24T00:00:00Z",
+        "treino_inicio": "2025-09-01T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -128.5,
+      "mfe_medio": 139.13888888888889,
+      "motivo_falha": null,
+      "numero_trades": 9,
+      "payoff_medio": 2.7851194424504437,
+      "pnl_total": -112.39250000000175,
+      "sharpe_anualizado": -1.3079682641436794,
+      "status": "ok",
+      "win_rate": 0.2222222222222222
+    },
+    {
+      "calmar": -21.08705292586488,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 9,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 922,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 13,
+        "teste_fim": "2025-12-22T00:00:00Z",
+        "teste_inicio": "2025-12-08T00:00:00Z",
+        "treino_fim": "2025-12-08T00:00:00Z",
+        "treino_inicio": "2025-09-15T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -184.425,
+      "mfe_medio": 138.375,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.7406613594611294,
+      "pnl_total": -694.3999999999796,
+      "sharpe_anualizado": -4.307914250431315,
+      "status": "ok",
+      "win_rate": 0.4
+    },
+    {
+      "calmar": -21.96441498378765,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 11,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 797,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 14,
+        "teste_fim": "2026-01-06T00:00:00Z",
+        "teste_inicio": "2025-12-22T00:00:00Z",
+        "treino_fim": "2025-12-22T00:00:00Z",
+        "treino_inicio": "2025-09-29T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -103.77777777777777,
+      "mfe_medio": 84.63888888888889,
+      "motivo_falha": null,
+      "numero_trades": 9,
+      "payoff_medio": 0.4739103562876922,
+      "pnl_total": -515.4424999999901,
+      "sharpe_anualizado": -5.278441427715827,
+      "status": "ok",
+      "win_rate": 0.3333333333333333
+    },
+    {
+      "calmar": 43.71879187712755,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 1,
+      "drawdown_maximo_percentual": 0.39650336431121697,
+      "duracao_ms": 906,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 15,
+        "teste_fim": "2026-01-20T00:00:00Z",
+        "teste_inicio": "2026-01-06T00:00:00Z",
+        "treino_fim": "2026-01-06T00:00:00Z",
+        "treino_inicio": "2025-10-13T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -103.275,
+      "mfe_medio": 141.025,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.6998921219465397,
+      "pnl_total": 336.6000000000058,
+      "sharpe_anualizado": 3.4185140295509147,
+      "status": "ok",
+      "win_rate": 0.7
+    },
+    {
+      "calmar": 47.35701407693876,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 6,
+      "drawdown_maximo_percentual": 0.532128143870277,
+      "duracao_ms": 875,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 16,
+        "teste_fim": "2026-02-03T00:00:00Z",
+        "teste_inicio": "2026-01-20T00:00:00Z",
+        "treino_fim": "2026-01-20T00:00:00Z",
+        "treino_inicio": "2025-10-27T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -109.35,
+      "mfe_medio": 217.525,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.4161598046431212,
+      "pnl_total": 664.4875000000102,
+      "sharpe_anualizado": 4.787095388077961,
+      "status": "ok",
+      "win_rate": 0.6
+    },
+    {
+      "calmar": -11.676259168505167,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 4,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 17,
+        "teste_fim": "2026-02-17T00:00:00Z",
+        "teste_inicio": "2026-02-03T00:00:00Z",
+        "treino_fim": "2026-02-03T00:00:00Z",
+        "treino_inicio": "2025-11-10T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -186.725,
+      "mfe_medio": 234.725,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.705981110470171,
+      "pnl_total": -426.875,
+      "sharpe_anualizado": -2.1236464514497984,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -25.2,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 13,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 875,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 18,
+        "teste_fim": "2026-03-03T00:00:00Z",
+        "teste_inicio": "2026-02-17T00:00:00Z",
+        "treino_fim": "2026-02-17T00:00:00Z",
+        "treino_inicio": "2025-11-24T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -200.475,
+      "mfe_medio": 163.0,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.613088097546552,
+      "pnl_total": -1345.9124999999985,
+      "sharpe_anualizado": -8.570466067191438,
+      "status": "ok",
+      "win_rate": 0.3
+    },
+    {
+      "calmar": -5.032825396379958,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 0,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 906,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 19,
+        "teste_fim": "2026-03-17T00:00:00Z",
+        "teste_inicio": "2026-03-03T00:00:00Z",
+        "treino_fim": "2026-03-03T00:00:00Z",
+        "treino_inicio": "2025-12-08T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -140.9,
+      "mfe_medio": 200.1,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.6015316338304252,
+      "pnl_total": -71.19999999999709,
+      "sharpe_anualizado": -0.5846658417926803,
+      "status": "ok",
+      "win_rate": 0.6
+    },
+    {
+      "calmar": 24.103652039137906,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 6,
+      "drawdown_maximo_percentual": 0.5397772497254644,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 20,
+        "teste_fim": "2026-03-31T00:00:00Z",
+        "teste_inicio": "2026-03-17T00:00:00Z",
+        "treino_fim": "2026-03-17T00:00:00Z",
+        "treino_inicio": "2025-12-22T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -85.55,
+      "mfe_medio": 224.875,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.6245635857974445,
+      "pnl_total": 222.1625000000131,
+      "sharpe_anualizado": 2.4612402180229087,
+      "status": "ok",
+      "win_rate": 0.7
+    },
+    {
+      "calmar": -9.421808053491839,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 9,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 859,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 21,
+        "teste_fim": "2026-04-14T00:00:00Z",
+        "teste_inicio": "2026-03-31T00:00:00Z",
+        "treino_fim": "2026-03-31T00:00:00Z",
+        "treino_inicio": "2026-01-06T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -174.25,
+      "mfe_medio": 208.80555555555554,
+      "motivo_falha": null,
+      "numero_trades": 9,
+      "payoff_medio": 0.7854774869461253,
+      "pnl_total": -415.45499999999447,
+      "sharpe_anualizado": -2.885606859485097,
+      "status": "ok",
+      "win_rate": 0.4444444444444444
+    },
+    {
+      "calmar": 13.218316931111026,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 5,
+      "drawdown_maximo_percentual": 0.7568370961816905,
+      "duracao_ms": 891,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 22,
+        "teste_fim": "2026-04-28T00:00:00Z",
+        "teste_inicio": "2026-04-14T00:00:00Z",
+        "treino_fim": "2026-04-14T00:00:00Z",
+        "treino_inicio": "2026-01-20T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -108.6,
+      "mfe_medio": 157.4,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.4060900550696571,
+      "pnl_total": 235.0500000000029,
+      "sharpe_anualizado": 2.182322397851535,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -3.7730897808461554,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 10,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 10,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 6,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 875,
+      "estrategia": "EstrategiaORB",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 23,
+        "teste_fim": "2026-05-12T00:00:00Z",
+        "teste_inicio": "2026-04-28T00:00:00Z",
+        "treino_fim": "2026-04-28T00:00:00Z",
+        "treino_inicio": "2026-02-03T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -137.4,
+      "mfe_medio": 164.825,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 0.8735234403839157,
+      "pnl_total": -102.78749999999127,
+      "sharpe_anualizado": -0.8974575709462358,
+      "status": "ok",
+      "win_rate": 0.5
+    }
+  ],
+  "manifesto_hash": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+  "status": "concluido",
+  "versoes_dependencias": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.0",
+    "python": "3.11.9"
+  }
+}

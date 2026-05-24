@@ -113,6 +113,15 @@ class CustosOperacionais(BaseModel):
       $0.39 USD/contrato/lado. Default 0.0.
     - ``usd_por_ponto``: multiplicador do instrumento. Default 2.0 (MNQ).
       Override só se ``ConfiguracaoWalkForward.instrumento`` for outro.
+    - ``slippage_fracao_range`` (opcional, **intraday-only**): quando
+      preenchido, slippage por lado vira ``max(slippage_pontos_por_lado,
+      slippage_fracao_range × range_referencia)``. Modelo proporcional
+      validado empiricamente pelo Hydra v1 para ORB intraday (mediana
+      7.5% × OR_size em 40 trades NT8 reais). **NÃO é apropriado para
+      estratégias de holding longo** (ex: Pre-FOMC drift de 24h) onde o
+      range total do trade reflete o caminho geométrico, não a execução
+      barra-a-barra. Use somente para estratégias intraday curtas
+      (entry+exit em 1-3 horas).
 
     Aplicado pelo :class:`BacktestRunner` antes de invocar o
     :class:`MetricasCalculator`, então Sharpe/Calmar/drawdown são
@@ -126,6 +135,9 @@ class CustosOperacionais(BaseModel):
         float, Field(ge=0.0, le=20.0)
     ] = 0.0
     usd_por_ponto: Annotated[float, Field(gt=0.0, le=1000.0)] = USD_POR_PONTO_MNQ
+    slippage_fracao_range: Optional[
+        Annotated[float, Field(ge=0.0, le=1.0)]
+    ] = None
 
     @classmethod
     def zerados(cls) -> "CustosOperacionais":
@@ -144,9 +156,47 @@ class CustosOperacionais(BaseModel):
             usd_por_ponto=USD_POR_PONTO_MNQ,
         )
 
-    def custo_total_pontos(self, contratos: int) -> float:
+    @classmethod
+    def topstep_mnq_proporcional(
+        cls,
+        slippage_fracao_range: float = 0.075,
+        slippage_pontos_minimo: float = 0.25,
+    ) -> "CustosOperacionais":
+        """Atalho com slippage proporcional ao range de entrada.
+
+        Decorre do null result do Hydra v1 (commit `c1b2bc6` do CAOS
+        importou referência): em 40 trades NT8 reais a mediana do
+        slippage foi **7.5% × range de referência**, e ignorar essa
+        proporcionalidade fez backtests parecerem otimistas. O Pre-FOMC
+        e qualquer revalidação séria de família devem usar este modelo.
+
+        Parâmetros:
+        - ``slippage_fracao_range``: default 0.075 (mediana Hydra v1).
+          Use 0.108 para média ou 0.158 para p75.
+        - ``slippage_pontos_minimo``: piso mínimo em pontos. 0.25 = 1
+          tick MNQ. Em barras de range ~0, slippage é o piso.
+        """
+        return cls(
+            slippage_pontos_por_lado=slippage_pontos_minimo,
+            comissao_usd_por_contrato_por_lado=0.62,
+            usd_por_ponto=USD_POR_PONTO_MNQ,
+            slippage_fracao_range=slippage_fracao_range,
+        )
+
+    def custo_total_pontos(
+        self,
+        contratos: int,
+        *,
+        range_referencia: Optional[float] = None,
+    ) -> float:
         """Calcula o custo total (em pontos × contratos) de 1 trade
         round-trip com ``contratos`` contratos.
+
+        Quando ``slippage_fracao_range`` está preenchido E
+        ``range_referencia`` é fornecido, o slippage por lado é
+        ``max(slippage_pontos_por_lado, slippage_fracao_range ×
+        range_referencia)`` — o piso fixo nunca permite slippage menor
+        que o que o tick size exige.
 
         Garante ``>= 0`` por construção (todos os campos validados em
         ``ge=0`` e ``contratos >= 1``).
@@ -158,7 +208,17 @@ class CustosOperacionais(BaseModel):
         comissao_pontos_por_lado = (
             self.comissao_usd_por_contrato_por_lado / self.usd_por_ponto
         )
-        custo_por_lado = self.slippage_pontos_por_lado + comissao_pontos_por_lado
+        slip_por_lado = float(self.slippage_pontos_por_lado)
+        if (
+            self.slippage_fracao_range is not None
+            and range_referencia is not None
+            and range_referencia > 0
+        ):
+            slip_por_lado = max(
+                slip_por_lado,
+                self.slippage_fracao_range * float(range_referencia),
+            )
+        custo_por_lado = slip_por_lado + comissao_pontos_por_lado
         # 2 lados (entrada + saida) × contratos.
         return 2.0 * custo_por_lado * float(contratos)
 
@@ -168,6 +228,10 @@ class CustosOperacionais(BaseModel):
         return (
             self.slippage_pontos_por_lado == 0.0
             and self.comissao_usd_por_contrato_por_lado == 0.0
+            and (
+                self.slippage_fracao_range is None
+                or self.slippage_fracao_range == 0.0
+            )
         )
 _REGEX_IDENTIFICADOR_WF = r"^\d{4}-\d{2}-\d{2}-\d{2}$"
 
