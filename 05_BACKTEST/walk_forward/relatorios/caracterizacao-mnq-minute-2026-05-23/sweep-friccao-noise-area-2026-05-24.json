@@ -1,0 +1,68 @@
+{
+  "estrategia": "EstrategiaNoiseArea (inverter_sinais=True)",
+  "config_base": "noise_area_inverter_topstep.yaml",
+  "valores_testados": [
+    0.0,
+    0.025,
+    0.05,
+    0.075,
+    0.1
+  ],
+  "resultados": [
+    {
+      "slippage_fracao_range": 0.0,
+      "status": "concluido",
+      "janelas": 4,
+      "sharpe_anualizado": 0.24111566509151422,
+      "pnl_total": 33.85499999984677,
+      "win_rate": 0.6275862068965516,
+      "calmar": 0.628290179015618,
+      "drawdown_pct": 1.0,
+      "trades_medio": 59.5
+    },
+    {
+      "slippage_fracao_range": 0.025,
+      "status": "concluido",
+      "janelas": 4,
+      "sharpe_anualizado": -0.6945951320558721,
+      "pnl_total": -19.20750000001135,
+      "win_rate": 0.5856321839080461,
+      "calmar": -0.9717818551953259,
+      "drawdown_pct": 1.0,
+      "trades_medio": 59.5
+    },
+    {
+      "slippage_fracao_range": 0.05,
+      "status": "concluido",
+      "janelas": 4,
+      "sharpe_anualizado": -1.957001748558702,
+      "pnl_total": -99.18249999996988,
+      "win_rate": 0.5347701149425287,
+      "calmar": -2.5033290459274466,
+      "drawdown_pct": 1.0,
+      "trades_medio": 59.5
+    },
+    {
+      "slippage_fracao_range": 0.075,
+      "status": "concluido",
+      "janelas": 4,
+      "sharpe_anualizado": -3.4492594799445326,
+      "pnl_total": -180.23249999998006,
+      "win_rate": 0.4663793103448276,
+      "calmar": -3.7950912017469225,
+      "drawdown_pct": 1.0,
+      "trades_medio": 59.5
+    },
+    {
+      "slippage_fracao_range": 0.1,
+      "status": "concluido",
+      "janelas": 4,
+      "sharpe_anualizado": -4.689065838339197,
+      "pnl_total": -261.3449999999684,
+      "win_rate": 0.37212643678160917,
+      "calmar": -4.17890345649582,
+      "drawdown_pct": 1.0,
+      "trades_medio": 59.5
+    }
+  ]
+}

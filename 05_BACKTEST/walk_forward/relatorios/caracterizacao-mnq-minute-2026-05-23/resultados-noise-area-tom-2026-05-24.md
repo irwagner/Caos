@@ -110,6 +110,62 @@ Explorador como motivação para investigar **variantes seletivas**
 quando tick data chegar (filtrar por spread baixo, hora do dia
 com mais reversão, etc).
 
+### Adendo 2 (2026-05-24, sweep WFs 2026-05-24-10..14) — Análise da fricção
+
+Para responder "quanto a fricção precisa cair para a estratégia ser
+viável?", rodei sweep com `slippage_fracao_range` ∈ {0, 0.025, 0.05,
+0.075, 0.10}, mantendo todo o resto idêntico. Identificadores
+2026-05-24-10 (sf=0.0) a 2026-05-24-14 (sf=0.10).
+
+| slippage_fracao | Sharpe   | PnL (pts) | Win rate | Trades |
+|-----------------|----------|-----------|----------|--------|
+| **0.000**       | **+0.24** | **+33.9** | 62.8%    | 59.5   |
+| 0.025           | −0.70    | −19.2     | 58.6%    | 59.5   |
+| 0.050           | −1.96    | −99.2     | 53.5%    | 59.5   |
+| 0.075           | −3.45    | −180.2    | 46.6%    | 59.5   |
+| 0.100           | −4.69    | −261.3    | 37.2%    | 59.5   |
+
+(JSON completo em
+`05_BACKTEST/walk_forward/relatorios/caracterizacao-mnq-minute-2026-05-23/sweep-friccao-noise-area-2026-05-24.json`.)
+
+**Achados quantitativos:**
+
+1. **PnL decai linear com slippage**, ~80 pts/step de 0.025. Isso
+   confirma o modelo de fricção: 240 trades × ~2.5 pts/trade ×
+   0.025 ≈ 15 pts/step. Bate empiricamente.
+
+2. **Break-even (PnL=0) está entre sf=0.0 e sf=0.025**. Ou seja,
+   **mesmo com 0% de slippage proporcional**, a estratégia está
+   apenas marginalmente positiva (Sharpe 0.24 anualizado — bem
+   abaixo do threshold de 1.0 que o Explorador exige para
+   classificar paper como `aprovada`).
+
+3. **Win rate cai monotonicamente com fricção** (62.8% → 37.2%).
+   Não é só PnL menor — trades vencedores começam a virar perdedores
+   quando a banda de fricção cresce.
+
+**Implicações operacionais cruciais:**
+
+- A **caracterização tick MNQ** deve focar em medir o **spread
+  efetivo realizado**. Se for ≥ 0.025 do range típico do trade,
+  qualquer estratégia "no ruído" de 1m está condenada.
+- Para Sharpe ≥ 1 sob fricção realista (sf ~0.025-0.05), a
+  **regra geral** é: **edge bruto ≥ 5 pts/trade**. Isso descarta
+  intraday mean-reversion no ruído branco do MNQ.
+- **Estratégias direcionais que sobrevivem precisam de moves
+  estruturalmente maiores** — eventos macro (Pre-FOMC), efeitos
+  de calendário (TOM), reversões pós-gap, etc.
+
+**Decisão estratégica:** o Explorador deve **priorizar candidatas
+com edge bruto declarado ≥ 5 pts/trade** ou trades de duração
+superior a 1 dia (PnL absoluto maior absorve fricção). Reabrir
+busca por:
+
+- Variantes do Pre-FOMC (filtros press conference, dia da semana).
+- Calendar effects multi-day (TOM já testado, faltam outros).
+- Reversões pós-gap maiores que 0.5% (gap-fade clássico).
+- Padrões cross-asset (ouro + Nasdaq, USD + Nasdaq).
+
 ## Análise — Turn-of-the-Month (insuficiente, manter como candidata)
 
 ### Hipótese original
@@ -146,15 +202,16 @@ históricos completos do MNQ (anos anteriores), reabrir.
 
 ## Comparação cruzada com candidatas anteriores
 
-| Estratégia                           | Status            | Trades/ano | Sharpe       | PnL/ano (USD) |
-|--------------------------------------|-------------------|------------|--------------|---------------|
-| ORB Crabel                           | rejeitada         | ~80        | <0           | negativo      |
-| Pre-FOMC drift                       | candidata frágil  | 8-10       | ~0.8         | +1k-2k        |
-| Crabel NR7                           | candidata frágil  | ~30        | ~0.5         | ~+500         |
-| Mini-portfolio (PreFOMC+NR7)         | candidata         | ~40        | combinado    | ~+2.5k        |
-| **Noise Area momentum (k=14 ou 90)** | **rejeitada**     | ~250       | **-8 a -10** | **-2k a -3k** |
-| **Noise Area mean-reversion**        | **rejeitada**     | ~250       | **-3.4**     | **-1.5k**     |
-| **Turn-of-the-Month**                | bloqueada (dados) | ~12        | ?            | ?             |
+| Estratégia                                 | Status            | Trades/ano | Sharpe       | PnL/ano (USD) |
+|--------------------------------------------|-------------------|------------|--------------|---------------|
+| ORB Crabel                                 | rejeitada         | ~80        | <0           | negativo      |
+| Pre-FOMC drift                             | candidata frágil  | 8-10       | ~0.8         | +1k-2k        |
+| Crabel NR7                                 | candidata frágil  | ~30        | ~0.5         | ~+500         |
+| Mini-portfolio (PreFOMC+NR7)               | candidata         | ~40        | combinado    | ~+2.5k        |
+| **Noise Area momentum (k=14 ou 90)**       | **rejeitada**     | ~250       | **−8 a −10** | **−2k a −3k** |
+| **Noise Area mean-reversion (sf=0.075)**   | **rejeitada**     | ~250       | **−3.4**     | **−1.5k**     |
+| **Noise Area mean-reversion (sf=0)**       | rejeitada-ruido   | ~250       | +0.24        | +135          |
+| **Turn-of-the-Month**                      | bloqueada (dados) | ~12        | ?            | ?             |
 
 ## Notas operacionais
 
@@ -172,15 +229,33 @@ históricos completos do MNQ (anos anteriores), reabrir.
 
 1. **Spread filter** (briefing 2ª rodada do Explorador) — ainda não
    implementado. É um overlay que pondera dias por quartil de spread
-   bid-ask realizado. Se o spread filter ajudar mesmo o NoiseArea
-   ruim a virar levemente positivo em dias de spread baixo, vale
-   investigar combinatorialmente. Mas dado o resultado catastrófico,
-   provavelmente não salva.
+   bid-ask realizado. Dado o achado do sweep (Sharpe = +0.24 mesmo
+   com **zero** slippage proporcional), o spread filter sozinho
+   provavelmente não salva a Noise Area, mas pode ajudar candidatas
+   futuras com edge bruto maior.
+
 2. **Aguardar tick data** — quando completar exportação, rodar:
    - Caracterização tick MNQ
-   - Spread médio realizado em sessões diferentes
+   - **Spread efetivo realizado** (medir slippage real, comparar
+     com sf=0.025/0.05/0.075 do sweep)
    - OFI vs price drift
-3. **TOM com dados estendidos** — quando dados históricos chegarem.
-4. **Não abrir Debate Auto agora**: G3 (resultado novo) ativo mas o
+
+3. **TOM com config menor** (treino=60, teste=60) — pra ter ≥3
+   janelas. Trade médio do TOM é da ordem de 50-100 pts (holding
+   ~7 dias úteis), bem acima do limite de 5 pts/trade do sweep, o
+   que sugere que TOM **não vai ser dominada por fricção**.
+
+4. **Pre-FOMC press conference filter** — Lucca-Moench 2018 reporta
+   efeito ~4× maior nos meetings com press conference. Se válido,
+   reduz trades pela metade mas mantém PnL ⇒ Sharpe sobe.
+
+5. **Candidatas ainda não testadas dos briefings:**
+   - Overnight effect (open-to-close negativo, close-to-open positivo)
+   - Reversão pós-gap > 0.5%
+   - Cross-asset (ouro + Nasdaq, USD + Nasdaq)
+   - Stocks-in-Play da Zarattini-Aziz (não aplicável ao MNQ direto,
+     mas talvez via flowback do índice)
+
+6. **Não abrir Debate Auto agora**: G3 (resultado novo) ativo mas o
    resultado é claramente negativo, sem proposta de promoção a fazer.
    Atualizar relatório e seguir.
