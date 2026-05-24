@@ -91,6 +91,13 @@ def main(contrato: str) -> int:
     saida = raiz / "spread_minuto.csv"
     print(f"  saida: {saida}")
 
+    # Resume safety: pula se ja existe e tem >100 KB (provavelmente
+    # completo). Evita reprocessar 50 GB de tick por engano.
+    if saida.is_file() and saida.stat().st_size > 100 * 1024:
+        print(f"  [skip] spread_minuto.csv ja existe ({saida.stat().st_size/1e6:.1f} MB). "
+              f"Remova manualmente para reprocessar.")
+        return 0
+
     minuto_atual: datetime | None = None
     last_prices: list[float] = []
     last_volumes: list[int] = []
