@@ -821,9 +821,15 @@
       "tamanho_bytes": 3529299
     }
   ],
-  "falhas": [],
+  "falhas": [
+    {
+      "caminho_relativo": "MNQ_06-26/tick/MNQ 06-26.Ask.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    }
+  ],
   "geracao": {
-    "data_iso8601_utc": "2026-05-24T02:28:53Z",
+    "data_iso8601_utc": "2026-05-24T02:55:24Z",
     "instrumento": "MNQ"
   }
 }
