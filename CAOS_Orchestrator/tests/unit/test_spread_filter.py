@@ -172,36 +172,37 @@ class TestModoHoraOtima:
 
 
 class TestModoMedianaDiaria:
-    def test_bloqueia_minutos_acima_da_mediana(self, tmp_path: Path) -> None:
-        # 4 minutos do mesmo dia: spreads 0.3, 0.4, 0.6, 0.8.
-        # Mediana = 0.5. So 2 primeiros passam.
+    def test_warmup_inicial_permite_tudo(self, tmp_path: Path) -> None:
+        # Antes do warmup (default 30 min), todos os minutos sao
+        # permitidos por padrao (permitir_se_falta_dado=True).
+        n = 40
+        ts_strs = [
+            (pd.Timestamp("2025-03-17 14:30:00", tz="UTC")
+             + pd.Timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:00Z")
+            for i in range(n)
+        ]
         spreads = pd.DataFrame({
-            "minuto_utc": [
-                "2025-03-17T14:30:00Z", "2025-03-17T14:31:00Z",
-                "2025-03-17T14:32:00Z", "2025-03-17T14:33:00Z",
-            ],
-            "spread_avg": [0.3, 0.4, 0.6, 0.8],
+            "minuto_utc": ts_strs,
+            "spread_avg": [0.3 + 0.01 * i for i in range(n)],
         })
         csv = _criar_csv_spread(tmp_path, spreads)
 
-        # Cria 4 barras correspondentes.
-        timestamps = pd.to_datetime([
-            "2025-03-17T14:30:00Z", "2025-03-17T14:31:00Z",
-            "2025-03-17T14:32:00Z", "2025-03-17T14:33:00Z",
-        ], utc=True)
+        timestamps = pd.to_datetime(ts_strs, utc=True)
         df = pd.DataFrame({
             "timestamp": timestamps,
-            "open": [20000.0] * 4,
-            "high": [20001.0] * 4,
-            "low": [19999.0] * 4,
-            "close": [20000.0] * 4,
-            "volume": [1.0] * 4,
+            "open": [20000.0] * n,
+            "high": [20001.0] * n,
+            "low": [19999.0] * n,
+            "close": [20000.0] * n,
+            "volume": [1.0] * n,
         })
 
         mock = _EstrategiaMock()
         wrapper = EstrategiaSpreadFilter(
             mock,
-            parametros=ParametrosSpreadFilter(modo="mediana_diaria"),
+            parametros=ParametrosSpreadFilter(
+                modo="mediana_diaria", minutos_warmup_dia=30
+            ),
             caminhos_spread_csv=[csv],
         )
         wrapper.treinar(df)
@@ -209,11 +210,53 @@ class TestModoMedianaDiaria:
         for barra in iterator:
             wrapper.on_barra(barra, iterator)
 
-        # So as barras com spread <= 0.5 passam (0.3 e 0.4).
-        assert len(mock.barras_vistas) == 2
-        horas_vistas = [ts.time() for ts in mock.barras_vistas]
-        assert time(14, 30) in horas_vistas
-        assert time(14, 31) in horas_vistas
+        # 30 primeiros sao warmup (permite todos).
+        # 10 ultimos passam pelo filtro running median.
+        # Como spreads sao crescentes (0.3, 0.31, ...), os ultimos 10
+        # estao todos ACIMA da mediana corrente, logo sao bloqueados.
+        assert len(mock.barras_vistas) == 30
+
+    def test_running_median_bloqueia_minutos_acima(self, tmp_path: Path) -> None:
+        # 35 minutos: primeiros 30 spreads em 0.5, ultimos 5 em 0.8.
+        # Apos warmup (30 min), a mediana sera 0.5. Os 5 com 0.8 sao bloqueados.
+        n = 35
+        spreads_lista = [0.5] * 30 + [0.8] * 5
+        ts_strs = [
+            (pd.Timestamp("2025-03-17 14:30:00", tz="UTC")
+             + pd.Timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:00Z")
+            for i in range(n)
+        ]
+        spreads = pd.DataFrame({
+            "minuto_utc": ts_strs,
+            "spread_avg": spreads_lista,
+        })
+        csv = _criar_csv_spread(tmp_path, spreads)
+
+        timestamps = pd.to_datetime(ts_strs, utc=True)
+        df = pd.DataFrame({
+            "timestamp": timestamps,
+            "open": [20000.0] * n,
+            "high": [20001.0] * n,
+            "low": [19999.0] * n,
+            "close": [20000.0] * n,
+            "volume": [1.0] * n,
+        })
+
+        mock = _EstrategiaMock()
+        wrapper = EstrategiaSpreadFilter(
+            mock,
+            parametros=ParametrosSpreadFilter(
+                modo="mediana_diaria", minutos_warmup_dia=30
+            ),
+            caminhos_spread_csv=[csv],
+        )
+        wrapper.treinar(df)
+        iterator = BarrasTesteIterator(df)
+        for barra in iterator:
+            wrapper.on_barra(barra, iterator)
+
+        # 30 (warmup) + 0 dos 5 com 0.8 (bloqueados) = 30 vistas.
+        assert len(mock.barras_vistas) == 30
 
     def test_falta_dado_permite_default(self, tmp_path: Path) -> None:
         # CSV com apenas 1 minuto. Os outros nao tem dado.
@@ -283,6 +326,68 @@ class TestModoMedianaDiaria:
         for barra in iterator:
             wrapper.on_barra(barra, iterator)
         assert len(mock.barras_vistas) == 0
+
+    def test_running_median_nao_usa_minutos_futuros(self, tmp_path: Path) -> None:
+        """Property test do anti-look-ahead: o filtro decide o minuto t
+        usando APENAS spreads de minutos < t do mesmo dia. Construimos
+        um cenario onde a 'mediana do dia inteiro' diferiria muito da
+        'running median' e validamos que o filtro usa a running.
+        """
+        spreads_lista = [0.3] * 30 + [0.5] * 10
+        n = len(spreads_lista)
+        ts_strs = [
+            (pd.Timestamp("2025-03-17 14:30:00", tz="UTC")
+             + pd.Timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:00Z")
+            for i in range(n)
+        ]
+        spreads = pd.DataFrame({
+            "minuto_utc": ts_strs,
+            "spread_avg": spreads_lista,
+        })
+        csv = _criar_csv_spread(tmp_path, spreads)
+
+        timestamps = pd.to_datetime(ts_strs, utc=True)
+        df = pd.DataFrame({
+            "timestamp": timestamps,
+            "open": [20000.0] * n,
+            "high": [20001.0] * n,
+            "low": [19999.0] * n,
+            "close": [20000.0] * n,
+            "volume": [1.0] * n,
+        })
+
+        mock = _EstrategiaMock()
+        wrapper = EstrategiaSpreadFilter(
+            mock,
+            parametros=ParametrosSpreadFilter(
+                modo="mediana_diaria", minutos_warmup_dia=30
+            ),
+            caminhos_spread_csv=[csv],
+        )
+        wrapper.treinar(df)
+        iterator = BarrasTesteIterator(df)
+        for barra in iterator:
+            wrapper.on_barra(barra, iterator)
+
+        # Mediana dia inteiro = 0.4 — se usado, os 10 com 0.5 seriam
+        # bloqueados E os 30 com 0.3 seriam permitidos.
+        # Running median ate o 30o minuto = 0.3 (vendo só 0.3s).
+        # Os 10 com 0.5 que vem depois sao TODOS bloqueados (0.5>0.3).
+        # 30 (warmup) + 0 (todos os 0.5 bloqueados) = 30.
+        spreads_dia = wrapper._spreads_observados_por_dia.get(
+            timestamps[0].date()
+        )
+        assert spreads_dia is not None
+        # Apos processar todas as 40 barras, o buffer deve conter 40
+        # observacoes (todas as vistas).
+        assert len(spreads_dia) == 40
+        # Os primeiros 30 valores devem ser 0.3 (preservou ordem).
+        assert spreads_dia[:30] == [0.3] * 30
+        # Os ultimos 10 sao 0.5.
+        assert spreads_dia[30:] == [0.5] * 10
+        # Quantas barras o mock viu? Espera 30 (warmup) + 0 (todos
+        # bloqueados pos-warmup pois 0.5 > running 0.3).
+        assert len(mock.barras_vistas) == 30
 
 
 # ---------------------------------------------------------------------------

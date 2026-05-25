@@ -90,6 +90,15 @@ class ParametrosSpreadFilter:
     ``permitir_se_falta_dado``: o que fazer quando o spread_minuto.csv
     nao tem entrada para o minuto sendo testado. ``True`` (default)
     = permite o trade. ``False`` = bloqueia.
+    ``minutos_warmup_dia``: no modo ``mediana_diaria``, numero minimo
+    de minutos do dia atual ja vistos antes que a mediana ROLANTE
+    (running) comece a ser usada para filtrar. Antes do warmup, a
+    politica e ``permitir_se_falta_dado``. Default 30 — alinhado com
+    o lockout pre-fechamento da Noise Area. Range [5, 240].
+
+    Decisao do Conselho 2026-05-25-01: o modo ``mediana_diaria`` USA
+    APENAS minutos PASSADOS do dia (running median). Calcular mediana
+    sobre o dia inteiro era look-ahead disfarcado e foi corrigido.
     """
 
     modo: ModoSpreadFilter = "mediana_diaria"
@@ -97,6 +106,7 @@ class ParametrosSpreadFilter:
     hora_inicio_utc: time = time(14, 30)
     hora_fim_utc: time = time(19, 0)
     permitir_se_falta_dado: bool = True
+    minutos_warmup_dia: int = 30
 
     def __post_init__(self) -> None:
         if self.modo not in ("mediana_diaria", "quantil_global", "hora_otima"):
@@ -108,6 +118,10 @@ class ParametrosSpreadFilter:
         if self.hora_inicio_utc >= self.hora_fim_utc:
             raise ValueError(
                 "hora_inicio_utc deve ser anterior a hora_fim_utc"
+            )
+        if not (5 <= self.minutos_warmup_dia <= 240):
+            raise ValueError(
+                f"minutos_warmup_dia deve estar em [5, 240]; recebido {self.minutos_warmup_dia}"
             )
 
 
@@ -158,11 +172,21 @@ class EstrategiaSpreadFilter:
             else:
                 self._corte_global = None
             # Cache da mediana por dia (preenchido on-demand).
-            self._mediana_dia_cache: dict[date, float] = {}
+            # ESTRUTURA: dict[date, list[float]] de spreads ordenados
+            # cronologicamente, populado bar-a-bar (running). Decisao
+            # 2026-05-25-01 exige running median, nao mediana do dia
+            # inteiro (que era look-ahead disfarcado).
+            self._spreads_observados_por_dia: dict[date, list[float]] = {}
+            # Pre-indexa minuto -> (data, spread) para lookup rapido.
+            if not self._spread_df.empty:
+                self._minuto_para_spread: dict = self._spread_df["spread_avg"].to_dict()
+            else:
+                self._minuto_para_spread = {}
         else:
             self._spread_df = pd.DataFrame()
             self._corte_global = None
-            self._mediana_dia_cache = {}
+            self._spreads_observados_por_dia = {}
+            self._minuto_para_spread = {}
 
         # Estatistica observavel (testes / auditoria).
         self._barras_recebidas: int = 0
@@ -179,7 +203,9 @@ class EstrategiaSpreadFilter:
         # Reset estatisticas por janela.
         self._barras_recebidas = 0
         self._barras_bloqueadas = 0
-        self._mediana_dia_cache = {}
+        # Reset running median state.
+        if hasattr(self, "_spreads_observados_por_dia"):
+            self._spreads_observados_por_dia = {}
 
     def on_barra(
         self,
@@ -222,37 +248,44 @@ class EstrategiaSpreadFilter:
         # Trunca para minuto inteiro para lookup.
         chave = ts.replace(second=0, microsecond=0)
         chave_pd = pd.Timestamp(chave)
-        if chave_pd not in self._spread_df.index:
+        spread = self._minuto_para_spread.get(chave_pd)
+        if spread is None:
             return self._parametros.permitir_se_falta_dado
-
-        spread = float(self._spread_df.loc[chave_pd, "spread_avg"])
 
         if modo == "quantil_global":
             if self._corte_global is None:
                 return self._parametros.permitir_se_falta_dado
-            return spread <= self._corte_global
+            # quantil_global usa estatistica do TREINO/dataset inteiro,
+            # que ja foi computado uma vez. Nao e look-ahead pois o
+            # corte_global e um numero fixo, nao depende do timestamp.
+            # Atualiza estado mesmo bloqueado/permitido (consistencia).
+            self._registrar_observacao(ts.date(), float(spread))
+            return float(spread) <= self._corte_global
 
-        # mediana_diaria.
+        # mediana_diaria — RUNNING MEDIAN sobre minutos passados do dia.
+        # Decisao 2026-05-25-01: NAO pode usar minutos futuros do dia.
         dia = ts.date()
-        mediana = self._mediana_dia_cache.get(dia)
-        if mediana is None:
-            mediana = self._calcular_mediana_dia(dia)
-            self._mediana_dia_cache[dia] = mediana
-        if mediana <= 0:
-            return self._parametros.permitir_se_falta_dado
-        return spread <= mediana
+        spreads_passados = self._spreads_observados_por_dia.setdefault(dia, [])
 
-    def _calcular_mediana_dia(self, dia: date) -> float:
-        """Calcula mediana de spread para o dia. Cache simples."""
-        # Filtra index pelo dia.
-        if self._spread_df.empty:
-            return 0.0
-        idx = self._spread_df.index
-        mask = (idx.date == dia)  # type: ignore[union-attr]
-        sub = self._spread_df.loc[mask, "spread_avg"]
-        if sub.empty:
-            return 0.0
-        return float(sub.median())
+        # Antes do warmup: politica default (permitir_se_falta_dado).
+        if len(spreads_passados) < self._parametros.minutos_warmup_dia:
+            self._registrar_observacao(dia, float(spread))
+            return self._parametros.permitir_se_falta_dado
+
+        # Mediana corrente (apenas minutos passados — exclui ts atual).
+        # Calcula ANTES de registrar para que o spread atual seja
+        # comparado contra historico estritamente anterior.
+        from statistics import median
+        mediana_corrente = median(spreads_passados)
+        self._registrar_observacao(dia, float(spread))
+        if mediana_corrente <= 0:
+            return self._parametros.permitir_se_falta_dado
+        return float(spread) <= mediana_corrente
+
+    def _registrar_observacao(self, dia: date, spread: float) -> None:
+        """Adiciona spread ao buffer de observacoes do dia."""
+        buffer = self._spreads_observados_por_dia.setdefault(dia, [])
+        buffer.append(spread)
 
     # ------------------------------------------------------------------
     # Acessores

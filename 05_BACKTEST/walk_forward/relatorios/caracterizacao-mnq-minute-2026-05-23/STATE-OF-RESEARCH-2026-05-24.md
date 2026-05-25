@@ -64,6 +64,7 @@ sessão 14:30-19:00 → Sharpe -3.47, igual ao baseline).
 | Overnight | Cooper-Cliff-Gulen | rejeitada | -1.07 | Não replica em futures (algos arbitram) |
 | Volatility | ORB original | rejeitada | <0 | Confirmado em 4 janelas |
 | Volatility | NR7 | frágil | ~0.5 | Sobrevive friccão mas Sharpe baixo |
+| **Volatility+Filter** | **Crabel NR7 + Spread Filter (running median)** | **frágil — DEBATE 2026-05-25-01** | **+2.91** | **Sharpe mediana ótimo MAS janela 1 com PnL −1711 pts** estoura Topstep DD. Não promovido (G3 fechou com aprovado_walk_forward=false). |
 
 ### 4. Pre-FOMC: degradação com janela maior
 
