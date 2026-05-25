@@ -1,0 +1,215 @@
+{
+  "agregado_media": {
+    "calmar": 5.416917433895454,
+    "drawdown_maximo_dias": 34.5,
+    "drawdown_maximo_percentual": 0.6731504677754269,
+    "mae_medio": -148.7554383116883,
+    "mfe_medio": 208.21517857142857,
+    "numero_trades": 9.5,
+    "payoff_medio": 1.4394516730844018,
+    "pnl_total": -100.20874999999614,
+    "sharpe_anualizado": 0.1376621538076388,
+    "win_rate": 0.41688311688311686
+  },
+  "agregado_mediana": {
+    "calmar": 2.0334042972850694,
+    "drawdown_maximo_dias": 28.0,
+    "drawdown_maximo_percentual": 0.749974465398283,
+    "mae_medio": -138.96428571428572,
+    "mfe_medio": 216.44285714285712,
+    "numero_trades": 10.0,
+    "payoff_medio": 1.6887172764234197,
+    "pnl_total": -9.019999999989523,
+    "sharpe_anualizado": 0.07753487168384599,
+    "win_rate": 0.39285714285714285
+  },
+  "configuracao": {
+    "custos": {
+      "comissao_usd_por_contrato_por_lado": 0.62,
+      "slippage_fracao_range": 0.075,
+      "slippage_pontos_por_lado": 0.25,
+      "usd_por_ponto": 2.0
+    },
+    "granularidade": "1m",
+    "holdout_dias_uteis": null,
+    "instrumento": "MNQ",
+    "passo_dias_uteis": 60,
+    "seed": 42,
+    "tamanho_teste_dias_uteis": 60,
+    "tamanho_treino_dias_uteis": 60
+  },
+  "estrategia": "Portfolio_PreFOMC_NR7SF",
+  "holdout_dias_uteis": null,
+  "holdout_fim": null,
+  "holdout_inicio": null,
+  "identificador": "2026-05-25-03",
+  "janelas": [
+    {
+      "calmar": 5.834546737737845,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 12,
+      "drawdown_maximo_percentual": 0.49994893079656616,
+      "duracao_ms": 7954,
+      "estrategia": "Portfolio_PreFOMC_NR7SF",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 0,
+        "teste_fim": "2025-09-01T00:00:00Z",
+        "teste_inicio": "2025-06-09T00:00:00Z",
+        "treino_fim": "2025-06-09T00:00:00Z",
+        "treino_inicio": "2025-03-17T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -89.275,
+      "mfe_medio": 177.1,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.933626661673911,
+      "pnl_total": 373.98750000001746,
+      "sharpe_anualizado": 3.35700457243272,
+      "status": "ok",
+      "win_rate": 0.5
+    },
+    {
+      "calmar": -4.2,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 70,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 8062,
+      "estrategia": "Portfolio_PreFOMC_NR7SF",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 1,
+        "teste_fim": "2025-11-24T00:00:00Z",
+        "teste_inicio": "2025-09-01T00:00:00Z",
+        "treino_fim": "2025-09-01T00:00:00Z",
+        "treino_inicio": "2025-06-09T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -227.8181818181818,
+      "mfe_medio": 90.25,
+      "motivo_falha": null,
+      "numero_trades": 11,
+      "payoff_medio": 0.44674547781685636,
+      "pnl_total": -1817.382500000007,
+      "sharpe_anualizado": -6.214219347295349,
+      "status": "ok",
+      "win_rate": 0.18181818181818182
+    },
+    {
+      "calmar": 21.80086114101168,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 12,
+      "drawdown_maximo_percentual": 0.1926529403051414,
+      "duracao_ms": 7531,
+      "estrategia": "Portfolio_PreFOMC_NR7SF",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 2,
+        "teste_fim": "2026-02-17T00:00:00Z",
+        "teste_inicio": "2025-11-24T00:00:00Z",
+        "treino_fim": "2025-11-24T00:00:00Z",
+        "treino_inicio": "2025-09-01T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -99.25,
+      "mfe_medio": 309.725,
+      "motivo_falha": null,
+      "numero_trades": 10,
+      "payoff_medio": 1.929659638065712,
+      "pnl_total": 1434.5875000000015,
+      "sharpe_anualizado": 6.609798219158212,
+      "status": "ok",
+      "win_rate": 0.7
+    },
+    {
+      "calmar": -1.7677381431677055,
+      "configuracao": {
+        "custos": {
+          "comissao_usd_por_contrato_por_lado": 0.62,
+          "slippage_fracao_range": 0.075,
+          "slippage_pontos_por_lado": 0.25,
+          "usd_por_ponto": 2.0
+        },
+        "granularidade": "1m",
+        "holdout_dias_uteis": null,
+        "instrumento": "MNQ",
+        "passo_dias_uteis": 60,
+        "seed": 42,
+        "tamanho_teste_dias_uteis": 60,
+        "tamanho_treino_dias_uteis": 60
+      },
+      "drawdown_maximo_dias": 44,
+      "drawdown_maximo_percentual": 1.0,
+      "duracao_ms": 7719,
+      "estrategia": "Portfolio_PreFOMC_NR7SF",
+      "janela": {
+        "hash_dados": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+        "indice": 3,
+        "teste_fim": "2026-05-12T00:00:00Z",
+        "teste_inicio": "2026-02-17T00:00:00Z",
+        "treino_fim": "2026-02-17T00:00:00Z",
+        "treino_inicio": "2025-11-24T00:00:00Z"
+      },
+      "look_ahead_violation": false,
+      "mae_medio": -178.67857142857142,
+      "mfe_medio": 255.78571428571428,
+      "motivo_falha": null,
+      "numero_trades": 7,
+      "payoff_medio": 1.4477749147811276,
+      "pnl_total": -392.0274999999965,
+      "sharpe_anualizado": -3.2019348290650282,
+      "status": "ok",
+      "win_rate": 0.2857142857142857
+    }
+  ],
+  "manifesto_hash": "f81eb5be8bacd0763d3e33d870b513186a6e43d3892a79f9afe649f2f5659f7f",
+  "status": "concluido",
+  "versoes_dependencias": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.0",
+    "python": "3.11.9"
+  }
+}
