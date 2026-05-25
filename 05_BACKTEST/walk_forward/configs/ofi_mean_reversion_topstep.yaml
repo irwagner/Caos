@@ -1,0 +1,19 @@
+# EstrategiaOFI variante mean_reversion.
+#
+# Achado empirico (correlacao analysis em MNQ_06-25):
+# - TFI no minuto t tem correlacao negativa fraca com retorno futuro.
+# - Maior horizonte (30min TFI vs 30min ret) = correlacao -0.030.
+# - Sinal sugere fade do flow, nao momentum.
+#
+# Hipotese a testar: pode virar Sharpe positivo com mean_reversion?
+# Caso negativo, refutamos OFI no MNQ.
+
+tamanho_treino_dias_uteis: 60
+tamanho_teste_dias_uteis: 60
+granularidade: 1m
+seed: 42
+custos:
+  slippage_pontos_por_lado: 0.25
+  comissao_usd_por_contrato_por_lado: 0.62
+  usd_por_ponto: 2.0
+  slippage_fracao_range: 0.075
