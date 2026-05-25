@@ -88,7 +88,7 @@ graph TD
   - Opcional: chama `CouncilRecorder.gravar` quando flag `--commit` for usada na CLI.
   - **Cobre**: R8.
 
-- [ ] 8. CLI `caos walk-forward run|status` (`caos/main.py`)
+- [x] 8. CLI `caos walk-forward run|status` (`caos/main.py`)
   - Estende a CLI do Spec 1 com novo subcomando.
   - Testes via subprocess (mesmo padrão do Task 17 do Spec 1).
   - **Cobre**: R9.

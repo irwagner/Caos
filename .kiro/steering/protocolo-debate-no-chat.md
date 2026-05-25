@@ -1,8 +1,8 @@
 ---
 inclusion: always
-data: 2026-05-22
+data: 2026-05-25
 autor: Athena
-justificativa: Carrega o protocolo do Conselho-no-Chat (Spec 5) em toda sessão Kiro. Define os 5 gatilhos canônicos, o vocabulário de turno, a máquina de estados, as regras de veto e os 5 freios humanos que guiam o Kiro_Brain quando atua como cérebro único interpretando os 9 papéis do Conselho.
+justificativa: Carrega o protocolo do Conselho-no-Chat (Spec 5) em toda sessão Kiro. Define os 5 gatilhos canônicos, o vocabulário de turno, a máquina de estados, as regras de veto e os 4 freios humanos (originalmente 5; o freio sobre `caos walk-forward run` foi removido em 22/mai/2026 e o freio de cópia para NT8 foi escopado em 25/mai/2026 para permitir sandbox `Strategies\caos\`).
 ---
 
 # Protocolo do Conselho-no-Chat
@@ -158,12 +158,14 @@ CERBERUS_TIMEOUT (Cerberus não respondeu em prazo).
 
 O Kiro_Brain, mesmo interpretando Athena, NUNCA pode:
 
-1. **Copiar arquivos para `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\`.** O Kiro_Brain só edita versão em `04_CODIGO/ninjascript/`. A instalação no NT8 é manual do usuário.
+1. **Tocar em qualquer arquivo dentro de `%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\` EXCETO** dentro do subdiretório isolado `Strategies\caos\`. O Kiro_Brain pode criar, editar, copiar e apagar arquivos livremente DENTRO de `Strategies\caos\` para fins de backtest replay e simulação. Fora dessa sandbox (qualquer outro arquivo .cs em `Strategies\` ou subpastas-irmãs como `Indicators\`, `AddOns\`, etc), a regra original vale: a instalação é manual do usuário. **Toda escrita em `Strategies\caos\` exige cópia espelho em `04_CODIGO/ninjascript/` versionada no Git** — as duas pastas devem permanecer sincronizadas em conteúdo.
 2. **Modificar Debate ou Decisão já commitado em Git.** Reabertura exige novo Debate com referência ao anterior em `notas_injetadas`.
 3. **Aplicar `Tag_De_Congelamento` (`caos-frozen-AAAA-MM-DD-NN`) sem `aprovado_walk_forward=true`** na Decisão. A regra é do Spec 1 R8.6; aqui é apenas reafirmada.
 4. **Rodar Debate sem anunciar primeiro no chat.** Antes do Turno 1, o Kiro_Brain SEMPRE imprime uma linha "**[Conselho]** abrindo Debate_Auto `<id>-<slug>` (gatilho: G<N>)" para que o usuário saiba o que está acontecendo. Quando o usuário responder "para o Conselho", o Debate é pausado (status: em-pausa) e a conversa volta ao normal.
 
-> **Histórico:** o freio "não executar `caos walk-forward run`" foi removido por decisão direta do usuário em 22/mai/2026. O Kiro_Brain agora pode invocar Walk-Forward quando fizer sentido (depois de gatilho ou pedido explícito), mas SEMPRE anuncia no chat antes de executar e SEMPRE roda com `--identificador` derivado de data/UTC + sequencial. Os 4 freios restantes seguem válidos.
+> **Histórico:** o freio "não executar `caos walk-forward run`" foi removido por decisão direta do usuário em 22/mai/2026. O Kiro_Brain agora pode invocar Walk-Forward quando fizer sentido (depois de gatilho ou pedido explícito), mas SEMPRE anuncia no chat antes de executar e SEMPRE roda com `--identificador` derivado de data/UTC + sequencial.
+>
+> O freio #1 foi **escopado em 25/mai/2026** por decisão direta do usuário: o Kiro_Brain ganhou liberdade dentro do subdiretório `Strategies\caos\` para que o ciclo "alterar plugin Python → atualizar C# espelho → recompilar no NT8 → rodar backtest replay" não dependa de cópia manual repetitiva. **Toda escrita em `Strategies\caos\` deve ter espelho versionado em `04_CODIGO/ninjascript/`** — sem exceção. O resto da pasta `Strategies\` (e demais subpastas do NT8 fora da sandbox) continua sob controle exclusivamente manual do usuário. Os freios 2, 3 e 4 seguem inteiros.
 
 ## Como abrir e fechar Debate (passo-a-passo)
 

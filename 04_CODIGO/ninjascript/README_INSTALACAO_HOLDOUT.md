@@ -6,9 +6,37 @@
 
 ---
 
-## Passo 1 — Copiar arquivos
+## Passo 1 — Sincronizar para a sandbox NT8
 
-Copie os 9 arquivos `.cs` deste diretório (`04_CODIGO/ninjascript/`) **EXCETO** o subdiretório `reference_hydra/`:
+Desde **25/mai/2026** existe uma **sandbox autorizada** dentro do NT8:
+
+```
+%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\caos\
+```
+
+O Kiro_Brain pode escrever livremente nessa sandbox (freio humano #1
+escopado — ver `protocolo-debate-no-chat.md`). Toda escrita lá exige
+cópia espelho neste diretório (`04_CODIGO/ninjascript/`), versionada no
+Git. O script `sincronizar.bat` faz a cópia bidirecional:
+
+```cmd
+cd /d e:\CAOS\04_CODIGO\ninjascript
+sincronizar.bat repo-para-caos
+```
+
+Modos do script:
+
+| Modo               | Direção                                   | Quando usar                              |
+|--------------------|-------------------------------------------|------------------------------------------|
+| `repo-para-caos`   | Repo → Sandbox NT8                        | Após pull do Git, antes de compilar NT8  |
+| `caos-para-repo`   | Sandbox NT8 → Repo                        | Após editar direto na sandbox            |
+| `verificar`        | Não copia, só compara hashes              | Antes de compilar para checar paridade   |
+
+Filtros do script:
+- Apenas `*.cs` são sincronizados.
+- `README*.md`, `*.bat` e `reference_hydra/` ficam de fora.
+
+Arquivos que devem aparecer na sandbox após `repo-para-caos`:
 
 ```
 Strategy.cs
@@ -20,16 +48,14 @@ EstrategiaORBLogica.cs
 EstrategiaCrabelLogica.cs
 SpreadFilterLogica.cs
 CircuitBreakerEstendido.cs
+StrategyORB.cs
 StrategyORBCrabelSpreadFilter.cs
 ```
 
-Para o caminho de instalação do NinjaTrader 8:
-
-```
-%USERPROFILE%\Documents\NinjaTrader 8\bin\Custom\Strategies\
-```
-
-> **Atenção (freio humano #1):** essa cópia é manual. Eu (Kiro_Brain) nunca copio arquivos para esse diretório automaticamente.
+> **Importante:** apenas a subpasta `Strategies\caos\` está liberada
+> para escrita automática. Qualquer outro arquivo em `Strategies\` ou
+> em subpastas-irmãs (`Indicators\`, `AddOns\`, etc.) continua sob
+> instalação manual exclusiva do usuário.
 
 ## Passo 2 — Compilar
 
