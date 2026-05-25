@@ -8,22 +8,25 @@ viáveis em MNQ. Documento vivo — atualizado a cada sessão.
 ### 1. Regra de ouro empírica do projeto
 
 > **Para Sharpe ≥ 1 anualizado em MNQ minute sob fricção Topstep:
-> edge bruto necessário ≥ 5 pts/trade.**
+> edge bruto necessário ≥ 4 pts/trade.**
+
+(Atualizado 2026-05-24 com tick consolidado de 14 meses: spread RTH
+real é 0.37 pts, fricção ~2.0 pts/trade, threshold cai de 5 → 4 pts.)
 
 Derivação:
 
-- Fricção realista: ~2.5 pts/trade (slippage 0.25 absoluto + spread
-  efetivo 0.5/2 + comissão 0.62 USD ÷ 2 USD/pt + slippage proporcional
+- Fricção realista: ~2.0 pts/trade (slippage 0.25 absoluto + spread
+  efetivo RTH 0.37/2 + comissão 0.62 USD ÷ 2 USD/pt + slippage proporcional
   ~0.08 × range).
 - Para 240 trades/ano e Sharpe 1: PnL líquido ≥ 200 pts → edge bruto
-  ≥ 3.3 pts/trade. Margem de segurança 50% → 5 pts/trade.
+  ≥ 2.8 pts/trade. Margem de segurança 50% → 4 pts/trade.
 
 **Validado por:**
 
 - Sweep `2026-05-24-10..14`: Noise Area com sf de 0 a 0.10. Confirmou
   break-even entre sf=0 (Sharpe +0.24) e sf=0.025 (Sharpe -0.70).
-- Caracterização tick `2026-05-24` no MNQ_06-25: razão real
-  spread/range = 0.0812 ≈ 0.075 do sweep (overestimou só 0.9x).
+- Caracterização tick `2026-05-24` em 5 contratos (14 meses): razão
+  real spread/range = 0.0812 ≈ 0.075 do sweep (overestimou só 0.9x).
 
 **Implicação:** estratégias direcionais "no ruído" intraday (1m) do
 MNQ estão eliminadas. Caminho viável: **moves estruturalmente
@@ -31,14 +34,19 @@ maiores** (eventos macro, calendário, gaps multi-dia).
 
 ### 2. Spread efetivo do MNQ por regime
 
-Medido em 12 GB de tick do MNQ_06-25 (~338M linhas):
+Medido em **210 GB de tick** processados em 5 contratos (~14 meses
+contíguos abr/2025 → mai/2026, 351k minutos):
 
 | Regime                  | Spread mediano | p90    |
 |-------------------------|---------------|--------|
-| **RTH NY (h=14-19 UTC)** | **0.40-0.41 pts** | 0.61 pts |
-| Geral                   | 0.51 pts      | 0.73 pts |
-| Overnight               | 0.55 pts      | 0.77 pts |
+| **RTH NY (14:30-21:00 UTC)** | **0.37 pts** | 0.56 pts |
+| Geral                   | 0.49 pts      | -      |
+| Overnight               | 0.52 pts      | 0.76 pts |
 | Pico iliquidez (h=22 UTC) | 0.67 pts    | -      |
+
+**Sazonalidade trimestral nova descoberta:**
+- Picos antes de cada vencimento (abr 0.64, mar 0.58 pts)
+- Mínimos no meio do trimestre (set 0.42, jul 0.44 pts)
 
 **Implicação:** estratégias que operam só RTH NY pagam ~30% menos
 fricção. Mas filtrar horário **não recupera** estratégias com edge
