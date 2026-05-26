@@ -1,0 +1,209 @@
+{
+  "identificador": "2026-05-26-01-rerun-fix",
+  "estrategia": "EstrategiaORBCrabelSFCB",
+  "fonte": "concat 5 contratos MNQ_06-25 a MNQ_06-26",
+  "decisao_referencia": "2026-05-25-02",
+  "decisao_fix": "2026-05-26-01",
+  "janelas_total": 24,
+  "janelas_concluidas": 17,
+  "sharpe_mediana": 9.071275729144332,
+  "sharpe_original": 2.91,
+  "pnl_pts_mediana": 0.0,
+  "trades_mediana": 1.0,
+  "drawdown_mediana": 0.0,
+  "validacao_aprovada": true,
+  "janelas": [
+    {
+      "treino_inicio": "2025-03-17",
+      "teste_fim": "2025-06-23",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-03-31",
+      "teste_fim": "2025-07-07",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-04-14",
+      "teste_fim": "2025-07-21",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 134.0,
+      "sharpe": 62.67276122846353
+    },
+    {
+      "treino_inicio": "2025-04-28",
+      "teste_fim": "2025-08-04",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": -121.75,
+      "sharpe": -11.224972160321826
+    },
+    {
+      "treino_inicio": "2025-05-12",
+      "teste_fim": "2025-08-18",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": -260.0,
+      "sharpe": -10.40460877605588
+    },
+    {
+      "treino_inicio": "2025-05-26",
+      "teste_fim": "2025-09-01",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-06-09",
+      "teste_fim": "2025-09-15",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-06-23",
+      "teste_fim": "2025-09-29",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 134.0,
+      "sharpe": 11.224972160321826
+    },
+    {
+      "treino_inicio": "2025-07-07",
+      "teste_fim": "2025-10-13",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 237.5,
+      "sharpe": 19.31833976866981
+    },
+    {
+      "treino_inicio": "2025-07-21",
+      "teste_fim": "2025-10-27",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 4.25,
+      "sharpe": 11.224972160321826
+    },
+    {
+      "treino_inicio": "2025-08-04",
+      "teste_fim": "2025-11-10",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-08-18",
+      "teste_fim": "2025-11-24",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-09-01",
+      "teste_fim": "2025-12-08",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 120.0,
+      "sharpe": 8.238511677300423
+    },
+    {
+      "treino_inicio": "2025-09-15",
+      "teste_fim": "2025-12-22",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-09-29",
+      "teste_fim": "2026-01-06",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": -67.25,
+      "sharpe": -10.305520515790345
+    },
+    {
+      "treino_inicio": "2025-10-13",
+      "teste_fim": "2026-01-20",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": -316.5,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-10-27",
+      "teste_fim": "2026-02-03",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 380.25,
+      "sharpe": 82.47914326497342
+    },
+    {
+      "treino_inicio": "2025-11-10",
+      "teste_fim": "2026-02-17",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": -22.5,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-11-24",
+      "teste_fim": "2026-03-03",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2025-12-08",
+      "teste_fim": "2026-03-17",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 193.75,
+      "sharpe": 9.071275729144332
+    },
+    {
+      "treino_inicio": "2025-12-22",
+      "teste_fim": "2026-03-31",
+      "status": "ok",
+      "trades": 1,
+      "pnl_pts": 150.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2026-01-06",
+      "teste_fim": "2026-04-14",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2026-01-20",
+      "teste_fim": "2026-04-28",
+      "status": "sem-trades",
+      "trades": 0,
+      "pnl_pts": 0.0,
+      "sharpe": null
+    },
+    {
+      "treino_inicio": "2026-02-03",
+      "teste_fim": "2026-05-12",
+      "status": "ok",
+      "trades": 2,
+      "pnl_pts": 89.75,
+      "sharpe": 4.849296035566228
+    }
+  ]
+}

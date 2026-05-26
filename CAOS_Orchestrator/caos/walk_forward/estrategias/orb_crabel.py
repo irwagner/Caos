@@ -46,20 +46,55 @@ from caos.walk_forward.runner import BarrasTesteIterator
 ModoNR = Literal["nr4", "nr7"]
 
 
+#: Numero minimo de barras de minuto que um dia precisa ter para ser
+#: contado como dia util valido pelo filtro NR (Decisao 2026-05-26-01).
+#: Pregao regular MNQ = 1380 barras (23h * 60min); domingo Globex
+#: tem ~120-300 barras; feriado parcial tem ~430-720. Limiar 300
+#: descarta especificamente abertura noturna de fim de semana.
+MIN_BARRAS_DIA_VALIDO: int = 300
+
+
 def _calcular_range_diario(historico: pd.DataFrame) -> dict[date, float]:
-    """Devolve mapa ``data -> range`` (em pontos) por dia útil.
+    """Devolve mapa ``data -> range`` (em pontos) por dia útil válido.
 
     ``historico`` deve seguir o schema canônico do
     :mod:`caos.walk_forward.data_reader`. Sem barras → mapa vazio.
+
+    **Filtro de dia válido (Decisao 2026-05-26-01)**:
+    Só conta dias que satisfaçam AMBOS:
+
+    - ``timestamp.dt.dayofweek < 5`` (segunda a sexta — exclui sábado e
+      domingo, que no MNQ representam abertura noturna do Globex e
+      têm sessão truncada de 3-5 horas).
+    - Pelo menos ``MIN_BARRAS_DIA_VALIDO`` barras de minuto. Pregão
+      regular MNQ = 1380 barras. Limiar de 300 barras (5h) descarta
+      dias parciais (ex: feriado parcial com fechamento muito
+      antecipado, abertura tardia por falha técnica) que gerariam
+      NR7 falso-positivo.
+
+    Sem este filtro, domingos com range artificialmente pequeno (~120-
+    200 pts vs. ~500 pts de pregão regular) viram NR7 sistemáticos e
+    toda segunda-feira é elegível espuriamente. Bug descoberto após
+    replay NT8 28/01-13/03/2026 (commit d2ff9d6).
     """
     if "timestamp" not in historico.columns or historico.empty:
         return {}
     df = historico.copy()
+    # Filtro 1: descarta sabado e domingo.
+    if df["timestamp"].dt.tz is None:
+        df = df[df["timestamp"].dt.dayofweek < 5].copy()
+    else:
+        df = df[df["timestamp"].dt.dayofweek < 5].copy()
+    if df.empty:
+        return {}
     df["dia"] = df["timestamp"].dt.date
     por_dia = df.groupby("dia").agg(
         high_max=("high", "max"),
         low_min=("low", "min"),
+        n_barras=("high", "count"),
     )
+    # Filtro 2: descarta dias com sessao truncada (< 300 barras).
+    por_dia = por_dia[por_dia["n_barras"] >= MIN_BARRAS_DIA_VALIDO]
     return {
         d: float(row["high_max"] - row["low_min"])
         for d, row in por_dia.iterrows()
@@ -144,6 +179,8 @@ class EstrategiaORBCrabel:
         self._dia_corrente: Optional[date] = None
         self._high_corrente: float = float("-inf")
         self._low_corrente: float = float("inf")
+        # Contador de barras do dia corrente (Decisao 2026-05-26-01).
+        self._barras_dia_corrente: int = 0
 
     # ------------------------------------------------------------------
     # Protocol Estrategia
@@ -159,6 +196,7 @@ class EstrategiaORBCrabel:
         self._dia_corrente = None
         self._high_corrente = float("-inf")
         self._low_corrente = float("inf")
+        self._barras_dia_corrente = 0
 
     def on_barra(
         self,
@@ -173,27 +211,40 @@ class EstrategiaORBCrabel:
             self._dia_corrente = dia_atual
             self._high_corrente = float(barra["high"])
             self._low_corrente = float(barra["low"])
+            self._barras_dia_corrente = 1
             # Se o filtro do treino sinalizou "próximo dia é elegível",
-            # adiciona ESTE dia (o primeiro do Teste) ao conjunto.
-            if self._proximo_dia_elegivel:
+            # adiciona ESTE dia (o primeiro do Teste) ao conjunto —
+            # APENAS se o dia atual passa o filtro de validade.
+            if self._proximo_dia_elegivel and self._dia_eh_valido(dia_atual):
                 self._dias_elegiveis.add(dia_atual)
                 self._proximo_dia_elegivel = False
+            elif self._proximo_dia_elegivel and not self._dia_eh_valido(dia_atual):
+                # Dia atual e invalido (sabado/domingo). Mantem flag
+                # ativa para o proximo dia util valido.
+                pass
         elif dia_atual != self._dia_corrente:
-            # Fecha o dia anterior: registra range e atualiza filtro.
-            self._ranges_por_dia[self._dia_corrente] = (
-                self._high_corrente - self._low_corrente
-            )
-            self._dias_elegiveis, prox = _dias_apos_nr(
-                self._ranges_por_dia, self._janela_nr
-            )
-            # Se o ÚLTIMO dia (recém-fechado) é NR, o dia que está
-            # entrando agora é elegível.
-            if prox:
-                self._dias_elegiveis.add(dia_atual)
+            # Fecha o dia anterior: registra range APENAS se valido.
+            if (
+                self._barras_dia_corrente >= MIN_BARRAS_DIA_VALIDO
+                and self._dia_eh_valido(self._dia_corrente)
+            ):
+                self._ranges_por_dia[self._dia_corrente] = (
+                    self._high_corrente - self._low_corrente
+                )
+                self._dias_elegiveis, prox = _dias_apos_nr(
+                    self._ranges_por_dia, self._janela_nr
+                )
+                # Se o ÚLTIMO dia (recém-fechado) é NR, o dia que está
+                # entrando agora é elegível — apenas se valido.
+                if prox and self._dia_eh_valido(dia_atual):
+                    self._dias_elegiveis.add(dia_atual)
+                elif prox and not self._dia_eh_valido(dia_atual):
+                    self._proximo_dia_elegivel = True
             # Inicia novo dia.
             self._dia_corrente = dia_atual
             self._high_corrente = float(barra["high"])
             self._low_corrente = float(barra["low"])
+            self._barras_dia_corrente = 1
         else:
             # Acumula no dia corrente.
             h = float(barra["high"])
@@ -202,6 +253,7 @@ class EstrategiaORBCrabel:
                 self._high_corrente = h
             if ll < self._low_corrente:
                 self._low_corrente = ll
+            self._barras_dia_corrente += 1
 
         # Filtro: se o dia atual NÃO é elegível, barra é silenciosamente
         # consumida sem invocar a ORB interna.
@@ -209,6 +261,15 @@ class EstrategiaORBCrabel:
             return
 
         self._orb_interna.on_barra(barra, contexto)
+
+    @staticmethod
+    def _dia_eh_valido(dia: date) -> bool:
+        """True se o dia é segunda a sexta (0-4 em ``date.weekday()``).
+
+        Decisao 2026-05-26-01: descarta sábado/domingo. Usado em
+        conjunto com :data:`MIN_BARRAS_DIA_VALIDO` no fechamento de dia.
+        """
+        return dia.weekday() < 5
 
     def finalizar(self) -> Sequence[Trade]:
         return self._orb_interna.finalizar()

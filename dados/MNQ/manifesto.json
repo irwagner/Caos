@@ -151,6 +151,26 @@
       "tamanho_bytes": 4915352
     },
     {
+      "hash_sha256": "52f9ad07b703cebac8a716aead041af1f4f42fa3b8ef0a8af5d0af7e48beea8c",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T05:04:27Z",
+      "nome_arquivo": "MNQ_03-26/tick/MNQ 03-26.Last.txt",
+      "num_linhas": 102235705,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 5206348547
+    },
+    {
+      "hash_sha256": "154b085360d1ed5bae7653608d70aadffc0a4879146dc1b6f421892a51e80b3b",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T22:23:02Z",
+      "nome_arquivo": "MNQ_03-26/tick/spread_minuto.csv",
+      "num_linhas": 86495,
+      "periodo_final": "2026-03-13T21:00:00Z",
+      "periodo_inicial": "2025-12-15T03:00:00Z",
+      "tamanho_bytes": 14895573
+    },
+    {
       "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "instrumento": "MNQ",
       "mtime": "2026-05-23T01:14:32Z",
@@ -289,6 +309,56 @@
       "periodo_final": "2025-06-14T02:28:00Z",
       "periodo_inicial": "2025-03-17T06:01:00Z",
       "tamanho_bytes": 5014078
+    },
+    {
+      "hash_sha256": "ea5dfd367925b2e6f8e7abb4f026110eb2f38061be2177bef8387be12ef551d4",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T12:16:51Z",
+      "nome_arquivo": "MNQ_06-25/tick/MNQ 06-25.Ask.txt",
+      "num_linhas": 153596357,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 5686631317
+    },
+    {
+      "hash_sha256": "4ff1026ce2b23ad42a1492f3fb3c5871edf34c048b5ad2ea5c0e337e43fa67d1",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T12:25:48Z",
+      "nome_arquivo": "MNQ_06-25/tick/MNQ 06-25.Bid.txt",
+      "num_linhas": 153166962,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 5669846172
+    },
+    {
+      "hash_sha256": "b6a2e1bd8536102001ca956310b90ee1f0563d947c9a2cc28882a439f6187088",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T12:28:31Z",
+      "nome_arquivo": "MNQ_06-25/tick/MNQ 06-25.Last.txt",
+      "num_linhas": 31427317,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 1599524426
+    },
+    {
+      "hash_sha256": "b13d7cb9dded06806954109a406144507fc1c8f3804533c7d8043d23bdae7677",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-25T03:38:29Z",
+      "nome_arquivo": "MNQ_06-25/tick/ofi_minuto.csv",
+      "num_linhas": 34366,
+      "periodo_final": "2025-06-13T23:27:00Z",
+      "periodo_inicial": "2025-04-04T00:00:00Z",
+      "tamanho_bytes": 5528997
+    },
+    {
+      "hash_sha256": "7f92de74f7136e6e15c580303a8750694c0d911e7874514888b8543baa1dfb8c",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T13:13:47Z",
+      "nome_arquivo": "MNQ_06-25/tick/spread_minuto.csv",
+      "num_linhas": 34366,
+      "periodo_final": "2025-06-13T23:27:00Z",
+      "periodo_inicial": "2025-04-04T00:00:00Z",
+      "tamanho_bytes": 5902242
     },
     {
       "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -431,6 +501,26 @@
       "tamanho_bytes": 3529299
     },
     {
+      "hash_sha256": "0e7a46babc49d5343c7efbad9b9cfdf19821107e85d91051e11c754fc89a0392",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T03:31:20Z",
+      "nome_arquivo": "MNQ_06-26/tick/MNQ 06-26.Last.txt",
+      "num_linhas": 61892382,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3151094796
+    },
+    {
+      "hash_sha256": "af44c74c2e230be4d98c288510bc405bcc3000ac45f0da8c68df8678e506e142",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-25T00:12:35Z",
+      "nome_arquivo": "MNQ_06-26/tick/spread_minuto.csv",
+      "num_linhas": 52581,
+      "periodo_final": "2026-05-07T02:59:00Z",
+      "periodo_inicial": "2026-03-15T21:33:00Z",
+      "tamanho_bytes": 9064776
+    },
+    {
       "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "instrumento": "MNQ",
       "mtime": "2026-05-23T01:14:32Z",
@@ -569,6 +659,26 @@
       "periodo_final": "2025-09-13T00:00:00Z",
       "periodo_inicial": "2025-06-16T06:01:00Z",
       "tamanho_bytes": 5039236
+    },
+    {
+      "hash_sha256": "cc9dafdf4fc60cd11234feb87b62679a46fec891be025215ea8055492a37b159",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T07:17:58Z",
+      "nome_arquivo": "MNQ_09-25/tick/MNQ 09-25.Last.txt",
+      "num_linhas": 68168504,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 3470171486
+    },
+    {
+      "hash_sha256": "3bcea431b9734e2d6f01fbd640c57de43a81d45c61251819327c34f554e6f5fb",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T15:14:38Z",
+      "nome_arquivo": "MNQ_09-25/tick/spread_minuto.csv",
+      "num_linhas": 88992,
+      "periodo_final": "2025-09-12T21:00:00Z",
+      "periodo_inicial": "2025-06-16T03:00:00Z",
+      "tamanho_bytes": 15271444
     },
     {
       "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -711,6 +821,26 @@
       "tamanho_bytes": 5055537
     },
     {
+      "hash_sha256": "25b3a392ed65547594b3c32588e4697cd3fd77ec9fc209c8c3163cbad5f33b48",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T06:22:07Z",
+      "nome_arquivo": "MNQ_12-25/tick/MNQ 12-25.Last.txt",
+      "num_linhas": 97267073,
+      "periodo_final": null,
+      "periodo_inicial": null,
+      "tamanho_bytes": 4953440453
+    },
+    {
+      "hash_sha256": "143670ed5cbb067a38fdf90552f393716b16b56656452ec9a582134c4ccb3358",
+      "instrumento": "MNQ",
+      "mtime": "2026-05-24T18:48:33Z",
+      "nome_arquivo": "MNQ_12-25/tick/spread_minuto.csv",
+      "num_linhas": 89008,
+      "periodo_final": "2025-12-15T02:59:00Z",
+      "periodo_inicial": "2025-09-15T03:00:00Z",
+      "tamanho_bytes": 15322055
+    },
+    {
       "hash_sha256": "c373a7433c10b3a69fe7e7996862f474038200149d02b40dabb5c4874ec2bb0d",
       "instrumento": "MNQ",
       "mtime": "2026-05-23T02:21:07Z",
@@ -826,10 +956,45 @@
       "caminho_relativo": "MNQ_03-26/tick/MNQ 03-26.Ask.txt",
       "categoria": "timeout",
       "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_03-26/tick/MNQ 03-26.Bid.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_06-26/tick/MNQ 06-26.Ask.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_06-26/tick/MNQ 06-26.Bid.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_09-25/tick/MNQ 09-25.Ask.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_09-25/tick/MNQ 09-25.Bid.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_12-25/tick/MNQ 12-25.Ask.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
+    },
+    {
+      "caminho_relativo": "MNQ_12-25/tick/MNQ 12-25.Bid.txt",
+      "categoria": "timeout",
+      "mensagem": "timeout excedido após 60s"
     }
   ],
   "geracao": {
-    "data_iso8601_utc": "2026-05-24T03:49:07Z",
+    "data_iso8601_utc": "2026-05-26T04:23:43Z",
     "instrumento": "MNQ"
   }
 }
