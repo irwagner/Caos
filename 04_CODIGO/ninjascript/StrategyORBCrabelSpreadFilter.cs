@@ -33,6 +33,7 @@
 
 #region Using declarations
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
@@ -122,6 +123,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _sinalUltimoTrade;
         private bool _temPosicaoAberta;
 
+        // Diagnostico (R7.1 do Spec 3): conta rejeicoes por motivo,
+        // e loga a primeira ocorrencia de NR7-elegivel apos cada
+        // mudanca de dia. Sem custo em runtime; estado pequeno.
+        private DateTime _ultimoDiaLogadoCrabel = DateTime.MinValue;
+        private int _rejeicoesCB;
+        private int _rejeicoesNaoNR7;
+        private int _rejeicoesSpread;
+        private int _rejeicoesORBNada;
+
         // ------------------------------------------------------------------
         // Ciclo de vida
         // ------------------------------------------------------------------
@@ -156,6 +166,48 @@ namespace NinjaTrader.NinjaScript.Strategies
             DateTime tsUtc = Time[0].ToUniversalTime();
             EstrategiaCrabelLogica.AtualizarFiltro(_estadoCrabel, tsUtc, High[0], Low[0]);
 
+            // 1b. Diagnostico: ao mudar de dia, loga estado do NR7
+            //     (ranges dos ultimos 7 dias, eh elegivel?). So logado
+            //     1x por dia para nao floodar.
+            DateTime diaAtual = tsUtc.Date;
+            if (_ultimoDiaLogadoCrabel != diaAtual)
+            {
+                _ultimoDiaLogadoCrabel = diaAtual;
+                bool elegivel = EstrategiaCrabelLogica.DiaEhElegivel(_estadoCrabel, diaAtual);
+                int diasNoMapa = _estadoCrabel.RangePorDia.Count;
+                var payload = new Dictionary<string, object>();
+                payload["dia"] = diaAtual.ToString("yyyy-MM-dd");
+                payload["elegivel"] = elegivel;
+                payload["dias_no_historico"] = diasNoMapa;
+                payload["rejeicoes_cb"] = _rejeicoesCB;
+                payload["rejeicoes_nao_nr7"] = _rejeicoesNaoNR7;
+                payload["rejeicoes_spread"] = _rejeicoesSpread;
+                payload["rejeicoes_orb_nada"] = _rejeicoesORBNada;
+                // Inclui range do dia anterior se conhecido — chave para
+                // reconstruir o NR7 que o NT8 esta enxergando.
+                if (_estadoCrabel.RangePorDia.Count > 0)
+                {
+                    var ultimosRanges = new List<string>();
+                    var diasOrdenados = new List<DateTime>(_estadoCrabel.RangePorDia.Keys);
+                    diasOrdenados.Sort();
+                    int inicio = Math.Max(0, diasOrdenados.Count - 7);
+                    for (int i = inicio; i < diasOrdenados.Count; i++)
+                    {
+                        DateTime d = diasOrdenados[i];
+                        ultimosRanges.Add(string.Format("{0:yyyy-MM-dd}={1:F2}",
+                            d, _estadoCrabel.RangePorDia[d]));
+                    }
+                    payload["ranges_ultimos_7_dias"] = string.Join(",", ultimosRanges);
+                }
+                Logger.Logar(
+                    CaosWorkspaceRoot,
+                    Name,
+                    LogNivel.INFO,
+                    "diagnostico-dia",
+                    payload,
+                    s => Print(s));
+            }
+
             // 2. Atualiza spread filter — em tempo real, calcula spread
             //    da cotacao atual via APIs autorizadas (whitelist).
             //    Observacao: GetCurrentAsk/Bid retornam o ask/bid mais
@@ -174,21 +226,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             // 3a. Circuit breaker (multi-periodo).
             if (_cbExtendido.BloqueadoAgora)
             {
-                // Bloqueado — nao opera.
+                _rejeicoesCB++;
                 return;
             }
 
             // 3b. Crabel: dia atual deve ser elegivel.
-            DateTime diaAtual = tsUtc.Date;
             if (!EstrategiaCrabelLogica.DiaEhElegivel(_estadoCrabel, diaAtual))
             {
-                // Dia nao apos NR7 — pula.
+                _rejeicoesNaoNR7++;
                 return;
             }
 
             // 3c. Spread Filter: minuto atual deve passar a running median.
             if (spread > 0 && !SpreadFilterLogica.MinutoPermitido(_estadoSpread, spread, SpreadFilterWarmup))
             {
+                _rejeicoesSpread++;
                 return;
             }
 
@@ -239,6 +291,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 case AcaoORB.NADA:
                 default:
+                    _rejeicoesORBNada++;
                     break;
             }
         }
