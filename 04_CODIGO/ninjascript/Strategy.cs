@@ -145,12 +145,42 @@ namespace NinjaTrader.NinjaScript.Strategies
             OnNovaBarra();
 
             // Atualiza trailing dado o preço corrente (mid Ask/Bid).
-            if (Trailing != null && Trailing.Fase != FaseTrailing.SemPosicao)
+            //
+            // Defesa em camadas (descobrimento 2026-05-26 via replay NT8):
+            //   1. Position.MarketPosition == Flat = posição já foi liquidada
+            //      pelo broker (o stop original bateu). Nesse caso, NUNCA
+            //      re-emitir SetStopLoss — geraria erro NT8 do tipo "Sell
+            //      StopMarket acima do mercado" porque o preço atual já
+            //      ultrapassou o stop original.
+            //   2. Trailing.Fase != SemPosicao = nosso estado interno ainda
+            //      acha que tem trade aberto (será resetado pelo
+            //      OnExecutionUpdate, mas pode estar desatualizado).
+            //   3. _sinalTradeCorrente != null = ainda temos referência
+            //      válida ao sinal da entrada.
+            // Quando (1) for Flat, força reset preventivo do trailing para
+            // re-sincronizar.
+            if (Position.MarketPosition == MarketPosition.Flat)
+            {
+                if (Trailing != null && Trailing.Fase != FaseTrailing.SemPosicao)
+                    Trailing.Fechar();
+            }
+            else if (Trailing != null && Trailing.Fase != FaseTrailing.SemPosicao
+                     && _sinalTradeCorrente != null)
             {
                 double precoMid = (GetCurrentAsk() + GetCurrentBid()) / 2.0;
                 double stopNovo = Trailing.Atualizar(precoMid);
-                if (!double.IsNaN(stopNovo) && _sinalTradeCorrente != null)
-                    SetStopLoss(_sinalTradeCorrente, CalculationMode.Price, stopNovo, false);
+                if (!double.IsNaN(stopNovo))
+                {
+                    // Defesa adicional contra o erro "stop acima/abaixo do
+                    // mercado": só re-aplica SetStopLoss se o novo stop
+                    // for COERENTE com a direcao em relacao ao preco
+                    // corrente (LONG: stop < preco; SHORT: stop > preco).
+                    bool stopCoerente = Position.MarketPosition == MarketPosition.Long
+                        ? stopNovo < precoMid
+                        : stopNovo > precoMid;
+                    if (stopCoerente)
+                        SetStopLoss(_sinalTradeCorrente, CalculationMode.Price, stopNovo, false);
+                }
             }
 
             // Atualiza MFE/MAE da posição corrente.
@@ -391,6 +421,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {"pnl_usd", snap.PnlUSD}
                 });
                 if (Trailing != null) Trailing.Fechar();
+                // Defesa: reseta sinal corrente para que próximas barras
+                // não tentem aplicar SetStopLoss sobre um sinal stale.
+                _sinalTradeCorrente = null;
                 if (Cerberus != null && Cerberus.CircuitBreakerAtivo)
                 {
                     Logar(LogNivel.WARN, "circuit-breaker-ativado", new Dictionary<string, object>
