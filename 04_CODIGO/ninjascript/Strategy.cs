@@ -301,6 +301,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             SetStopLoss(sinal, CalculationMode.Price, stopLossPreco, false);
             SetProfitTarget(sinal, CalculationMode.Price, takeProfitPreco);
+            // Memoriza para que o trailing nao re-emita o mesmo stop
+            // na proxima barra (causaria erro "Sell StopMarket acima
+            // do mercado" se o preco ja caiu abaixo entre as chamadas).
+            _ultimoStopAplicado = stopLossPreco;
+            _ultimaBarraSetStopLoss = CurrentBar;
 
             AbrirEstadoInterno(direcao, contratos, stopLossPreco, takeProfitPreco, sinal);
             Logar(LogNivel.INFO, "entrada-autorizada", new Dictionary<string, object>
