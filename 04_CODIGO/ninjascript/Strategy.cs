@@ -293,14 +293,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return false;
             }
 
-            // Despacha ordem real ao NT8.
+            // Declara stop e alvo ANTES de despachar a ordem (R3.3).
+            //
+            // Padrao NT8: SetStopLoss/SetProfitTarget sao declarativos —
+            // se aplicam a entradas FUTURAS com o mesmo signal name. Se
+            // chamados DEPOIS do EnterLong, o NT8 tenta aplica-los em
+            // ordem stop/limit imediatamente, e se o preco corrente ja
+            // esta no lado errado do stop (ex: gap), gera erro
+            // "Sell StopMarket acima do mercado".
+            //
+            // Inversão: declarar protecoes ANTES de enviar a ordem.
+            SetStopLoss(sinal, CalculationMode.Price, stopLossPreco, false);
+            SetProfitTarget(sinal, CalculationMode.Price, takeProfitPreco);
+
+            // Despacha ordem real ao NT8 — ja com stop/alvo declarados.
             if (direcao == DirecaoTrade.Long)
                 EnterLong(contratos, sinal);
             else
                 EnterShort(contratos, sinal);
 
-            SetStopLoss(sinal, CalculationMode.Price, stopLossPreco, false);
-            SetProfitTarget(sinal, CalculationMode.Price, takeProfitPreco);
             // Memoriza para que o trailing nao re-emita o mesmo stop
             // na proxima barra (causaria erro "Sell StopMarket acima
             // do mercado" se o preco ja caiu abaixo entre as chamadas).
