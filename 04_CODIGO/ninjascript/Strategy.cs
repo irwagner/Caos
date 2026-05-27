@@ -47,6 +47,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _sinalTradeCorrente;
         private DateTime _entradaTimestampCorrente;
         private double _entradaPrecoCorrente;
+        private double _ultimoStopAplicado = double.NaN;
+        private int _ultimaBarraSetStopLoss = -1;
 
         // Contador de avisos quando a conta NÃO é Sim101 (R8.3).
         private int _avisosContaRealRestantes;
@@ -111,6 +113,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 case State.DataLoaded:
                     InstanciarComponentes();
+                    // Log de auditoria: registra instrumento, timezone e
+                    // primeira/ultima barra ao carregar dados. Ajuda a
+                    // detectar discrepancias de contrato/timezone que
+                    // afetam preco e timestamp dos eventos.
+                    LogarMetadadosCarga();
                     break;
 
                 case State.Historical:
@@ -178,8 +185,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                     bool stopCoerente = Position.MarketPosition == MarketPosition.Long
                         ? stopNovo < precoMid
                         : stopNovo > precoMid;
-                    if (stopCoerente)
+                    // Defesa adicional: nao re-aplica o mesmo stop e nao
+                    // faz mais de uma chamada SetStopLoss por barra.
+                    bool stopMudou = double.IsNaN(_ultimoStopAplicado) ||
+                                     Math.Abs(stopNovo - _ultimoStopAplicado) > 0.01;
+                    bool primeiraVezNaBarra = _ultimaBarraSetStopLoss != CurrentBar;
+                    if (stopCoerente && stopMudou && primeiraVezNaBarra)
+                    {
                         SetStopLoss(_sinalTradeCorrente, CalculationMode.Price, stopNovo, false);
+                        _ultimoStopAplicado = stopNovo;
+                        _ultimaBarraSetStopLoss = CurrentBar;
+                    }
                 }
             }
 
@@ -366,6 +382,40 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (Cerberus != null) Cerberus.Resetar();
         }
 
+        private void LogarMetadadosCarga()
+        {
+            // Captura instrumento, timezone do sistema, primeira/ultima
+            // barra carregada. Util para diagnosticar bugs onde NT8 esta
+            // usando contrato continuous sem perceber, ou onde a conversao
+            // Time[0].ToUniversalTime() esta gerando offset inesperado.
+            try
+            {
+                var payload = new Dictionary<string, object>();
+                payload["instrumento"] = Instrument != null ? Instrument.FullName : "<null>";
+                payload["instrumento_master"] = Instrument != null && Instrument.MasterInstrument != null
+                    ? Instrument.MasterInstrument.Name : "<null>";
+                payload["bars_period_value"] = BarsPeriod != null ? BarsPeriod.Value : 0;
+                payload["bars_period_type"] = BarsPeriod != null ? BarsPeriod.BarsPeriodType.ToString() : "<null>";
+                payload["timezone_local"] = TimeZoneInfo.Local.Id;
+                payload["timezone_offset_horas"] = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalHours;
+                payload["barras_carregadas"] = Bars != null ? Bars.Count : 0;
+                if (Bars != null && Bars.Count > 0)
+                {
+                    DateTime tsPrimeiro = Bars.GetTime(0);
+                    DateTime tsUltimo = Bars.GetTime(Bars.Count - 1);
+                    payload["primeira_barra_local"] = tsPrimeiro.ToString("yyyy-MM-ddTHH:mm:ssK");
+                    payload["primeira_barra_utc"] = tsPrimeiro.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    payload["ultima_barra_local"] = tsUltimo.ToString("yyyy-MM-ddTHH:mm:ssK");
+                    payload["ultima_barra_utc"] = tsUltimo.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                }
+                Logar(LogNivel.INFO, "metadados-carga", payload);
+            }
+            catch (Exception exc)
+            {
+                Print("[CAOS] Falha ao logar metadados de carga: " + exc.Message);
+            }
+        }
+
         private void VerificarConta()
         {
             string nomeConta = Account != null ? Account.Name : null;
@@ -424,6 +474,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Defesa: reseta sinal corrente para que próximas barras
                 // não tentem aplicar SetStopLoss sobre um sinal stale.
                 _sinalTradeCorrente = null;
+                _ultimoStopAplicado = double.NaN;
+                _ultimaBarraSetStopLoss = -1;
                 if (Cerberus != null && Cerberus.CircuitBreakerAtivo)
                 {
                     Logar(LogNivel.WARN, "circuit-breaker-ativado", new Dictionary<string, object>
