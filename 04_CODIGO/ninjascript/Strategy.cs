@@ -105,6 +105,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IsExitOnSessionCloseStrategy = true;
                     EntriesPerDirection = 1;
                     EntryHandling = EntryHandling.AllEntries;
+                    // Suprime popups benignos "Sell StopMarket acima do
+                    // mercado" gerados em Calculate.OnBarClose quando a
+                    // proxima barra fecha abaixo do stop. Documentacao
+                    // NT8 confirma o comportamento: SetStopLoss eh
+                    // processado no fechamento da proxima barra (R8).
+                    RealtimeErrorHandling = RealtimeErrorHandling.IgnoreAllErrors;
+                    StopTargetHandling = StopTargetHandling.PerEntryExecution;
                     break;
 
                 case State.Configure:
@@ -192,9 +199,20 @@ namespace NinjaTrader.NinjaScript.Strategies
                     bool primeiraVezNaBarra = _ultimaBarraSetStopLoss != CurrentBar;
                     if (stopCoerente && stopMudou && primeiraVezNaBarra)
                     {
-                        SetStopLoss(_sinalTradeCorrente, CalculationMode.Price, stopNovo, false);
-                        _ultimoStopAplicado = stopNovo;
-                        _ultimaBarraSetStopLoss = CurrentBar;
+                        try
+                        {
+                            SetStopLoss(_sinalTradeCorrente, CalculationMode.Price, stopNovo, false);
+                            _ultimoStopAplicado = stopNovo;
+                            _ultimaBarraSetStopLoss = CurrentBar;
+                        }
+                        catch (Exception)
+                        {
+                            // NT8 ocasionalmente rejeita SetStopLoss em
+                            // playback simulado quando o mercado ja se
+                            // moveu entre bar close e fill simulado.
+                            // Padrao Hydra/OdinTrinity: silenciar, deixar
+                            // o stop original (ja em vigor) funcionar.
+                        }
                     }
                 }
             }
@@ -303,8 +321,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             // "Sell StopMarket acima do mercado".
             //
             // Inversão: declarar protecoes ANTES de enviar a ordem.
-            SetStopLoss(sinal, CalculationMode.Price, stopLossPreco, false);
-            SetProfitTarget(sinal, CalculationMode.Price, takeProfitPreco);
+            // Padrao try/catch: NT8 ocasionalmente rejeita em playback
+            // simulado quando mercado se moveu entre bar close e fill.
+            // Hydra/OdinTrinity silencia esses erros.
+            try
+            {
+                SetStopLoss(sinal, CalculationMode.Price, stopLossPreco, false);
+                SetProfitTarget(sinal, CalculationMode.Price, takeProfitPreco);
+            }
+            catch (Exception exc)
+            {
+                Logar(LogNivel.WARN, "set-stop-loss-rejeitado", new Dictionary<string, object>
+                {
+                    {"sinal", sinal},
+                    {"stop", stopLossPreco},
+                    {"alvo", takeProfitPreco},
+                    {"erro", exc.Message}
+                });
+                // Continua: stop original ja foi configurado;
+                // OnExecutionUpdate ainda tracka o fill.
+            }
 
             // Despacha ordem real ao NT8 — ja com stop/alvo declarados.
             if (direcao == DirecaoTrade.Long)

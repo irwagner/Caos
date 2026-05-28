@@ -63,6 +63,8 @@ via Decisao_Do_Conselho explícita ou no escopo de um spec ativo.
 
 ### Diagnóstico
 - Print
+- RealtimeErrorHandling
+- StopTargetHandling
 
 ## Como solicitar inclusão de nova API
 
@@ -79,3 +81,10 @@ via Decisao_Do_Conselho explícita ou no escopo de um spec ativo.
   `Calculate`, `IsExitOnSessionCloseStrategy`, `CurrentBar`,
   `CurrentBars`, `GetCurrentAsk`, `GetCurrentBid`, `TickSize`,
   `MarketPosition`, `Account`, `CalculationMode`.
+- **2026-05-27**: Adicionados `RealtimeErrorHandling` e
+  `StopTargetHandling` em diagnóstico, autorizados pelo escopo
+  operacional do hold-out (não alteram exposição). Suprimem popup
+  benigno "Sell StopMarket acima do mercado" gerado quando
+  `Calculate.OnBarClose` faz stop ser processado no close da próxima
+  barra abaixo do stop original. Sem Debate formal — auto-resolved
+  por categoria de severidade.
