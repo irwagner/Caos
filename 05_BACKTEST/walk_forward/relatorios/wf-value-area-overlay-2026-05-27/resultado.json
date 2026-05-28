@@ -1,0 +1,41 @@
+{
+  "periodo": [
+    "2025-03-17",
+    "2026-05-18"
+  ],
+  "baseline": {
+    "nome": "BASELINE \u2014 sem VA filter",
+    "janelas_total": 24,
+    "janelas_ok": 17,
+    "janelas_sem_trades": 7,
+    "janelas_falha": 0,
+    "janelas_lucrativas": 9,
+    "janelas_perdedoras": 5,
+    "trades_total": 28,
+    "trades_mediana": 1.0,
+    "pnl_total_pts": 655.5,
+    "pnl_total_usd": 1311.0,
+    "sharpe_mediana": 9.071275729144332,
+    "drawdown_mediana": 0.0,
+    "win_rate_mediana": 0.5
+  },
+  "overlay": {
+    "nome": "OVERLAY \u2014 com VA filter (modo trend)",
+    "janelas_total": 24,
+    "janelas_ok": 15,
+    "janelas_sem_trades": 9,
+    "janelas_falha": 0,
+    "janelas_lucrativas": 6,
+    "janelas_perdedoras": 5,
+    "trades_total": 17,
+    "trades_mediana": 1.0,
+    "pnl_total_pts": -628.5,
+    "pnl_total_usd": -1257.0,
+    "sharpe_mediana": 6.053575772097679,
+    "drawdown_mediana": 0.0,
+    "win_rate_mediana": 0.5,
+    "dias_trend": 7,
+    "dias_range": 5,
+    "pct_trend": 58.333333333333336
+  }
+}
