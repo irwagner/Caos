@@ -7,12 +7,21 @@
 > **Decisões precedentes**:
 > - `Decisao_2026-05-29-01` (descarte da Crabel NR7 + ORB + SF + CB)
 > - `Decisao_2026-05-29-02` (triagem da shopping-list — vencedor: arXiv 2605.11423)
+> - `Decisao_2026-05-29-03` (emendas após leitura crítica do abstract: year-stability, T ≥ 2.0, MaxContratos=1 fixo permanente)
 > - Etapa-zero NotebookLM/Gemini (`Etapa_Zero_NotebookLM_Gemini_2026-05-29`)
 >
 > **Paper-base**: arXiv 2605.11423 (Mesfin) — *A Validated
 > Volatility-Volume-Gap Classifier for Regime Identification in MNQ
 > Intraday Data*. 947 dias úteis 2021-2025, edge documentado de
 > +7.80 pontos/trade líquido (T = 1.46) em dias VVG-positivos.
+>
+> **Aviso crítico**: o próprio paper conclui que "all tested
+> directional trading strategies fail institutional validation
+> standards after transaction costs and multi-year consistency
+> requirements are applied". A `Decisao_2026-05-29-03` aceitou
+> implementar mesmo assim **sob critérios mais rigorosos**
+> (year-stability, T ≥ 2.0, hold-out 60 dias) reconhecendo que
+> a estratégia pode ser refutada — esse é o resultado aceito.
 
 ---
 
@@ -254,6 +263,13 @@ sobreviver à alta curtose documentada do paper Mesfin.
    (já implementado), mas o valor default desta estratégia
    SHALL ser 1.
 
+   **Emenda da `Decisao_2026-05-29-03`**: `MaxContratos = 1`
+   é **fixo permanente** — NÃO evoluir para 2 mesmo após
+   hold-out passar todos os critérios. Isto reflete a alta
+   curtose documentada no paper Mesfin e a recomendação
+   convergente do Gemini Pro (S5 da etapa-zero) e do Cerberus
+   (Decisão `2026-05-29-03`).
+
 2. THE estratégia SHALL **NÃO implementar** position sizing
    dinâmico via fórmula ATR (item R8 da etapa-zero rejeitado).
    Qualquer evolução para 2 contratos exige Decisão formal
@@ -361,6 +377,11 @@ respeitando o pipeline canônico do Spec 2.
    - **Sharpe mediana ≥ 1.0** sobre os cortes do WF
    - **Calmar mediana ≥ 1.5** sobre os cortes do WF
    - **PnL total > 0** com 1 contrato MNQ
+   - **Year-stability** (emenda `Decisao_2026-05-29-03`):
+     **Sharpe positivo em pelo menos 3 dos 4 trimestres** da
+     janela WF (2025-Q3, 2025-Q4, 2026-Q1, 2026-Q2). Critério
+     mais frouxo que o do paper Mesfin (que exigia todos os
+     anos) mas mais rigoroso que apenas mediana.
 
 4. WHEN qualquer critério acima falha, THE estratégia SHALL ser
    arquivada em `02_ESTRATEGIAS/mortas/` automaticamente,
@@ -398,11 +419,19 @@ qualquer dinheiro real.
 1. THE replay NT8 SHALL ser executado em Sim101 sobre dados de
    2026-06+ (período que NÃO entrou no WF longo da R7).
 
-2. THE replay SHALL durar no mínimo **30 dias úteis** corridos
-   de mercado.
+2. THE replay SHALL durar no mínimo **60 dias úteis** corridos
+   de mercado (estendido de 30 para 60 pela emenda da
+   `Decisao_2026-05-29-03` para acomodar a alta curtose
+   documentada no paper Mesfin).
 
 3. THE critério quantitativo de sucesso SHALL ser:
-   - **PnL ≥ −USD 100** em 30 dias úteis com 1 contrato MNQ
+   - **PnL ≥ −USD 100** em 60 dias úteis com 1 contrato MNQ
+   - **T-statistic ≥ 2.0** sobre PnL/trade no replay (emenda
+     `Decisao_2026-05-29-03`, extensão de Mister_M). Cálculo:
+     `T = mean(PnL/trade) / (sd(PnL/trade) / sqrt(N))`.
+     Critério T ≥ 2.0 garante IC95% estritamente positivo
+     sobre o edge — o paper Mesfin tinha apenas T = 1.46
+     (IC95% cruza zero).
    - **Zero erros** do tipo "MfeMaeTracker já tem trade aberto"
      (regressão da `Decisao_2026-05-28-01`)
    - **Zero erros** de stop market acima/abaixo do mercado
@@ -429,7 +458,9 @@ de confirmação do experimentador.
    `02_ESTRATEGIAS/mortas/` se qualquer um dos critérios abaixo
    falhar:
    - R7.3: Sharpe mediana WF < 1.0 OR Calmar mediana WF < 1.5
-   - R8.3: PnL replay < −USD 100 em 30 dias úteis
+     OR PnL total ≤ 0 OR year-stability < 3/4 trimestres
+   - R8.3: PnL replay < −USD 100 em 60 dias úteis OR
+     T-statistic < 2.0 sobre PnL/trade
    - R6.2: Paridade Python↔C# > 5% de divergência por trade
 
 2. WHEN o arquivamento ocorre, THE Kiro_Brain SHALL:
