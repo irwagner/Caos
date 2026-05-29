@@ -43,7 +43,8 @@ from caos.walk_forward.runner import BarrasTesteIterator
 
 
 #: Modo de filtro NR. ``"nr4"`` = janela de 4 dias. ``"nr7"`` = 7 dias.
-ModoNR = Literal["nr4", "nr7"]
+#: ``"range_absoluto"`` = filtro de range absoluto fixo (Decisao 2026-05-29-01).
+ModoNR = Literal["nr4", "nr7", "range_absoluto"]
 
 
 #: Numero minimo de barras de minuto que um dia precisa ter para ser
@@ -52,6 +53,19 @@ ModoNR = Literal["nr4", "nr7"]
 #: tem ~120-300 barras; feriado parcial tem ~430-720. Limiar 300
 #: descarta especificamente abertura noturna de fim de semana.
 MIN_BARRAS_DIA_VALIDO: int = 300
+
+
+#: Tick size do MNQ em pontos (CME oficial).
+TICK_SIZE_MNQ: float = 0.25
+
+
+#: Threshold do filtro range_absoluto, em ticks (Decisao 2026-05-29-01,
+#: caminho B = re-engenharia minima P2). Dia D eh elegivel se
+#: ``range[D-1] <= K * TICK_SIZE_MNQ``. K=80 ticks = 20 pontos no MNQ.
+#: Calibrado em janela 2025-01-01 a 2025-06-30 (separada do WF original
+#: 2025-07-01 a 2026-05-15). **Valor congelado em codigo** — regra
+#: anti-overfit do projeto.
+K_RANGE_ABSOLUTO_TICKS: int = 80
 
 
 def _calcular_range_diario(historico: pd.DataFrame) -> dict[date, float]:
@@ -147,6 +161,49 @@ def _dias_apos_nr(
     return elegiveis, proximo_dia_elegivel
 
 
+def _dias_apos_range_absoluto(
+    ranges_por_dia: dict[date, float],
+    threshold_pontos: float,
+) -> tuple[Set[date], bool]:
+    """Devolve ``(elegiveis, proximo_dia_eh_elegivel)`` para filtro absoluto.
+
+    Um dia ``d`` esta em "range absoluto" se ``range[d] <= threshold_pontos``.
+    O dia util seguinte fica elegivel para operar ORB.
+
+    Comparado com NR4/NR7:
+
+    - **Nao depende de janela movel** (resolve o bug de paridade
+      Python<->C# descoberto na auditoria 2026-05-28: NT8 zera
+      memoria entre contratos, NR7 entrava em warmup espurio).
+    - **Trivialmente paridade-equivalente**: olha apenas ``Bars[1]``
+      em C# (dia anterior).
+    - **Sem janela = sem warmup**: na primeira barra do Teste, o
+      filtro ja tem dados suficientes (o dia anterior do Treino).
+
+    Decisao 2026-05-29-01 (caminho B / P2): ``threshold_pontos`` =
+    ``K_RANGE_ABSOLUTO_TICKS * TICK_SIZE_MNQ`` = 80 * 0.25 = 20 pontos.
+    """
+    if threshold_pontos <= 0:
+        raise ValueError(
+            f"threshold_pontos deve ser > 0; recebido {threshold_pontos}"
+        )
+    dias_ordenados = sorted(ranges_por_dia.keys())
+    if not dias_ordenados:
+        return set(), False
+    elegiveis: Set[date] = set()
+    # Para cada dia D (exceto o ultimo conhecido), se range[D] <=
+    # threshold, o dia D+1 (proximo dia conhecido) eh elegivel.
+    for i in range(len(dias_ordenados) - 1):
+        if ranges_por_dia[dias_ordenados[i]] <= threshold_pontos:
+            elegiveis.add(dias_ordenados[i + 1])
+    # Proximo dia desconhecido: elegivel se ultimo dia conhecido tem
+    # range <= threshold.
+    proximo_dia_elegivel = (
+        ranges_por_dia[dias_ordenados[-1]] <= threshold_pontos
+    )
+    return elegiveis, proximo_dia_elegivel
+
+
 class EstrategiaORBCrabel:
     """ORB filtrada por NR4 ou NR7 (Crabel 1990).
 
@@ -162,12 +219,18 @@ class EstrategiaORBCrabel:
         modo_nr: ModoNR = "nr7",
         parametros: Optional[ParametrosORB] = None,
     ) -> None:
-        if modo_nr not in ("nr4", "nr7"):
+        if modo_nr not in ("nr4", "nr7", "range_absoluto"):
             raise ValueError(
-                f"modo_nr deve ser 'nr4' ou 'nr7'; recebido {modo_nr!r}"
+                f"modo_nr deve ser 'nr4', 'nr7' ou 'range_absoluto'; "
+                f"recebido {modo_nr!r}"
             )
         self._modo_nr: ModoNR = modo_nr
-        self._janela_nr: int = 4 if modo_nr == "nr4" else 7
+        # Janela so se aplica a NR4/NR7. Para range_absoluto, threshold
+        # eh o que importa.
+        self._janela_nr: int = 4 if modo_nr == "nr4" else 7  # ignorado em range_absoluto
+        self._threshold_pontos: float = (
+            K_RANGE_ABSOLUTO_TICKS * TICK_SIZE_MNQ
+        )  # 20 pontos
         self._orb_interna = EstrategiaORB(parametros=parametros)
         self._ranges_por_dia: dict[date, float] = {}
         self._dias_elegiveis: Set[date] = set()
@@ -182,6 +245,16 @@ class EstrategiaORBCrabel:
         # Contador de barras do dia corrente (Decisao 2026-05-26-01).
         self._barras_dia_corrente: int = 0
 
+    def _calcular_elegiveis(
+        self,
+    ) -> tuple[Set[date], bool]:
+        """Despacha para a funcao de elegibilidade conforme ``modo_nr``."""
+        if self._modo_nr == "range_absoluto":
+            return _dias_apos_range_absoluto(
+                self._ranges_por_dia, self._threshold_pontos
+            )
+        return _dias_apos_nr(self._ranges_por_dia, self._janela_nr)
+
     # ------------------------------------------------------------------
     # Protocol Estrategia
     # ------------------------------------------------------------------
@@ -190,8 +263,8 @@ class EstrategiaORBCrabel:
         """Calcula ranges dos dias de Treino e prepara filtro NR."""
         self._orb_interna.treinar(historico)
         self._ranges_por_dia = _calcular_range_diario(historico)
-        self._dias_elegiveis, self._proximo_dia_elegivel = _dias_apos_nr(
-            self._ranges_por_dia, self._janela_nr
+        self._dias_elegiveis, self._proximo_dia_elegivel = (
+            self._calcular_elegiveis()
         )
         self._dia_corrente = None
         self._high_corrente = float("-inf")
@@ -231,9 +304,7 @@ class EstrategiaORBCrabel:
                 self._ranges_por_dia[self._dia_corrente] = (
                     self._high_corrente - self._low_corrente
                 )
-                self._dias_elegiveis, prox = _dias_apos_nr(
-                    self._ranges_por_dia, self._janela_nr
-                )
+                self._dias_elegiveis, prox = self._calcular_elegiveis()
                 # Se o ÚLTIMO dia (recém-fechado) é NR, o dia que está
                 # entrando agora é elegível — apenas se valido.
                 if prox and self._dia_eh_valido(dia_atual):
@@ -283,6 +354,14 @@ class EstrategiaORBCrabel:
         return self._modo_nr
 
     @property
+    def threshold_pontos(self) -> float:
+        """Threshold em pontos do filtro range_absoluto.
+
+        Para NR4/NR7 este valor existe mas e ignorado pelo filtro.
+        """
+        return self._threshold_pontos
+
+    @property
     def dias_elegiveis(self) -> Set[date]:
         # Cópia defensiva.
         return set(self._dias_elegiveis)
@@ -295,4 +374,6 @@ class EstrategiaORBCrabel:
 __all__ = [
     "EstrategiaORBCrabel",
     "ModoNR",
+    "K_RANGE_ABSOLUTO_TICKS",
+    "TICK_SIZE_MNQ",
 ]
