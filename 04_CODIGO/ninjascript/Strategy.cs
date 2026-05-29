@@ -396,6 +396,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (Trailing != null)
             {
+                // Defesa contra desync NT8 em playback: se o trailing
+                // ainda esta marcado SemPosicao=false (trade anterior
+                // nao fechado pelo OnExecutionUpdate), forca reset.
+                if (Trailing.Fase != FaseTrailing.SemPosicao)
+                {
+                    Trailing.Fechar();
+                }
                 if (direcao == DirecaoTrade.Long)
                     Trailing.AbrirLong(_entradaPrecoCorrente, stopLossPreco);
                 else
@@ -407,6 +414,31 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DirecaoTradeMfeMae dirMfe = direcao == DirecaoTrade.Long
                     ? DirecaoTradeMfeMae.Long
                     : DirecaoTradeMfeMae.Short;
+                // Defesa contra desync NT8 em playback (descoberto
+                // 2026-05-28): se um trade anterior nao foi fechado
+                // pelo OnExecutionUpdate (timing simulado falho),
+                // forca fechamento aqui antes de abrir novo. Evita
+                // excecao "MfeMaeTracker ja tem trade aberto".
+                if (MfeMae.TemTradeAberto)
+                {
+                    try
+                    {
+                        TradeMfeMae snapStale = MfeMae.FecharTradeEPersistir(
+                            _entradaPrecoCorrente,
+                            _entradaTimestampCorrente,
+                            0.0,  // PnL desconhecido (sera atualizado pelo proximo OnExecutionUpdate)
+                            Print);
+                        Logar(LogNivel.WARN, "mfemae-fechamento-defensivo", new Dictionary<string, object>
+                        {
+                            {"id_trade_orfao", snapStale.IdTrade},
+                            {"motivo", "AbrirTrade chamado com trade aberto pendente; OnExecutionUpdate atrasou"}
+                        });
+                    }
+                    catch (Exception exc)
+                    {
+                        Print("[CAOS] Falha ao fechar trade pendente do MfeMae: " + exc.Message);
+                    }
+                }
                 MfeMae.AbrirTrade(_idTradeCorrente, dirMfe, _entradaPrecoCorrente, _entradaTimestampCorrente);
             }
         }
