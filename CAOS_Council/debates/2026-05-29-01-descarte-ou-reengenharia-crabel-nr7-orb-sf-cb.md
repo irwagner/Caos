@@ -31,25 +31,19 @@ seeds:
   Hermes: 42
   Manolo: 42
   Mister_M: 42
-status: pendente-de-usuario
+status: concluido
 titulo: descarte-ou-reengenharia-crabel-nr7-orb-sf-cb
 turnos_consumidos: 7
 ---
-
-# Debate 2026-05-29-01 — Descarte ou re-engenharia da Crabel NR7 + ORB + SpreadFilter + CircuitBreaker
-
-> Slug: `descarte-ou-reengenharia-crabel-nr7-orb-sf-cb`. Aberto por: `auto` (gatilho: `G5`).
-
-Os turnos abaixo serÃ£o preenchidos pelo Conselho conforme o protocolo em `.kiro/steering/protocolo-debate-no-chat.md`. ApÃ³s preenchimento, execute `caos debate fechar` no cmd para gerar a DecisÃ£o e o commit Git auditÃ¡vel.
 
 ## Turno 1 — Athena (INICIADO)
 
 ```meta
 agente: Athena
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:12:22Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:12:22Z'
 ```
 
 ### Tema
@@ -111,9 +105,9 @@ Avanco para a fase **PROPOSTAS**.
 ```meta
 agente: Explorador
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:14:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:14:00Z'
 ```
 
 ### Proposta P1 — Descarte completo + nova candidata vinda de paper aprovado
@@ -194,9 +188,9 @@ confianca: 55
 ```meta
 agente: Manolo
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:16:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:16:00Z'
 ```
 
 ### Proposta P2 — Re-engenharia minima: substituir filtro NR7 por filtro de range absoluto sem dependencia de janela
@@ -277,9 +271,9 @@ confianca: 68
 ```meta
 agente: Mister_M
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:18:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:18:00Z'
 ```
 
 ### Proposta P3 — Manter estrategia, refazer hold-out com janela controlada e nova metrica de validacao
@@ -365,9 +359,9 @@ confianca: 72
 ```meta
 agente: Devils_Advocate
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:21:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:21:00Z'
 ```
 
 ### Critica
@@ -481,9 +475,9 @@ porque eu sou critico, nao proponente.
 ```meta
 agente: Hermes
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:24:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:24:00Z'
 ```
 
 ### Avaliacao tecnica das tres propostas
@@ -553,9 +547,9 @@ Devils_Advocate sobre N pequeno e leakage de janela.
 ```meta
 agente: Athena
 modelo: claude-opus-4.7
-timestamp: 2026-05-29T14:28:00Z
 nao_deterministico: true
 status: ok
+timestamp: '2026-05-29T14:28:00Z'
 ```
 
 ### Sintese
@@ -628,60 +622,97 @@ re-engenheirar".
 
 ### Status final
 
-`pendente-usuario`.
+`concluido`. Usuario escolheu **caminho B (P2)** com clausula de
+fallback automatico para A (descarte) caso P2 falhe pelos criterios
+quantitativos pre-registrados.
 
-O Conselho **nao tem maioria interna** para resolver entre
-descarte definitivo e re-engenharia. Athena recomenda que o
-usuario decida entre os dois caminhos:
+#### Implementacao mandatoria
 
-- **(A) Descarte puro** (P4 do Devils_Advocate): arquivar
-  estrategia em `02_ESTRATEGIAS/mortas/`, manter pipeline
-  ocioso ate aparecer paper R12-aprovado **independente** desta
-  decisao. Tag `caos-frozen-2026-05-25-02` permanece SUSPENSA
-  permanentemente.
-- **(B) Re-engenharia minima** (P2 do Manolo, com correcao):
-  substituir NR7 por filtro de range absoluto K=80 ticks,
-  recalibrar K em janela 2025-01 a 2025-06 (NAO usada no WF
-  original), validar em 2025-07 a 2026-05, replay em 2026-06+.
-  Custo: ~1 mes de Conselho. Risco: novo overfit possivel.
+1. Modificar `EstrategiaCrabelLogica.cs` (C#) e
+   `caos/walk_forward/estrategias/orb_crabel.py` (Python) para
+   adicionar parametro discreto `modo_nr ∈ {nr7, range_absoluto}`,
+   default `nr7`. Filtro range_absoluto: dia D elegivel se
+   `(High[D-1] - Low[D-1]) ≤ 80 ticks` (20 pontos no MNQ). K=80
+   congelado em codigo.
+2. Calibrar K=80 em janela 2025-01-01 a 2025-06-30 (separada do WF
+   original 2025-07-01 a 2026-05-15) e validar Sharpe ≥ 1.0 nessa
+   janela isolada antes de prosseguir.
+3. Rodar WF longo 60+10 anchored em 2025-07 a 2026-05 com modo
+   `range_absoluto`. Cerberus exige Sharpe mediana ≥ 1.0 e Calmar
+   mediana ≥ 1.5.
+4. Replay NT8 em 2026-06+ (dados que nao entraram no WF) — minimo
+   30 dias uteis, criterio PnL ≥ −USD 100, paridade Python↔C#
+   trade-a-trade dentro de 5%.
 
-A tag `caos-frozen-2026-05-25-02` permanece SUSPENSA
-**incondicionalmente** ate proxima Decisao com
-`aprovado_walk_forward=true` (independentemente do caminho A ou B).
+#### Fallback automatico para A (descarte)
+
+Se qualquer criterio acima falhar, **fallback automatico** sem
+necessidade de novo Debate: estrategia arquivada em
+`02_ESTRATEGIAS/mortas/`, nota Zettel registra refutacao de P2.
+Pipeline aguarda paper R12-aprovado independente.
+
+#### Tag de congelamento
+
+`caos-frozen-2026-05-25-02` permanece **SUSPENSA** ate nova Decisao
+com `aprovado_walk_forward=true` (so se P2 passar todos os
+criterios).
 
 ### Campos da Decisao final
 
-- `proposta_aceita`: null
-- `vetos`: nenhum (Hermes sem Veto_Tecnico; Cerberus ja vetou
-  hold-out na Decisao anterior, em vigor)
-- `aprovado_walk_forward`: false
-- `reproduzivel`: total
-- `regressao_detectada`: true (ja registrada em
-  `2026-05-28-01`)
-- `status`: pendente-usuario
+- `proposta_aceita`: P2 (com clausula de fallback condicional para
+  descarte se P2 falhar)
+- `vetos`: nenhum (Hermes sem Veto_Tecnico; Cerberus impoe criterios
+  quantitativos pre-registrados, nao veto)
+- `aprovado_walk_forward`: false (P2 ainda nao validada)
+- `reproduzivel`: true
+- `regressao_detectada`: true (ja registrada em `2026-05-28-01`)
+- `status`: concluido
 - `links_zettel`: `[[Decisao_2026-05-25-02_Crabel_NR7_SF_CB]]`,
   `[[Bug_Paridade_Warmup_NR7_2026-05-28]]`,
   `[[Re_Replay_Pos_Fix_Warmup_2026-05-29]]`
 
 ### Confianca
 
-70 (na sintese; o usuario precisa fechar A/B).
+75 (na sintese; usuario fechou A/B com escolha clara e fallback
+condicional bem definido).
 
 ```sintese
-proposta_aceita: null
+proposta_aceita: P2
 rationale: |
-  Cerberus impos veredito automatico em 2026-05-28-01: PnL <= -USD 500
-  em 105 dias dispara Debate de descarte (Devils_Advocate vence).
-  Re-replay 28/01-26/05/2026 deu PnL = -USD 573,50 em 11 trades —
-  limiar cruzado, descarte mandatorio. Veto Cerberus mantem tag
-  caos-frozen-2026-05-25-02 SUSPENSA. Conselho fica em empate
-  interno (P1+P4 implicito = descarte vs P2+P3 = manter), sem
-  maioria 2/3 — status pendente-de-usuario. Usuario decide entre
-  (A) descarte puro [P4 do DA] ou (B) re-engenharia minima [P2 do
-  Manolo, com K calibrado em janela 2025-01 a 2025-06 separada do
-  WF original]. Independentemente da escolha A/B, tag
-  caos-frozen-2026-05-25-02 permanece SUSPENSA ate proxima Decisao
-  com aprovado_walk_forward=true.
+  Usuario decide caminho B (re-engenharia minima P2) com clausula de
+  fallback automatico para A (descarte) caso o teste do B falhe pelos
+  criterios quantitativos pre-registrados abaixo.
+
+  Implementacao P2:
+  (1) Adicionar parametro discreto `modo_nr` em EstrategiaCrabelLogica
+      com valores {nr7, range_absoluto}. Default permanece `nr7` para
+      nao quebrar Decisoes anteriores.
+  (2) Adicionar logica de filtro `range_absoluto`: dia D eh elegivel
+      se (High[D-1] - Low[D-1]) <= 80 ticks (= 20 pontos no MNQ).
+      K=80 ticks congelado em codigo (regra anti-overfit).
+  (3) Calibrar K em janela 2025-01-01 a 2025-06-30 (separada do WF
+      original que usou 2025-07-01 a 2026-05-15). Validar K=80
+      reproduz Sharpe >= 1.0 nessa janela isolada.
+  (4) Porta Python espelho em caos/walk_forward/estrategias/orb_crabel.py.
+  (5) Whitelist NinjaScript: sem mudanca (High[1], Low[1], TickSize ja
+      autorizadas).
+
+  Criterios quantitativos pre-registrados (Cerberus impoe; cruzar
+  qualquer um dispara fallback A):
+  - WF longo de validacao (60+10 anchored, 2025-07 a 2026-05) com
+    Sharpe mediana >= 1.0 e Calmar mediana >= 1.5;
+  - Replay NT8 em 2026-06+ (dados que NAO entraram no WF) com
+    PnL >= -USD 100 em 30 dias uteis (escala proporcional ao
+    criterio anterior);
+  - Paridade Python<->C# trade-a-trade dentro de 5% nessa janela.
+
+  Falha em qualquer criterio ativa fallback A: arquivar estrategia
+  em 02_ESTRATEGIAS/mortas/ com nota Zettel registrando o caminho
+  completo (P2 testada e refutada).
+
+  Tag caos-frozen-2026-05-25-02 permanece SUSPENSA ate proxima
+  Decisao com aprovado_walk_forward=true (apenas se P2 passar todos
+  os criterios acima).
 links_zettel:
   - "[[Decisao_2026-05-25-02_Crabel_NR7_SF_CB]]"
   - "[[Bug_Paridade_Warmup_NR7_2026-05-28]]"
@@ -689,7 +720,7 @@ links_zettel:
 aprovado_walk_forward: false
 reproduzivel: 'true'
 regressao_detectada: true
-status: pendente-de-usuario
+status: concluido
 ```
 
 ### Proximo passo
@@ -699,4 +730,3 @@ Usuario decide A ou B no chat e roda:
 ```cmd
 caos debate fechar 2026-05-29-01
 ```
-
