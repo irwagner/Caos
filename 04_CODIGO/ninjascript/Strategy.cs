@@ -303,6 +303,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             double takeProfitPreco,
             string sinal)
         {
+            // Defesa de warmup (Decisao 2026-05-28-01): nao processa
+            // entrada antes de BarsRequiredToTrade barras. Isso vale
+            // para State.Historical TAMBEM — caso contrario, o NT8
+            // simula trades internamente em barras de aquecimento e
+            // o MfeMaeTracker quebra ("ja tem trade aberto") quando
+            // multiplos sinais aparecem rapidamente.
+            if (CurrentBar < BarsRequiredToTrade)
+                return false;
+
             // R2.3 — em histórico, nada é enviado ao broker. Apenas atualiza
             // a máquina de Trailing e MfeMaeTracker para que o backtest
             // ainda exercite a contabilidade auditável.
