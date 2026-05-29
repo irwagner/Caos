@@ -112,6 +112,20 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // processado no fechamento da proxima barra (R8).
                     RealtimeErrorHandling = RealtimeErrorHandling.IgnoreAllErrors;
                     StopTargetHandling = StopTargetHandling.PerEntryExecution;
+                    // Warmup defensivo (Decisao 2026-05-28-01): exige
+                    // 14 dias uteis de barras de minuto antes de aceitar
+                    // qualquer trade. NT8 troca de contrato em playback
+                    // (ex: 03-26 -> 06-26) destroi a instancia, zera
+                    // memoria e o filtro NR7 entrava em warmup espurio
+                    // (poucos dias historico = qualquer dia parece NR7).
+                    // BarsRequiredToTrade eh nativa NT8 e bloqueia
+                    // EnterLong/Short ate CurrentBar atingir o limite.
+                    // 14 dias uteis * 1380 barras/dia (CME 23h Globex)
+                    // = 19320 barras de minuto.
+                    // IMPORTANTE: o usuario deve configurar "Days to load"
+                    // no chart >= dias_warmup + dias_teste para que o
+                    // historico cubra o warmup. Recomendado: 44+ dias.
+                    BarsRequiredToTrade = 19320;
                     break;
 
                 case State.Configure:

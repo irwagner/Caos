@@ -65,6 +65,7 @@ via Decisao_Do_Conselho explícita ou no escopo de um spec ativo.
 - Print
 - RealtimeErrorHandling
 - StopTargetHandling
+- BarsRequiredToTrade
 
 ## Como solicitar inclusão de nova API
 
@@ -88,3 +89,9 @@ via Decisao_Do_Conselho explícita ou no escopo de um spec ativo.
   `Calculate.OnBarClose` faz stop ser processado no close da próxima
   barra abaixo do stop original. Sem Debate formal — auto-resolved
   por categoria de severidade.
+- **2026-05-28**: Adicionado `BarsRequiredToTrade` em diagnóstico
+  (Decisão `2026-05-28-01`). Defesa contra reset de estado em troca
+  de contrato Continuum no NT8 — quando a instância da strategy é
+  destruída e recriada, `BarsRequiredToTrade` força warmup de
+  19320 barras (14 dias úteis) antes de aceitar qualquer
+  `EnterLong/Short`. Bloqueio nativo NT8, não exige código próprio.

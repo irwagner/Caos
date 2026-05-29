@@ -70,6 +70,24 @@ StrategyORBCrabelSpreadFilter.cs
 2. **Não use conta real durante o hold-out.** A estratégia ainda está em hold-out cego — não foi liberada para USD real (Decisão 2026-05-25-02).
 3. Configure margens equivalentes a Topstep funded (USD 50 inicial / USD 2500 trailing DD para conta de USD 50k).
 
+## Passo 3.5 — CONFIGURAR DAYS TO LOAD (CRÍTICO, Decisão 2026-05-28-01)
+
+A estratégia exige **warmup mínimo de 14 dias úteis** (19320 barras de minuto)
+antes de aceitar qualquer trade. Sem isso, o filtro NR7 dispara entradas
+espúrias logo após qualquer reset (troca de contrato, reload do NT8, etc).
+
+**No chart MNQ 1m, antes de habilitar a estratégia:**
+
+1. Botão direito no chart → **Data Series** (ou `Ctrl+D`)
+2. Em **Período de tempo → Dias para carregar**, defina **44 dias** (mínimo)
+   - 14 dias para warmup do filtro NR7
+   - 30 dias para hold-out útil
+3. **OK** e aguarde o chart recarregar
+
+**Se você reabrir o NT8 ou trocar de contrato durante o hold-out**, a
+estratégia vai **automaticamente** bloquear trades até completar 19320
+barras (14 dias úteis). O `BarsRequiredToTrade` faz isso nativamente.
+
 ## Passo 4 — Habilitar a estratégia
 
 1. **New Strategy → Strategies →** procure `StrategyORBCrabelSpreadFilter`.

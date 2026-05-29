@@ -1,0 +1,91 @@
+audações, Kiro Brain e membros do CAOS Council.
+
+Esse é um erro clássico (e doloroso) de arquitetura orientada a eventos. O que aconteceu foi que o NT8 reiniciou a instância da sua estratégia, zerou as variáveis em memória e a estratégia começou a operar "cega", achando que já tinha dados suficientes para calcular o NR7, gerando overtrading e estragando o PnL.
+
+Abaixo, respondo às suas 6 perguntas, separando rigorosamente o que é Documentação Oficial do NT8 do que são Práticas de Mercado / Opinião.
+
+1) Qual é o evento canônico para HIDRATAR o estado antes do OnBarUpdate?
+Documentação Oficial:
+No NinjaTrader 8, não existe um evento canônico para hidratar o estado varrendo o histórico antes do OnBarUpdate. A arquitetura do NT8 é puramente event-driven baseada no tempo.
+Os estados são: SetDefaults -> Configure -> Active -> DataLoaded -> Historical -> Transition -> Realtime.
+Em State.DataLoaded, as séries de dados (BarsArray) são inicializadas na memória, mas a engine de simulação ainda não começou a injetar as barras. A hidratação (warmup) deve ocorrer dentro do OnBarUpdate enquanto a propriedade State == State.Historical.
+
+2) Tem como iterar TODAS as barras em State.DataLoaded?
+Documentação Oficial:
+A documentação do NinjaTrader desencoraja fortemente tentar acessar preços em State.DataLoaded. Você até consegue forçar a leitura chamando métodos de baixo nível do core de dados, mas isso quebra a mecânica de indicadores, barras múltiplas e gerenciamento de estado da engine.
+Se você fizer um for (int i = 0; i < Bars.Count; i++) no DataLoaded, seus indicadores não estarão calculados para esse índice e você terá erros de out of bounds ou dados não processados.
+
+3) NT8 troca de contrato em playback reseta a estratégia?
+Documentação Oficial:
+Depende de como você configurou o gráfico. Se você está usando um contrato contínuo (ex: MNQ), o NT8 faz a rolagem automaticamente (Merge Back Adjusted) e a estratégia não reseta.
+Contudo, se você altera manualmente o ativo no gráfico (de MNQ 03-26 para MNQ 06-26), ou se há uma quebra de conexão severa que force o recarregamento do workspace (ou se você clica em F5/Reload NinjaScript), a instância da classe Strategy_CAOS é destruída e recriada. O OnStateChange passa por State.Terminated e volta para State.SetDefaults. Toda a memória RAM é limpa.
+
+4) Existe BarsRequiredToTrade para exigir N barras (ex: 14 dias)?
+Documentação Oficial:
+Sim. BarsRequiredToTrade é uma propriedade nativa do NT8.
+Para configurá-la para 19.320 barras (14 dias úteis no M1), você define isso no bloco State.SetDefaults:
+
+C#
+protected override void OnStateChange()
+{
+    if (State == State.SetDefaults)
+    {
+        BarsRequiredToTrade = 19320; // 14 dias de M1 (14 * 1380)
+    }
+}
+A engine do NT8 bloqueia nativamente qualquer chamada aos métodos de ordem (como EnterLong()) se CurrentBar < BarsRequiredToTrade.
+
+5) Você conhece o padrão "warmup via OnBarUpdate"? Bastaria um if?
+Prática de Mercado / Opinião:
+Sim, esse é o padrão ouro absoluto no desenvolvimento de NinjaScript. Toda estratégia institucional no NT8 usa o OnBarUpdate para "hidratar" o estado silenciosamente, deixando o tempo passar até que o modelo tenha dados suficientes.
+
+CUIDADO EXTREMO: Você não pode colocar o if (CurrentBar < BarsRequiredToTrade) return; no início do OnBarUpdate. Se você fizer isso, você não hidrata nada! O seu estado continuará vazio quando chegar na barra 19320.
+
+A ordem correta e idiomática é:
+
+Recebe a barra.
+
+Atualiza o seu Estado/Filtro (Hidratação).
+
+Verifica se tem barras suficientes. Se não tiver, retorna.
+
+Executa a lógica de trading.
+
+C#
+protected override void OnBarUpdate()
+{
+    if (CurrentBar < 0) return; // Prevenção de crash no índice 0
+
+    // 1. HIDRATAÇÃO CONSTANTE (Ocorre no histórico e no realtime)
+    DateTime tsUtc = Time[0].ToUniversalTime();
+    EstrategiaCrabelLogica.AtualizarFiltro(_estadoCrabel, tsUtc, High[0], Low[0]);
+
+    // 2. BLOQUEIO DE WARMUP
+    if (CurrentBar < BarsRequiredToTrade) 
+        return; // Retorna SEM operar, mas com o estado já atualizado!
+
+    // 3. LÓGICA DE DECISÃO E ORDENS
+    // Aqui você já tem 14 dias reais de histórico populando o _estadoCrabel
+    if (_estadoCrabel.EhNR7) 
+    {
+        // EnterLong() etc...
+    }
+}
+6) BÔNUS: Qual é a forma mais idiomática de persistir o RangePorDia?
+Prática de Mercado / Opinião para o CAOS Council:
+NÃO SERIALIZE PARA ARQUIVO a menos que o cálculo seja proibitivamente lento (como treinar uma Rede Neural). Gravar em JSON/XML no meio do NT8 para manter estado de OHLC é um "anti-pattern" que gera problemas de concorrência, locks de arquivo no Windows e dessincronização de dados.
+
+A forma mais idiomática, robusta e imune a falhas de rolagem de contrato para resolver o seu bug é: Recalcular sempre.
+
+A Solução Definitiva para a Paridade Python vs NT8:
+
+Configure no gráfico do NT8 Days to load para cobrir o seu período de teste mais a janela de warmup (ex: se quer testar 30 dias, carregue 44 dias no gráfico).
+
+Configure BarsRequiredToTrade = 19320; em State.SetDefaults.
+
+Deixe o OnBarUpdate reconstruir o _estadoCrabel do zero a cada reload.
+
+O NT8 processa barras históricas a velocidades altíssimas. Reconstruir 14 dias de barras de 1 minuto em C# puro leva milissegundos.
+
+Veredito:
+O Kiro detectou um bug clássico de inicialização (Cold Start). Implementando a arquitetura de Warmup Passivo no OnBarUpdate com BarsRequiredToTrade, o seu Filtro NR7 em C# terá exatamente a mesma janela estatística do seu DataFrame do Python. Isso deve fechar a discrepância de USD 8.000/ano no PnL.
