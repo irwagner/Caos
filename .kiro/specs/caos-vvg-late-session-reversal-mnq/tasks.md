@@ -70,7 +70,7 @@ graph TD
 
 ## Tasks
 
-- [ ] 1. Calibração obrigatória dos parâmetros pendentes
+- [x] 1. Calibração obrigatória dos parâmetros pendentes
   - Criar `scripts/calibrar_vvg_2026-05-29.py` que carrega
     `dados/MNQ/_concat_minute_last/01_MNQ_06-25.csv` e filtra a
     janela 2025-03-17 a 2025-06-30.
@@ -88,7 +88,7 @@ graph TD
     com print do output do script e justificativa.
   - **Cobre**: R10.2 (regra anti-overfit), pré-requisito de R1, R2.
 
-- [ ] 2. `caos/walk_forward/estrategias/vvg_logica.py`
+- [x] 2. `caos/walk_forward/estrategias/vvg_logica.py`
   - Define `ParametrosVvg`, `EstadoVvg`, `AcaoVvg` (dataclasses
     frozen + enum).
   - Implementa `decidir_acao(barra, estado, parametros) ->
@@ -97,7 +97,7 @@ graph TD
     Zettel da tarefa 1.
   - **Cobre**: R2.1, R2.2, R2.5, R2.6, R10.
 
-- [ ] 3. `caos/walk_forward/estrategias/vvg_classifier.py`
+- [x] 3. `caos/walk_forward/estrategias/vvg_classifier.py`
   - Classe `VvgClassifier` stateful (mantém histórico rolling de
     `n_dias_baseline + 5` dias).
   - Método `on_barra(barra) -> Optional[ResultadoClassificacao]`
@@ -108,7 +108,7 @@ graph TD
     `MIN_BARRAS_DIA_VALIDO=300` (regra herdada do Spec 4).
   - **Cobre**: R1.1, R1.2, R1.4, R1.5.
 
-- [ ] 4. `caos/walk_forward/estrategias/vvg_late_session_reversal.py`
+- [x] 4. `caos/walk_forward/estrategias/vvg_late_session_reversal.py`
   - Classe `EstrategiaVvgLateSessionReversal` compatível com o
     Protocol `Estrategia` (Spec 2).
   - `treinar` aquece o classificador com barras do histórico;
@@ -118,7 +118,7 @@ graph TD
   - **Cobre**: R2 (despacho), R4.3 (risco USD via Cerberus
     futuro), R6.2 (sem random).
 
-- [ ] 5. `caos/estrategias_modelo/vvg.py` — porta de referência
+- [x] 5. `caos/estrategias_modelo/vvg.py` — porta de referência
   - Replica fielmente a lógica que vai pro C# em Python puro,
     sem dependência de pandas/numpy.
   - Usado pelo property test (tarefa 9) como ground truth da
@@ -126,7 +126,7 @@ graph TD
   - Estrutura paralela ao Spec 4 (`caos/estrategias_modelo/orb.py`).
   - **Cobre**: pré-requisito de Property 11 (paridade Python↔C#).
 
-- [ ] 6. `04_CODIGO/ninjascript/EstrategiaVvgLateSessionLogica.cs`
+- [x] 6. `04_CODIGO/ninjascript/EstrategiaVvgLateSessionLogica.cs`
   - Porta C# **literal** de `vvg_logica.py`: `ParametrosVvg`
     (struct), `EstadoVvg` (struct ref), `AcaoVvg` (enum),
     `DecidirAcao(...)` (método estático).
@@ -134,7 +134,7 @@ graph TD
     isolamento.
   - **Cobre**: R5.1 (arquivo novo), R6.1 (paridade).
 
-- [ ] 7. `04_CODIGO/ninjascript/EstrategiaVvgClassifierLogica.cs`
+- [x] 7. `04_CODIGO/ninjascript/EstrategiaVvgClassifierLogica.cs`
   - Porta C# **literal** de `vvg_classifier.py`. Usa
     `Queue<KeyValuePair<DateTime, double>>` como buffer rolling.
   - Sem dependência de `Strategy` ou APIs NT8.

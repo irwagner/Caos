@@ -14,12 +14,22 @@ durante revisão.
 Módulos:
 
 - :mod:`caos.estrategias_modelo.orb` ↔ ``04_CODIGO/ninjascript/EstrategiaORBLogica.cs``.
+- :mod:`caos.estrategias_modelo.vvg` ↔ ``04_CODIGO/ninjascript/EstrategiaVvgLateSessionLogica.cs``
+  + ``EstrategiaVvgClassifierLogica.cs`` (porta de referência da
+  estratégia VVG Late-Session Reversal — Spec 5).
 
 Strategies plugadas no Walk-Forward (Python "oficial") ficam em
 :mod:`caos.walk_forward.estrategias` e são a referência canônica da
 regra de decisão. Os espelhos aqui só existem para o teste de paridade.
+
+Nota sobre ``vvg``: diferente de ``orb`` (que apenas delega para a
+função canônica nesta fase), :class:`~caos.estrategias_modelo.vvg.VvgModeloCSharpPort`
+**reimplementa** a lógica de forma independente — é um ground truth
+paralelo, não um wrapper. Isso evita que a Property 11 (paridade) seja
+tautológica.
 """
 
 from caos.estrategias_modelo.orb import OrbModeloCSharpPort
+from caos.estrategias_modelo.vvg import VvgModeloCSharpPort
 
-__all__ = ["OrbModeloCSharpPort"]
+__all__ = ["OrbModeloCSharpPort", "VvgModeloCSharpPort"]
