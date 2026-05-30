@@ -141,7 +141,7 @@ graph TD
   - **Cobre**: R5.1, R5.5 (acesso a close(D-1) sem
     `AddDataSeries` adicional), R6.1.
 
-- [ ] 8. Testes unitários Python
+- [-] 8. Testes unitários Python
   - `tests/unit/test_vvg_classifier.py`: cobrir Properties 2, 3, 4
     + edge cases (warmup incompleto, dia inválido, baseline
     rolling).
@@ -151,7 +151,7 @@ graph TD
     `on_barra` integração, `finalizar` devolve trades canônicos.
   - **Cobre**: Properties 1-9, 12; R1-R4 testáveis.
 
-- [ ] 9. `tests/property/test_vvg_paridade_py_cs.py`
+- [-] 9. `tests/property/test_vvg_paridade_py_cs.py`
   - Hypothesis com N=200 sequências OHLCV (mesma estratégia do
     Spec 4 Property 19). Compara
     `EstrategiaVvgLateSessionReversal` (Python) com
@@ -161,7 +161,7 @@ graph TD
   - Falha em qualquer barra → bug em uma das portas.
   - **Cobre**: Property 11; R6.
 
-- [ ] 10. `04_CODIGO/ninjascript/StrategyVvgLateSessionReversal.cs`
+- [-] 10. `04_CODIGO/ninjascript/StrategyVvgLateSessionReversal.cs`
   - Subclasse de `Strategy_CAOS` (Spec 3).
   - `OnStateChange` configura `Name`, `Description`, `MaxContratos
     = 1`, e instancia o classificador em `State.DataLoaded`.
