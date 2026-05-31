@@ -98,6 +98,25 @@ a veto condicional). Quem não endereçar → rejeitado sem Spec.
 | VVG Late-Session Reversal | ARQUIVADA (year-stability) |
 | Value Area Filter | REFUTADA (`2026-05-27`) |
 | OFI direto | REFUTADO (Sharpe −39) |
+| ORB limit-entry (ressuscitação Hydra) | REFUTADO (`Investigacao_ORB_Limit_Entry...2026-05-31`) |
+
+### Investigação ORB limit-entry (31/mai/2026, custo zero)
+
+A pedido do usuário ("resultado agora, minerar o Hydra"), testei o
+caminho de ressuscitação #1 do ORB-Hydra: trocar entrada market→**LIMIT**
+(pullback) para eliminar o slippage que matou o edge (PF 1.87→0.94).
+
+**Resultado**: o fix de execução **funciona** (sem custo, market PF 0.81
+→ limit PF 1.03), confirmando a hipótese mecânica do Hydra. **Mas o edge
+bruto do ORB não persiste** na janela 2025-2026: melhor caso limit PF
+1.03 (empate), year-stability 3/6 trimestres (FALHA). Q3/25, Q1/26, Q2/26
+negativos — mesma não-persistência das 3 refutações. O PF 1.87 do Hydra
+era artefato da janela bull 2025. **4º caso confirmando a Regra de Ouro
+Negativa.** Detalhes em
+`[[Investigacao_ORB_Limit_Entry_Ressuscitacao_Hydra_2026-05-31]]`.
+
+Bloqueador da porta de arbitragem estrutural (MNQ vs ES/MES/NQ): só
+temos dados de MNQ — exigiria aquisição de dados de outros instrumentos.
 
 ## 5. Lições aprendidas (acumuladas)
 
