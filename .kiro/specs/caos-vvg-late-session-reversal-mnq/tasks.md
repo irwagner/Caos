@@ -191,7 +191,7 @@ graph TD
     (replay NT8). NÃO aplicar tag `caos-frozen-*` nesta tarefa.
   - **Cobre**: R7, R9.
 
-- [ ] 12. Sincronizar sandbox NT8 + README do replay
+- [x] 12. Sincronizar sandbox NT8 + README do replay
   - Sincronizar repo → sandbox via
     `04_CODIGO/ninjascript/sincronizar.bat repo-para-caos`
     (R5.4).
