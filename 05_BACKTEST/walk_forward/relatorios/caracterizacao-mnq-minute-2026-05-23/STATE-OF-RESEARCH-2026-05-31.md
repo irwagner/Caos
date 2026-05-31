@@ -118,6 +118,32 @@ Negativa.** Detalhes em
 Bloqueador da porta de arbitragem estrutural (MNQ vs ES/MES/NQ): só
 temos dados de MNQ — exigiria aquisição de dados de outros instrumentos.
 
+### ACHADO POSITIVO: ORB sem limites, edge tarde/noite (31/mai/2026)
+
+Diretriz do usuário: foco MNQ-only; **remover limites a-priori** (janela
+RTH, hora de corte, saída forçada, 1 trade/sessão) porque podem mascarar
+edge; depois validar e usar replay forward pra perfilar horário/trades-dia.
+
+Rodei 5 experimentos exploratórios (custo zero, entrada limit, custo
+honesto 0.87 pt/trade, split treino 70% / hold-out cego 30%):
+
+- **Sem amarras**, o ORB limit revela edge de rompimento concentrado na
+  **tarde/noite/madrugada ET, NÃO na abertura**. As horas 16, 19, 22 ET
+  foram selecionadas como lucrativas em **9/9 meses** do walk-forward
+  rolling (100% — persistência, não cherry-pick).
+- Conjunto fixo de horas tarde/noite {10,16,18,19,22 ET}: treino PF 1.23
+  → **hold-out cego PF 1.22, year-stability 2/2** (degradação ~zero).
+- **PRIMEIRO candidato a passar year-stability em hold-out disjunto** após
+  4 refutações. Passa o critério de triagem (edge estrutural, hipótese:
+  janela pós-gamma-0DTE).
+
+**Ressalvas (régua dura)**: a regra ADAPTATIVA (re-derivar horas todo mês)
+deu PF 0.99 — só o conjunto FIXO funciona. PF modesto (~1.22), hold-out
+curto (~5 meses), ~10 configs testadas (multiple-testing), modelo de fill
+otimista. **Exige Spec formal** (WalkForwardEngine + split tripartite +
+replay forward) antes de qualquer promoção. Detalhes em
+`[[Achado_ORB_Sem_Limites_Tarde_Noite_MNQ_2026-05-31]]`.
+
 ## 5. Lições aprendidas (acumuladas)
 
 1. **WF longo sozinho NÃO valida** — precisa de hold-out temporal
