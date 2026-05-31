@@ -13,7 +13,7 @@ Implementa **Property 11 — Paridade Python ↔ C# trade-a-trade (R6)**:
     minuto), mesmo preço de entrada/saída, mesmo motivo de saída, mesmo
     número de trades e PnL/trade dentro de 5% (tolerância de R6).
 
-**Validates: Requirements 6.2**
+**Validates: Requirements 6.1, 6.2**
 
 Por que o teste tem valor (não é tautológico)
 ---------------------------------------------
@@ -408,7 +408,7 @@ def _assert_paridade(
 )
 @given(cenario=_cenario_vvg())
 def test_property_vvg_paridade_py_cs(cenario: Tuple[List[Barra6], List[Barra6]]) -> None:
-    """**Validates: Requirements 6.2** (Property 11).
+    """**Validates: Requirements 6.1, 6.2** (Property 11).
 
     Para qualquer sequência de barras OHLCV gerada (com dias VVG-positivos
     forçados), o plugin de produção e a porta de referência emitem o
@@ -469,7 +469,7 @@ def test_paridade_dia_vvg_positivo_conhecido() -> None:
     de fato exercido (o gerador aleatório poderia, em teoria, nunca
     forçar um dia positivo).
 
-    **Validates: Requirements 6.2**
+    **Validates: Requirements 6.1, 6.2**
     """
     warmup_bars, test_bars = _cenario_fixo_vvg_positivo()
 
