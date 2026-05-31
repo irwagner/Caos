@@ -170,7 +170,7 @@ graph TD
   - Reusa **todas** as defesas de warmup do `Strategy.cs` (R5.3).
   - **Cobre**: R5.1-R5.5.
 
-- [-] 11. Rodar Walk-Forward longo
+- [x] 11. Rodar Walk-Forward longo
   - Script `scripts/rodar_wf_vvg_late_session.py` que invoca
     `caos walk-forward run` com a configuração canônica:
     - Janela: 2025-07-01 a 2026-05-15

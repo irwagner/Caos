@@ -1,0 +1,64 @@
+{
+  "acao": "fallback A automatico (arquivada, sem novo Debate)",
+  "composicao": "EstrategiaCircuitBreaker(EstrategiaSpreadFilter(EstrategiaVvgLateSessionReversal(), mediana_diaria, warmup=30), diario=-250, semanal=-750, janela=-1000)",
+  "criterios": {
+    "calmar_mediana>=1.5": true,
+    "pnl_total>0": false,
+    "sharpe_mediana>=1.0": true,
+    "year_stability>=3/4": false
+  },
+  "estrategia": "EstrategiaCircuitBreaker",
+  "identificador": "2026-05-29-01",
+  "janela_wf": {
+    "config": "60+10 anchored",
+    "contratos": 1,
+    "fim": "2026-05-15T23:59:59+00:00",
+    "friccao": "topstep_mnq (0.25 pt/lado slippage + USD 0.62/lado comissao)",
+    "inicio": "2025-07-01T00:00:00+00:00"
+  },
+  "metricas": {
+    "calmar_mediana": 16.99409499357396,
+    "pnl_total_pontos": -8.080000000023574,
+    "pnl_total_usd_1contrato": -16.160000000047148,
+    "sharpe_mediana": 2.8304889799458106
+  },
+  "n_janelas": 16,
+  "n_trades_total": 9,
+  "n_trimestres_positivos": 1,
+  "sanity_check_pnl_recoletado": {
+    "bate_com_engine": true,
+    "pnl_recoletado_pontos": -8.080000000023574
+  },
+  "status_wf": "concluido",
+  "veredito": "REFUTADA",
+  "year_stability": {
+    "2025-Q3": {
+      "n_dias_com_trade": 0,
+      "n_trades": 0,
+      "pnl_total_pontos": 0.0,
+      "positivo": false,
+      "sharpe": null
+    },
+    "2025-Q4": {
+      "n_dias_com_trade": 5,
+      "n_trades": 5,
+      "pnl_total_pontos": -276.8500000000131,
+      "positivo": false,
+      "sharpe": -5.343529380517417
+    },
+    "2026-Q1": {
+      "n_dias_com_trade": 1,
+      "n_trades": 1,
+      "pnl_total_pontos": 60.37999999999738,
+      "positivo": false,
+      "sharpe": null
+    },
+    "2026-Q2": {
+      "n_dias_com_trade": 3,
+      "n_trades": 3,
+      "pnl_total_pontos": 208.38999999999214,
+      "positivo": true,
+      "sharpe": 12.79987644541276
+    }
+  }
+}
