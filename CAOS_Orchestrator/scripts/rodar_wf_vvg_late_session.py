@@ -78,10 +78,14 @@ RAIZ = Path(r"e:\CAOS").resolve()
 RAIZ_DADOS_ISO = RAIZ / "dados" / "_wf_isolada"
 FONTE_DIR = RAIZ_DADOS_ISO / "_concat_minute_last"
 
-#: Arquivos que cobrem a janela do WF longo + warmup (file 01 = calibração,
-#: usado APENAS como warmup de treino; os cortes de Teste caem em 2025-07+).
+#: Arquivos que cobrem a janela PRÉ-REGISTRADA do WF longo (2025-07-01 a
+#: 2026-05-15). O arquivo ``01_MNQ_06-25.csv`` (2025-03-17 a 2025-06-13) é a
+#: janela de CALIBRAÇÃO (Tarefa 1) e é DELIBERADAMENTE EXCLUÍDO: incluí-lo
+#: faria os primeiros cortes de Teste do WF anchored caírem dentro da janela
+#: de calibração — contaminação circular vetada pela regra anti-overfit
+#: (R10.2). O warmup do classificador (baseline de 10 dias) é fornecido pelo
+#: início do arquivo 02 (2025-06-16+), suficiente para os 10 dias de baseline.
 ARQUIVOS_WF = [
-    FONTE_DIR / "01_MNQ_06-25.csv",  # 2025-03-17 .. 2025-06-13 (warmup/treino)
     FONTE_DIR / "02_MNQ_09-25.csv",  # 2025-06-16 .. 2025-09-13
     FONTE_DIR / "03_MNQ_12-25.csv",  # 2025-09-15 .. 2025-12-15
     FONTE_DIR / "04_MNQ_03-26.csv",  # 2025-12-15 .. 2026-03-14

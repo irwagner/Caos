@@ -1,0 +1,113 @@
+{
+  "identificador": "2026-05-29-04",
+  "gerado_utc": "2026-05-31T02:56:02+00:00",
+  "janela_wf": {
+    "inicio": "2025-07-01T00:00:00+00:00",
+    "fim": "2026-05-15T00:00:00+00:00"
+  },
+  "config_wf": "60+10 anchored",
+  "custos": {
+    "slippage_pontos_por_lado": 0.25,
+    "comissao_usd_por_contrato_por_lado": 0.62,
+    "usd_por_ponto": 2.0,
+    "slippage_fracao_range": null
+  },
+  "parametros_congelados": {
+    "multiplicador_volume": 1.5,
+    "threshold_gap_pct": 0.0015,
+    "n_dias_baseline": 10,
+    "stop_pontos": 472.25,
+    "target_pontos": 944.25
+  },
+  "dias_vvg_positivos": 30,
+  "criterios_pre_registrados": {
+    "sharpe_mediana_min": 1.0,
+    "calmar_mediana_min": 1.5,
+    "pnl_total_min": 0.0,
+    "year_stability_min": "3/4"
+  },
+  "composicao_canonica_CB_SF_VVG": {
+    "status_wf": "concluido",
+    "num_janelas": 18,
+    "metricas": {
+      "sharpe_mediana": 5.509938256063173,
+      "calmar_mediana": 76.48150225313917,
+      "pnl_total": 20.679999999971187,
+      "numero_trades": 11,
+      "year_stability_positivos": 1
+    },
+    "year_stability_trimestres": {
+      "2025-Q3": {
+        "sharpe": -4.802189327190294,
+        "trades": 5,
+        "pnl": -59.8500000000131
+      },
+      "2025-Q4": {
+        "sharpe": -4.885403473693392,
+        "trades": 7,
+        "pnl": -301.84000000001834
+      },
+      "2026-Q1": {
+        "sharpe": -5.696559336185153,
+        "trades": 5,
+        "pnl": -179.6000000000131
+      },
+      "2026-Q2": {
+        "sharpe": 12.881982118116731,
+        "trades": 4,
+        "pnl": 237.51999999998952
+      }
+    },
+    "avaliacao": {
+      "c1_sharpe_mediana_>=1.0": true,
+      "c2_calmar_mediana_>=1.5": true,
+      "c3_pnl_total_>0": true,
+      "c4_year_stability_>=3/4": false,
+      "aprovado": false
+    }
+  },
+  "vvg_puro_diagnostico": {
+    "status_wf": "concluido",
+    "num_janelas": 18,
+    "metricas": {
+      "sharpe_mediana": 5.828105446503516,
+      "calmar_mediana": 3.662697910066675,
+      "pnl_total": -237.24000000007072,
+      "numero_trades": 27,
+      "year_stability_positivos": 3
+    },
+    "year_stability_trimestres": {
+      "2025-Q3": {
+        "sharpe": 0.03189232087172603,
+        "trades": 4,
+        "pnl": 0.2699999999895226
+      },
+      "2025-Q4": {
+        "sharpe": -9.370035400954883,
+        "trades": 7,
+        "pnl": -476.34000000001834
+      },
+      "2026-Q1": {
+        "sharpe": 0.5388037503892245,
+        "trades": 14,
+        "pnl": 58.81999999996333
+      },
+      "2026-Q2": {
+        "sharpe": 7.498554280217757,
+        "trades": 5,
+        "pnl": 180.6499999999869
+      }
+    },
+    "avaliacao": {
+      "c1_sharpe_mediana_>=1.0": true,
+      "c2_calmar_mediana_>=1.5": true,
+      "c3_pnl_total_>0": false,
+      "c4_year_stability_>=3/4": true,
+      "aprovado": false
+    }
+  },
+  "decisao_automatica": {
+    "aprovado": false,
+    "caminho": "FALLBACK_A_REFUTACAO"
+  }
+}

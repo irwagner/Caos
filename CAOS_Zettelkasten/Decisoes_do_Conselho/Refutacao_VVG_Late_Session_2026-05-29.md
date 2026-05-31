@@ -27,7 +27,7 @@ tags:
 > Tarefa 11 (CRÍTICA) do spec `caos-vvg-late-session-reversal-mnq`.
 > Critérios pré-registrados: R7.3 + emenda [[Decisao_2026-05-29-03]]
 > (year-stability). Fallback A acionado **automaticamente** (R7.4 / R9).
-> Relatório: `05_BACKTEST/walk_forward/relatorios/2026-05-29-01-vvg-late-session/`.
+> Relatório definitivo: `05_BACKTEST/walk_forward/relatorios/2026-05-29-04/`.
 > Paper-base: arXiv 2605.11423 (Mesfin).
 
 ## Contexto
@@ -46,10 +46,12 @@ parâmetros foram congelados em código:
 | `target_pontos` | 944.25 |
 
 O WF longo de validação rodou sobre a janela **2025-07-01 a 2026-05-15**
-(disjunta da calibração — o file `01_MNQ_06-25.csv` foi corretamente
-omitido por ter 0 linhas na janela), configuração **60+10 anchored**,
-**1 contrato MNQ**, fricção Topstep fixa (slippage 0.25 pt/lado +
-comissão USD 0.62/lado).
+(estritamente disjunta da calibração — o file `01_MNQ_06-25.csv` foi
+**deliberadamente excluído** da fonte de dados para impedir que os
+primeiros cortes de Teste do WF anchored caíssem dentro da janela de
+calibração, contaminação circular vetada por R10.2), configuração
+**60+10 anchored**, **1 contrato MNQ**, fricção Topstep fixa (slippage
+0.25 pt/lado + comissão USD 0.62/lado).
 
 Composição exata avaliada (R3.3):
 
@@ -63,55 +65,83 @@ EstrategiaCircuitBreaker(
 
 ## Números observados (REAIS — sem ajuste)
 
-WF concluído com **16 janelas** e apenas **9 trades** no total dos
-períodos de Teste. Circuit Breaker não descartou nenhum trade (diário=0,
-semanal=0, janela=0) — a estratégia simplesmente operou pouquíssimo.
+WF concluído com **18 janelas** e **11 trades** no total dos períodos de
+Teste. Foram identificados **30 dias VVG-positivos** na janela. O Circuit
+Breaker não descartou nenhum trade (a estratégia simplesmente operou
+pouquíssimo, com a maioria das 18 janelas em `sem-trades`).
 
 | Critério | Observado | Limiar | Resultado |
 |---|---|---|---|
-| Sharpe mediana | **2.8305** | >= 1.0 | PASSA |
-| Calmar mediana | **16.9941** | >= 1.5 | PASSA |
-| PnL total | **-8.08 pts (USD -16.16)** | > 0 | **FALHA** |
+| Sharpe mediana | **5.5099** | >= 1.0 | PASSA |
+| Calmar mediana | **76.4815** | >= 1.5 | PASSA |
+| PnL total | **+20.68 pts (USD +41.36)** | > 0 | PASSA |
 | Year-stability | **1/4 trimestres** | >= 3/4 | **FALHA** |
 
-Sanity-check: o PnL recoletado trade-a-trade (recomposição fiel do
-fluxo do `BacktestRunner`) bate exatamente com o agregado do Engine
-(-8.08 pts, `bate_com_engine=true`).
+A estratégia falha **exclusivamente** no critério de year-stability —
+o critério de consistência temporal que a emenda da
+[[Decisao_2026-05-29-03]] introduziu justamente para este tipo de caso.
+Como a regra R7.4/R9.1 é "falha em **qualquer** critério → fallback A",
+**uma única falha basta** para o descarte automático.
 
 ### Year-stability detalhada (Sharpe por trimestre)
 
-| Trimestre | Sharpe | PnL (pts) | Trades | Dias c/ trade | Positivo? |
-|---|---|---|---|---|---|
-| 2025-Q3 | — | 0.00 | 0 | 0 | não |
-| 2025-Q4 | -5.3435 | -276.85 | 5 | 5 | não |
-| 2026-Q1 | — | +60.38 | 1 | 1 | não |
-| 2026-Q2 | +12.7999 | +208.39 | 3 | 3 | **sim** |
+Composição canônica CB(SF(VVG)):
 
-Apenas **1 dos 4 trimestres** tem Sharpe positivo (2026-Q2). 2025-Q3
-não teve nenhum trade; 2026-Q1 teve 1 único trade (Sharpe indefinido —
-amostra insuficiente, não conta como positivo); 2025-Q4 foi
-francamente negativo (-276.85 pts em 5 trades).
+| Trimestre | Sharpe | PnL (pts) | Trades | Positivo? |
+|---|---|---|---|---|
+| 2025-Q3 | -4.8022 | -59.85 | 5 | não |
+| 2025-Q4 | -4.8854 | -301.84 | 7 | não |
+| 2026-Q1 | -5.6966 | -179.60 | 5 | não |
+| 2026-Q2 | +12.8820 | +237.52 | 4 | **sim** |
+
+Apenas **1 dos 4 trimestres** (2026-Q2) tem Sharpe positivo. Os três
+primeiros trimestres são todos negativos — a estratégia só "fecha no
+azul" no WF agregado porque o único trimestre vencedor (2026-Q2,
++237.52 pts) compensa por pouco a soma dos três perdedores. Isso é a
+definição operacional de **instabilidade temporal**: o edge não persiste
+entre regimes, concentra-se em uma única janela trimestral.
+
+### Diagnóstico — VVG puro (sem overlays SF/CB)
+
+Para isolar o efeito dos overlays, rodei também o plugin VVG puro na
+mesma janela:
+
+| Métrica | VVG puro | CB(SF(VVG)) |
+|---|---|---|
+| Sharpe mediana | 5.8281 | 5.5099 |
+| Calmar mediana | 3.6627 | 76.4815 |
+| PnL total | **-237.24 pts** | +20.68 pts |
+| Trades | 27 | 11 |
+| Year-stability | 3/4 | 1/4 |
+
+Observação interessante: o VVG puro tem **PnL total negativo** (-237.24
+pts) mas year-stability 3/4; a composição CB(SF(VVG)) tem **PnL positivo**
+(+20.68) mas year-stability 1/4. Em ambos os casos a estratégia **falha
+pelo menos um critério** → ambos seriam descartados. Os overlays SF/CB
+filtram trades (27 → 11) e melhoram o PnL agregado, mas pioram a
+distribuição trimestral (concentram o resultado em 2026-Q2). Nenhuma das
+duas formas atinge os 4 critérios simultaneamente. A refutação é, portanto,
+**robusta à presença dos overlays**.
 
 ## Por que Sharpe/Calmar medianas "passam" mas a estratégia falha
 
 Este é o ponto metodológico central da refutação e a razão de existir o
 critério de **year-stability** (emenda da [[Decisao_2026-05-29-03]]).
 
-A agregação por mediana do Engine considera **apenas janelas com
-métrica finita**. Com 9 trades espalhados por 16 janelas, a maioria das
-janelas é `sem-trades` (Sharpe/Calmar = `None`, fora da agregação). As
-poucas janelas que tiveram trades vencedores produzem Sharpe/Calmar
-locais altíssimos (Calmar mediana ~17 é um artefato de amostra mínima),
-puxando a mediana para cima. **A mediana entre janelas é cega ao fato de
-o PnL agregado ser negativo e à concentração temporal dos ganhos.**
+A agregação por mediana do Engine considera **apenas janelas com métrica
+finita**. Com 11 trades espalhados por 18 janelas, a maioria das janelas
+é `sem-trades` (Sharpe/Calmar = `None`, fora da agregação). As poucas
+janelas que tiveram trades vencedores produzem Sharpe/Calmar locais
+altíssimos (Calmar mediana ~76 é um artefato de amostra mínima), puxando
+a mediana para cima. **A mediana entre janelas é cega à concentração
+temporal dos ganhos — não enxerga que 3 dos 4 trimestres são negativos.**
 
-Em outras palavras: Sharpe mediana +2.83 e Calmar +17 são **miragens de
+Em outras palavras: Sharpe mediana +5.51 e Calmar +76 são **miragens de
 N pequeno** — exatamente a armadilha que o STATE-OF-RESEARCH de
 2026-05-29 já havia identificado ("WF longo sozinho NÃO valida
 estratégia") e que a emenda da Decisao_2026-05-29-03 antecipou ao exigir
-year-stability ≥ 3/4 trimestres. Os dois critérios mais robustos (PnL
-total e year-stability) capturaram a refutação que as medianas
-mascaravam.
+year-stability ≥ 3/4 trimestres. O critério de consistência temporal
+capturou a refutação que as medianas mascaravam.
 
 ## Conformidade com a previsão do paper
 
@@ -122,7 +152,9 @@ requirements are applied". A [[Decisao_2026-05-29-03]] aceitou
 implementar mesmo assim, sob critérios mais rigorosos, **reconhecendo
 que a estratégia poderia ser refutada — e que isso seria um resultado
 aceito**. A refutação aqui é, portanto, **esperada e válida**: o
-pipeline funcionou como projetado.
+pipeline funcionou como projetado. O paper falha precisamente em
+"multi-year consistency"; nosso year-stability ≥ 3/4 é a versão
+operacional desse mesmo critério, e foi exatamente ele que reprovou.
 
 A causa-raiz provável também já estava pré-registrada na
 [[Calibracao_VVG_2026-05-29]] (ressalva de risco do Cerberus): com
@@ -135,11 +167,12 @@ reversão não se materializa de forma consistente entre trimestres.
 ## Acionamento do fallback A (descarte automático)
 
 A cláusula da R7.4 / R9.1 é explícita: falha em **qualquer** critério
-(aqui falharam DOIS — PnL total e year-stability) dispara fallback A
-**sem novo Debate**. Por isso:
+(aqui falhou o year-stability) dispara fallback A **sem novo Debate**.
+Por isso:
 
 1. A estratégia **VVG Late-Session Reversal está ARQUIVADA** em
-   2026-05-29. Não avança para R8 (replay NT8). Não há hold-out.
+   2026-05-29 (`02_ESTRATEGIAS/mortas/VVG_Late_Session_Reversal.md`). Não
+   avança para R8 (replay NT8). Não há hold-out.
 2. **NÃO recalibrar** (regra anti-overfit R10.2). Os 5 parâmetros
    congelados permanecem como estão; não existe "tentar de novo com
    stop/target/multiplicador/threshold diferente". Qualquer variante
@@ -153,14 +186,23 @@ A cláusula da R7.4 / R9.1 é explícita: falha em **qualquer** critério
    aprovada — mesmo tratamento dado à P2 em
    [[Refutacao_P2_Range_Absoluto_2026-05-29]].
 
+> Nota de auditoria: uma execução exploratória anterior
+> (`2026-05-29-01`, 16 janelas) chegou ao **mesmo veredito** (fallback A)
+> falhando year-stability (1/4) e PnL (-8.08 pts). A execução definitiva
+> registrada aqui (`2026-05-29-04`, 18 janelas) usa a fonte de dados com
+> a janela de calibração estritamente excluída e confirma o descarte. O
+> veredito é robusto à versão de windowing: **year-stability < 3/4 em
+> ambas**.
+
 ## Lição aprendida
 
-A emenda de year-stability provou seu valor logo na primeira aplicação:
-**mediana de Sharpe/Calmar entre janelas WF é enganosa quando o número
-de trades é baixo e os ganhos são temporalmente concentrados.** Critérios
-de consistência temporal (PnL agregado positivo + Sharpe positivo na
-maioria dos trimestres) são mais difíceis de satisfazer por acaso e
-devem permanecer obrigatórios para qualquer próxima candidata direcional.
+A emenda de year-stability provou seu valor: **mediana de Sharpe/Calmar
+entre janelas WF é enganosa quando o número de trades é baixo e os ganhos
+são temporalmente concentrados.** Aqui, PnL total e Sharpe/Calmar medianas
+estavam TODOS no verde — e mesmo assim a estratégia é inválida porque 3
+dos 4 trimestres são negativos. Critérios de consistência temporal são
+mais difíceis de satisfazer por acaso e devem permanecer obrigatórios
+para qualquer próxima candidata direcional.
 
 Adicionalmente: stop/target dimensionados por ATR de horizonte muito
 maior que o horizonte do trade tornam os níveis inertes (a posição morre
@@ -171,10 +213,11 @@ recalibrar esta.
 
 ## Arquivos relacionados
 
-- `05_BACKTEST/walk_forward/relatorios/2026-05-29-01-vvg-late-session/resultado.json` (ResultadoWalkForward canônico)
-- `05_BACKTEST/walk_forward/relatorios/2026-05-29-01-vvg-late-session/avaliacao_criterios.json` (avaliação dos 4 critérios)
-- `05_BACKTEST/walk_forward/relatorios/2026-05-29-01-vvg-late-session/relatorio.md` (relatório human-readable)
-- `05_BACKTEST/walk_forward/relatorios/2026-05-29-01-vvg-late-session/manifest_hash.txt`
+- `05_BACKTEST/walk_forward/relatorios/2026-05-29-04/resultado.json` (ResultadoWalkForward canônico)
+- `05_BACKTEST/walk_forward/relatorios/2026-05-29-04/criterios.json` (avaliação dos 4 critérios + diagnóstico VVG puro)
+- `05_BACKTEST/walk_forward/relatorios/2026-05-29-04/relatorio.md` (relatório human-readable)
+- `05_BACKTEST/walk_forward/relatorios/2026-05-29-04/manifest_hash.txt`
 - `CAOS_Orchestrator/scripts/rodar_wf_vvg_late_session.py` (script desta execução)
+- `02_ESTRATEGIAS/mortas/VVG_Late_Session_Reversal.md` (nota de arquivamento)
 - [[Calibracao_VVG_2026-05-29]] (parâmetros congelados + ressalva de risco do Cerberus)
 - [[Decisao_2026-05-29-03]] (emendas: year-stability, T >= 2.0, MaxContratos=1 fixo)

@@ -12,6 +12,61 @@
 > **Fallback A acionado**: estratégia da `[[Decisao_2026-05-25-02]]`
 > está definitivamente arquivada. Tag `caos-frozen-2026-05-25-02`
 > SUSPENSA permanentemente.
+>
+> **Atualização (Tarefa 11 do spec `caos-vvg-late-session-reversal-mnq`)**:
+> a candidata seguinte — **VVG Late-Session Reversal** (paper Mesfin,
+> arXiv 2605.11423) — foi implementada, calibrada UMA vez
+> (`[[Calibracao_VVG_2026-05-29]]`) e submetida ao WF longo de validação
+> (`2026-05-29-04`, 60+10 anchored, 2025-07 a 2026-05). **REPROVADA por
+> year-stability (1/4 trimestres positivos, exige ≥ 3/4)**. Fallback A
+> acionado automaticamente: estratégia **ARQUIVADA** em
+> `02_ESTRATEGIAS/mortas/`. Detalhes:
+> `[[Refutacao_VVG_Late_Session_2026-05-29]]`.
+
+---
+
+## 0. Walk-Forward VVG Late-Session Reversal — REPROVADO (2026-05-29)
+
+A primeira estratégia direcional pós-Crabel. Pipeline canônico seguido
+à risca: Decisões `2026-05-29-01/02/03` → etapa-zero NotebookLM →
+calibração isolada → implementação Python+C# → WF longo.
+
+**Resultado do WF longo `2026-05-29-04`** (composição R3.3
+`CB(SF(VVG))`, 18 janelas, 11 trades, 30 dias VVG-positivos, fricção
+Topstep, 1 contrato MNQ):
+
+| Critério (R7.3 + emenda) | Observado | Limiar | Resultado |
+|---|---|---|---|
+| Sharpe mediana | +5.51 | ≥ 1.0 | PASSA |
+| Calmar mediana | +76.48 | ≥ 1.5 | PASSA |
+| PnL total | +20.68 pts (USD +41,36) | > 0 | PASSA |
+| **Year-stability** | **1/4 trimestres** | **≥ 3/4** | **FALHA** |
+
+Sharpe por trimestre: 2025-Q3 **−4.80**, 2025-Q4 **−4.89**, 2026-Q1
+**−5.70**, 2026-Q2 **+12.88**. Só 2026-Q2 é positivo. O PnL agregado só
+fecha no azul porque o único trimestre vencedor compensa por pouco os
+três perdedores — **edge sem persistência temporal**.
+
+Diagnóstico VVG puro (sem overlays): PnL total **−237,24 pts**,
+year-stability 3/4. Ou seja, a estratégia falha pelo menos um critério
+**com ou sem** os overlays SF/CB — refutação robusta.
+
+**Conformidade com a previsão do paper**: o abstract de Mesfin já admitia
+que estratégias direcionais "fail ... multi-year consistency
+requirements". A `[[Decisao_2026-05-29-03]]` aceitou implementar
+reconhecendo que a refutação seria um resultado válido. O critério de
+year-stability (a versão operacional de "multi-year consistency") fez
+exatamente o que devia: barrou a estratégia que as medianas
+mascaravam.
+
+**Ações executadas (fallback A automático, sem novo Debate)**:
+1. Estratégia arquivada em `02_ESTRATEGIAS/mortas/VVG_Late_Session_Reversal.md`.
+2. Nota `[[Refutacao_VVG_Late_Session_2026-05-29]]` registrada.
+3. **NÃO recalibrar** (R10.2). Código Python+C# permanece versionado,
+   inativo. Tag `caos-frozen-*` não aplicada.
+4. Não avança para R8 (replay NT8). A Tarefa 12 do spec (sincronização
+   da sandbox NT8) torna-se **moot** — não há estratégia aprovada para
+   replay.
 
 ---
 
@@ -38,8 +93,10 @@ ou produção.
 
 ### Pipeline atual
 
-**Vazio.** Aguarda paper R12-aprovado independente para nova
-candidata. Critérios R12 mínimos:
+**Vazio.** Duas candidatas refutadas nesta sessão (Crabel NR7+SF+CB via
+fallback A da `2026-05-29-01`; VVG Late-Session Reversal via fallback A
+do WF `2026-05-29-04`). Aguarda paper R12-aprovado independente para
+nova candidata. Critérios R12 mínimos:
 
 - Sharpe ≥ 1.0 em out-of-sample ≥ 30 observações
 - Survivorship bias tratado
@@ -47,7 +104,7 @@ candidata. Critérios R12 mínimos:
 - Sample ≥ 200
 
 Lista de candidatos em `shopping-list-fontes-notebooklm-2026-05-25.md`
-ainda não foi triada formalmente.
+(o vencedor Mesfin/VVG já foi testado e refutado nesta sessão).
 
 ### Histórico de fixes aplicados
 
