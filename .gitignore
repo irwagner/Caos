@@ -73,6 +73,7 @@ dados/MNQ/**/*.parquet
 # - _quarantine_*: arquivos .txt em export do NT8 movidos
 #   temporariamente para fora da raiz monitorada.
 dados/_wf_isolada/
+dados/_wf_vvg_late_session/
 dados/_quarantine_tick_em_export/
 dados/_quarantine_export_temporario/
 
