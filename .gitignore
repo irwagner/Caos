@@ -85,3 +85,4 @@ dados/_quarantine_export_temporario/
 *.tmp
 *.bak
 *~
+CAOS_Orchestrator/scripts/_wf_*.log
